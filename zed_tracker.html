@@ -1604,6 +1604,77 @@
                 </div> <!-- Wrapper End -->
             </div>
 
+            <!-- New Section for Recording Stud Auction Income -->
+            <div class="section" id="stud-auction-section">
+                <div class="content-wrapper">
+                    <h2>Stud Auction Income</h2>
+                    <p>Record 5% commission income from stud auctions.</p>
+                    
+                    <form id="add-stud-auction-form">
+                        <h3>Record Stud Auction Income</h3>
+                        <div class="form-grid">
+                            <div>
+                                <label for="stud-auction-horse">Select Stud:</label>
+                                <select id="stud-auction-horse" required>
+                                    <option value="">--Select Male Breeding Horse--</option>
+                                    <!-- Male breeding horses populated by JS -->
+                                </select>
+                            </div>
+                            <div>
+                                <label for="stud-auction-price">Auction Sale Price:</label>
+                                <input type="number" id="stud-auction-price" step="0.01" min="0" required>
+                            </div>
+                            <div>
+                                <label for="stud-auction-date">Auction Date:</label>
+                                <input type="date" id="stud-auction-date">
+                            </div>
+                            <div>
+                                <label for="stud-auction-commission">Commission (5%):</label>
+                                <input type="number" id="stud-auction-commission" step="0.01" min="0" required>
+                            </div>
+                            <div style="display: flex; align-items: flex-end;">
+                                <button type="submit" style="height: 42px; margin-top: auto;">Record Income</button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <hr style="margin: 2em 0; border-color: var(--border-color);">
+                    
+                    <h3>Auction Income History</h3>
+                    <div style="overflow-x:auto;">
+                        <table id="stud-auction-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Stud Name</th>
+                                    <th>Auction Price</th>
+                                    <th>Commission (5%)</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stud-auction-table-body">
+                                <!-- Stud auction history populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Pagination controls for stud auction table -->
+                    <div id="stud-auction-pagination-controls" class="pagination-controls">
+                        <div style="display: inline-flex; align-items: center; gap: 5px;">
+                            <label for="stud-auction-items-per-page" style="margin-right: 5px;">Show:</label>
+                            <select id="stud-auction-items-per-page" class="pagination-select">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        <button id="stud-auction-prev-page" class="button pagination-button">&lt; Previous</button>
+                        <span id="stud-auction-page-info">Page 1 of 1</span>
+                        <button id="stud-auction-next-page" class="button pagination-button">Next &gt;</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Section for Recording Bred Horses (Stays the same) -->
             <div class="section" id="bred-horses-section">
                 <div class="content-wrapper"> <!-- Wrapper Start -->
@@ -1931,12 +2002,16 @@
         <h2>Overall Statistics</h2>
         <div id="stats-content">
             <p>Total Races Recorded: <span id="total-races"></span></p>
-            <p>Total $ZED Change (All Horses): <span id="total-zed-change"></span></p>
+            <p>$ZED Change for Active Racers: <span id="total-zed-change"></span></p>
+            <p>Current Balance of Active Racers: <span id="active-racers-balance"></span></p>
+            <hr style="border-color: var(--border-color); margin: 0.8em 0;">
             <p>Total Retirement Earnings: <span id="total-retirement-earnings"></span></p>
+            <p>Total Stud Auction Income: <span id="total-stud-auction-income"></span></p>
             <p>Total Stud Fees Paid: <span id="total-stud-fees"></span></p>
-            <!-- Add more overall stats if desired -->
-                 </div>
+            <hr style="border-color: var(--border-color); margin: 0.8em 0;">
+            <p><strong>Net Earnings (Retire + Auction - Fees):</strong> <strong id="net-earnings" style="font-size: 1.1em;"></strong></p>
         </div>
+    </div>
     </div>
 
         <!-- Settings Tab Content -->
@@ -1969,6 +2044,7 @@
         let races = [];
         let breedingHorses = [];
         let bredHorses = [];
+        let studAuctions = []; // Stud auction income records
         // Augment lists - managed dynamically
         let cpuAugments = [];
         let ramAugments = [];
@@ -1987,10 +2063,14 @@
         // Pagination State for Bred History Table
         let bredHistoryTableCurrentPage = 1;
         let bredHistoryTableItemsPerPage = 10; // Default, will be loaded
+        // Pagination State for Stud Auction Table
+        let studAuctionTableCurrentPage = 1;
+        let studAuctionTableItemsPerPage = 10; // Default, will be loaded
         
         // Editing states
         let currentlyEditingHorse = null; // For editing a horse
         let currentlyEditingRace = null;  // For editing a race
+        let currentlyEditingStudAuction = null; // For editing a stud auction
 
         // Declare modal variables globally (scoped to the script)
         let modal, modalCloseBtn, modalTitle, modalStatsContent, modalAnalysisContent;
@@ -2020,6 +2100,14 @@
         const externalSireFields = document.querySelectorAll('.external-sire-fields');
         const externalSireNameInput = document.getElementById('external-sire-name');
         const externalSireBloodlineSelect = document.getElementById('external-sire-bloodline');
+        // Stud Auction Elements
+        const addStudAuctionForm = document.getElementById('add-stud-auction-form');
+        const studAuctionHorseSelect = document.getElementById('stud-auction-horse');
+        const studAuctionPriceInput = document.getElementById('stud-auction-price');
+        const studAuctionDateInput = document.getElementById('stud-auction-date');
+        const studAuctionCommissionInput = document.getElementById('stud-auction-commission');
+        const studAuctionTableBody = document.getElementById('stud-auction-table-body');
+        const totalStudAuctionIncomeSpan = document.getElementById('total-stud-auction-income');
 
         // Tab Elements
         const tabButtonContainer = document.getElementById('tab-buttons');
@@ -2109,9 +2197,11 @@
             renderBreedingHorsesTable(); // Renamed function call
             renderRacesTable();
             renderBredHorsesTable();
+            renderStudAuctionTable(); // Render stud auction table
             renderAugmentAnalysis();
             updateHorseDropdown(); // For race form (only racing horses)
             updateParentDropdowns(); // For bred form (all horses)
+            updateStudAuctionSelect(); // For stud auction form (male breeding horses)
             updateOverallStats();
             setupEventListeners();
             console.log("Tracker Initialized.");
@@ -2123,6 +2213,7 @@
             horses = JSON.parse(localStorage.getItem('zedTrackerHorses') || '[]');
             races = JSON.parse(localStorage.getItem('zedTrackerRaces') || '[]');
             bredHorses = JSON.parse(localStorage.getItem('zedTrackerBredHorses') || '[]');
+            studAuctions = JSON.parse(localStorage.getItem('zedTrackerStudAuctions') || '[]'); // Load stud auctions
             cpuAugments = JSON.parse(localStorage.getItem('zedTrackerCpuAugments') || '["Void C100", "Crimson C", "GX-Core C", "Darklight 100C", "Midnight 100C"]');
             ramAugments = JSON.parse(localStorage.getItem('zedTrackerRamAugments') || '["Void R100", "Crimson R", "GX-Core R", "Darklight 100R", "Midnight 100R"]');
             hydraulicAugments = JSON.parse(localStorage.getItem('zedTrackerHydraulicAugments') || '["Void H100", "Crimson H", "GX-Core H", "Darklight 100H", "Midnight 100H"]');
@@ -2132,6 +2223,7 @@
             raceTableItemsPerPage = parseInt(localStorage.getItem('raceTableItemsPerPage') || '10', 10); // Load races pref
             breedingHorseTableItemsPerPage = parseInt(localStorage.getItem('breedingHorseTableItemsPerPage') || '10', 10); // Load breeding pref
             bredHistoryTableItemsPerPage = parseInt(localStorage.getItem('bredHistoryTableItemsPerPage') || '10', 10); // Load bred history pref
+            studAuctionTableItemsPerPage = parseInt(localStorage.getItem('studAuctionTableItemsPerPage') || '10', 10); // Load stud auction pref
 
             // --- Data Migration: Merge old breedingHorses into horses if exists --- //
             const oldBreedingHorsesData = localStorage.getItem('zedTrackerBreedingHorses');
@@ -2190,7 +2282,7 @@
                 }
             });
 
-            console.log(`Loaded ${horses.length} total horses, ${races.length} races, ${bredHorses.length} bred horses.`);
+            console.log(`Loaded ${horses.length} total horses, ${races.length} races, ${bredHorses.length} bred horses, ${studAuctions.length} stud auctions.`);
             console.log(`Loaded ${cpuAugments.length} CPU, ${ramAugments.length} RAM, ${hydraulicAugments.length} Hydraulic augments.`);
         }
 
@@ -2198,6 +2290,7 @@
             localStorage.setItem('zedTrackerHorses', JSON.stringify(horses)); // Unified list
             localStorage.setItem('zedTrackerRaces', JSON.stringify(races));
             localStorage.setItem('zedTrackerBredHorses', JSON.stringify(bredHorses));
+            localStorage.setItem('zedTrackerStudAuctions', JSON.stringify(studAuctions)); // Save stud auctions
             localStorage.setItem('zedTrackerCpuAugments', JSON.stringify(cpuAugments));
             localStorage.setItem('zedTrackerRamAugments', JSON.stringify(ramAugments));
             localStorage.setItem('zedTrackerHydraulicAugments', JSON.stringify(hydraulicAugments));
@@ -2206,6 +2299,7 @@
             localStorage.setItem('raceTableItemsPerPage', raceTableItemsPerPage.toString()); // Save races pref
             localStorage.setItem('breedingHorseTableItemsPerPage', breedingHorseTableItemsPerPage.toString()); // Save breeding pref
             localStorage.setItem('bredHistoryTableItemsPerPage', bredHistoryTableItemsPerPage.toString()); // Save bred history pref
+            localStorage.setItem('studAuctionTableItemsPerPage', studAuctionTableItemsPerPage.toString()); // Save stud auction pref
              console.log("Data saved to localStorage.");
         }
 
@@ -2726,41 +2820,73 @@
         function updateOverallStats() {
             let totalZedChange = 0;
             let totalStudFeesPaid = 0;
+            let totalStudAuctionIncome = 0;
+            let activeRacersBalance = 0;
             
             // Calculate based on current balances vs initial balances for *active* racing horses
             horses.forEach(horse => {
-                // Only consider racing horses for ZED change calculation
                 if (horse.status === 'racing') { 
                     const stats = calculateHorseStats(horse.id);
-                    // Check if stats calculation was successful before accessing properties
                     if (stats && stats.currentZedBalance !== undefined && horse.initialZedBalance !== undefined) {
                         totalZedChange += (stats.currentZedBalance - Number(horse.initialZedBalance));
+                        activeRacersBalance += stats.currentZedBalance; // Add current balance of active racer
                     }
                 }
             });
 
             // Calculate total stud fees from bredHorses records
             bredHorses.forEach(bred => {
-                 if (bred.studFeePaid && !isNaN(bred.studFeePaid)) {
+                if (bred.studFeePaid && !isNaN(bred.studFeePaid)) {
                     totalStudFeesPaid += Number(bred.studFeePaid);
                 }
             });
+            
+            // Calculate total stud auction income
+            studAuctions.forEach(auction => {
+                if (auction.commission && !isNaN(auction.commission)) {
+                    totalStudAuctionIncome += Number(auction.commission);
+                }
+            });
+
+            // Calculate Net Earnings
+            const netEarnings = totalRetirementEarnings + totalStudAuctionIncome - totalStudFeesPaid;
 
             // Update Total Races
             totalRacesSpan.textContent = ` ${races.length}`;
             totalRacesSpan.style.color = 'inherit'; // Default color
             
-            // Update Total $ZED Change
+            // Update $ZED Change for Active Racers
             totalZedChangeSpan.textContent = ` ${totalZedChange >= 0 ? '+' : ''}${totalZedChange.toFixed(2)}`;
             totalZedChangeSpan.style.color = totalZedChange >= 0 ? 'var(--success-color)' : 'var(--error-color)';
             
+            // Update Current Balance of Active Racers
+            const activeRacersBalanceSpan = document.getElementById('active-racers-balance');
+            if (activeRacersBalanceSpan) {
+                activeRacersBalanceSpan.textContent = ` ${activeRacersBalance.toFixed(2)}`;
+                activeRacersBalanceSpan.style.color = activeRacersBalance >= 0 ? 'var(--success-color)' : 'var(--error-color)';
+            }
+
             // Update Total Retirement Earnings
             totalRetirementEarningsSpan.textContent = ` ${totalRetirementEarnings.toFixed(2)}`;
             totalRetirementEarningsSpan.style.color = 'var(--success-color)';
             
+            // Update Total Stud Auction Income
+            const totalStudAuctionIncomeSpan = document.getElementById('total-stud-auction-income');
+            if (totalStudAuctionIncomeSpan) {
+                totalStudAuctionIncomeSpan.textContent = ` ${totalStudAuctionIncome.toFixed(2)}`;
+                totalStudAuctionIncomeSpan.style.color = 'var(--success-color)';
+            }
+            
             // Update Total Stud Fees Paid
             totalStudFeesSpan.textContent = ` ${totalStudFeesPaid.toFixed(2)}`;
             totalStudFeesSpan.style.color = 'var(--error-color)';
+            
+            // Update Net Earnings
+            const netEarningsSpan = document.getElementById('net-earnings');
+            if (netEarningsSpan) {
+                netEarningsSpan.textContent = ` ${netEarnings >= 0 ? '+' : ''}${netEarnings.toFixed(2)}`;
+                netEarningsSpan.style.color = netEarnings >= 0 ? 'var(--success-color)' : 'var(--error-color)';
+            }
         }
 
 
@@ -2773,6 +2899,34 @@
             // Listen for changes on parent dropdowns
             sireSelect.addEventListener('change', (e) => displayParentStats(e.target.value, 'sire'));
             damSelect.addEventListener('change', (e) => displayParentStats(e.target.value, 'dam'));
+
+            // Stud Auction listeners
+            if (addStudAuctionForm) {
+                addStudAuctionForm.addEventListener('submit', handleAddStudAuction);
+                // Auto-calculate between price and commission when either changes
+                if (studAuctionPriceInput) {
+                    studAuctionPriceInput.addEventListener('input', handleStudAuctionPriceChange);
+                }
+                if (studAuctionCommissionInput) {
+                    studAuctionCommissionInput.addEventListener('input', handleStudAuctionCommissionChange);
+                }
+            }
+
+            // Stud Auction pagination listeners
+            const studAuctionItemsPerPageSelect = document.getElementById('stud-auction-items-per-page');
+            const studAuctionPrevPageButton = document.getElementById('stud-auction-prev-page');
+            const studAuctionNextPageButton = document.getElementById('stud-auction-next-page');
+            
+            if (studAuctionItemsPerPageSelect) {
+                studAuctionItemsPerPageSelect.value = studAuctionTableItemsPerPage;
+                studAuctionItemsPerPageSelect.addEventListener('change', handleStudAuctionItemsPerPageChange);
+            }
+            if (studAuctionPrevPageButton) {
+                studAuctionPrevPageButton.addEventListener('click', handleStudAuctionPrevPage);
+            }
+            if (studAuctionNextPageButton) {
+                studAuctionNextPageButton.addEventListener('click', handleStudAuctionNextPage);
+            }
 
             // Tab switching listener
             tabButtonContainer.addEventListener('click', handleTabClick);
@@ -4704,6 +4858,7 @@
                 horses: horses,
                 races: races,
                 bredHorses: bredHorses,
+                studAuctions: studAuctions, // Include stud auctions
                 cpuAugments: cpuAugments,
                 ramAugments: ramAugments,
                 hydraulicAugments: hydraulicAugments,
@@ -4773,6 +4928,7 @@
                     horses = importedData.horses || [];
                     races = importedData.races || [];
                     bredHorses = importedData.bredHorses || [];
+                    studAuctions = importedData.studAuctions || []; // Import stud auctions
                     cpuAugments = importedData.cpuAugments || [...cpuAugments]; // Fallback to current if missing
                     ramAugments = importedData.ramAugments || [...ramAugments];
                     hydraulicAugments = importedData.hydraulicAugments || [...hydraulicAugments];
@@ -4881,6 +5037,272 @@
             console.log(`Horse ${horse.name} retired with earnings of ${earningsFromRacing.toFixed(2)}`);
         }
 
+        // --- Update Stud Auction Dropdown ---
+        function updateStudAuctionSelect() {
+            // Skip if element doesn't exist yet
+            if (!studAuctionHorseSelect) return;
+            
+            studAuctionHorseSelect.innerHTML = '<option value="">--Select Male Breeding Horse--</option>';
+            
+            // Filter for male breeding horses only
+            const maleBreedingHorses = horses.filter(h => h.status === 'breeding' && h.gender === 'Male');
+            
+            // Sort alphabetically by name
+            maleBreedingHorses.sort((a, b) => a.name.localeCompare(b.name));
+            
+            // Add options for each horse
+            maleBreedingHorses.forEach(horse => {
+                const option = document.createElement('option');
+                option.value = horse.id;
+                option.textContent = horse.name;
+                studAuctionHorseSelect.appendChild(option);
+            });
+        }
+
+        // --- Handle Stud Auction Price Change ---
+        function handleStudAuctionPriceChange() {
+            const price = parseFloat(studAuctionPriceInput.value) || 0;
+            const commission = price * 0.05; // 5% commission
+            
+            // Only update if not being edited by user (prevent circular updates)
+            if (!studAuctionCommissionInput.matches(':focus')) {
+                studAuctionCommissionInput.value = commission.toFixed(2);
+            }
+        }
+        
+        // --- Handle Stud Auction Commission Change ---
+        function handleStudAuctionCommissionChange() {
+            const commission = parseFloat(studAuctionCommissionInput.value) || 0;
+            const price = commission * 20; // Commission is 5% of price, so price = commission * 20
+            
+            // Only update if not being edited by user (prevent circular updates)
+            if (!studAuctionPriceInput.matches(':focus')) {
+                studAuctionPriceInput.value = price.toFixed(2);
+            }
+        }
+
+        // --- Handle Add Stud Auction ---
+        function handleAddStudAuction(event) {
+            event.preventDefault();
+            
+            const horseId = studAuctionHorseSelect.value;
+            let auctionPrice = parseFloat(studAuctionPriceInput.value) || 0;
+            let commission = parseFloat(studAuctionCommissionInput.value) || 0;
+            const auctionDate = studAuctionDateInput.value || new Date().toISOString().split('T')[0]; // Today if not specified
+            
+            // Validation
+            if (!horseId) {
+                alert("Please select a breeding stud.");
+                return;
+            }
+            
+            // Ensure both price and commission are valid and consistent
+            if (auctionPrice <= 0 && commission <= 0) {
+                alert("Please enter either a valid auction price or commission amount.");
+                return;
+            }
+            
+            // If user entered commission directly but not price, calculate price
+            if (commission > 0 && auctionPrice <= 0) {
+                auctionPrice = commission * 20;
+                studAuctionPriceInput.value = auctionPrice.toFixed(2);
+            } 
+            // If user entered price but not commission, calculate commission
+            else if (auctionPrice > 0 && commission <= 0) {
+                commission = auctionPrice * 0.05;
+                studAuctionCommissionInput.value = commission.toFixed(2);
+            }
+            
+            const horse = horses.find(h => h.id === horseId);
+            if (!horse) {
+                alert("Selected horse not found. Please refresh and try again.");
+                return;
+            }
+            
+            // Create new auction record or update existing
+            if (currentlyEditingStudAuction) {
+                // Update existing record
+                const index = studAuctions.findIndex(sa => sa.id === currentlyEditingStudAuction.id);
+                if (index !== -1) {
+                    currentlyEditingStudAuction.horseId = horseId;
+                    currentlyEditingStudAuction.horseName = horse.name;
+                    currentlyEditingStudAuction.auctionPrice = auctionPrice;
+                    currentlyEditingStudAuction.commission = commission;
+                    currentlyEditingStudAuction.date = auctionDate;
+                    
+                    studAuctions[index] = currentlyEditingStudAuction;
+                }
+            } else {
+                // Create new record
+                const newRecord = {
+                    id: `stud-auction-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                    horseId: horseId,
+                    horseName: horse.name,
+                    auctionPrice: auctionPrice,
+                    commission: commission,
+                    date: auctionDate
+                };
+                
+                studAuctions.push(newRecord);
+            }
+            
+            // Update totals, save data, and refresh UI
+            saveData();
+            renderStudAuctionTable();
+            updateOverallStats();
+            
+            // Reset form and editing state
+            addStudAuctionForm.reset();
+            currentlyEditingStudAuction = null;
+            const submitButton = addStudAuctionForm.querySelector('button[type="submit"]');
+            submitButton.textContent = 'Record Income';
+            
+            console.log("Stud auction income recorded successfully");
+        }
+
+        // --- Render Stud Auction Table ---
+        function renderStudAuctionTable() {
+            if (!studAuctionTableBody) return;
+            
+            studAuctionTableBody.innerHTML = '';
+            
+            // Sort by date descending
+            const sortedAuctions = [...studAuctions].sort((a, b) => {
+                const dateA = a.date ? new Date(a.date) : 0;
+                const dateB = b.date ? new Date(b.date) : 0;
+                return dateB - dateA; // Descending
+            });
+            
+            // Pagination calculation
+            const totalItems = sortedAuctions.length;
+            const totalPages = Math.ceil(totalItems / studAuctionTableItemsPerPage);
+            
+            if (studAuctionTableCurrentPage > totalPages) {
+                studAuctionTableCurrentPage = Math.max(totalPages, 1);
+            }
+            
+            const startIndex = (studAuctionTableCurrentPage - 1) * studAuctionTableItemsPerPage;
+            const endIndex = startIndex + studAuctionTableItemsPerPage;
+            const auctionsToShow = sortedAuctions.slice(startIndex, endIndex);
+            
+            // Render the sliced rows
+            auctionsToShow.forEach(auction => {
+                const row = studAuctionTableBody.insertRow();
+                
+                row.innerHTML = `
+                    <td>${auction.date ? new Date(auction.date).toLocaleDateString() : '-'}</td>
+                    <td>${auction.horseName || 'Unknown'}</td>
+                    <td>${auction.auctionPrice.toFixed(2)}</td>
+                    <td style="color: var(--success-color);">${auction.commission.toFixed(2)}</td>
+                    <td class="actions">
+                        <button class="action-button edit-button" onclick="editStudAuction('${auction.id}')" title="Edit Auction Record">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </button>
+                        <button class="action-button delete-button" onclick="deleteStudAuction('${auction.id}')" title="Delete Auction Record">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                        </button>
+                    </td>
+                `;
+            });
+            
+            // Render pagination controls
+            renderStudAuctionPaginationControls(totalItems, totalPages);
+        }
+
+        // --- Pagination controls for stud auction table ---
+        function renderStudAuctionPaginationControls(totalItems, totalPages) {
+            const itemsPerPageSelectContainer = document.getElementById('stud-auction-items-per-page')?.parentElement;
+            const pageNavContainer = document.getElementById('stud-auction-page-info')?.parentElement;
+            const controlsContainer = document.getElementById('stud-auction-pagination-controls');
+            const pageInfoSpan = document.getElementById('stud-auction-page-info');
+            const prevPageButton = document.getElementById('stud-auction-prev-page');
+            const nextPageButton = document.getElementById('stud-auction-next-page');
+            
+            if (!pageInfoSpan || !prevPageButton || !nextPageButton || !controlsContainer || !pageNavContainer) {
+                console.warn("Stud auction pagination elements not found, skipping control render.");
+                return;
+            }
+            
+            controlsContainer.style.display = 'flex';
+            
+            if (totalItems === 0) {
+                pageInfoSpan.textContent = 'No auction records found';
+            } else {
+                pageInfoSpan.textContent = `Page ${studAuctionTableCurrentPage} of ${totalPages} (${totalItems} items)`;
+            }
+            
+            prevPageButton.disabled = studAuctionTableCurrentPage <= 1;
+            nextPageButton.disabled = studAuctionTableCurrentPage >= totalPages;
+            pageNavContainer.style.display = 'flex';
+        }
+
+        // --- Pagination Event Handlers for Stud Auction ---
+        function handleStudAuctionItemsPerPageChange() {
+            const itemsPerPageSelect = document.getElementById('stud-auction-items-per-page');
+            const newSize = parseInt(itemsPerPageSelect.value, 10);
+            
+            if (!isNaN(newSize) && newSize > 0) {
+                studAuctionTableItemsPerPage = newSize;
+                studAuctionTableCurrentPage = 1; // Reset to first page
+                localStorage.setItem('studAuctionTableItemsPerPage', studAuctionTableItemsPerPage.toString()); // Save preference
+                renderStudAuctionTable();
+            }
+        }
+
+        function handleStudAuctionPrevPage() {
+            if (studAuctionTableCurrentPage > 1) {
+                studAuctionTableCurrentPage--;
+                renderStudAuctionTable();
+            }
+        }
+
+        function handleStudAuctionNextPage() {
+            const totalItems = studAuctions.length;
+            const totalPages = Math.ceil(totalItems / studAuctionTableItemsPerPage);
+            
+            if (studAuctionTableCurrentPage < totalPages) {
+                studAuctionTableCurrentPage++;
+                renderStudAuctionTable();
+            }
+        }
+
+        // --- Edit, Delete Stud Auction ---
+        function editStudAuction(auctionId) {
+            const auction = studAuctions.find(a => a.id === auctionId);
+            if (!auction) {
+                console.error("Stud auction record not found for editing:", auctionId);
+                return;
+            }
+            
+            // Store the record being edited
+            currentlyEditingStudAuction = auction;
+            
+            // Populate the form
+            studAuctionHorseSelect.value = auction.horseId;
+            studAuctionPriceInput.value = auction.auctionPrice.toFixed(2);
+            studAuctionCommissionInput.value = auction.commission.toFixed(2);
+            studAuctionDateInput.value = auction.date;
+            
+            // Update button text
+            const submitButton = addStudAuctionForm.querySelector('button[type="submit"]');
+            submitButton.textContent = 'Update Income';
+            
+            // Scroll to the form
+            document.getElementById('stud-auction-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function deleteStudAuction(auctionId) {
+            const auction = studAuctions.find(a => a.id === auctionId);
+            if (!auction) return;
+            
+            if (confirm(`Are you sure you want to delete this stud auction record for ${auction.horseName}?`)) {
+                studAuctions = studAuctions.filter(a => a.id !== auctionId);
+                saveData();
+                renderStudAuctionTable();
+                updateOverallStats();
+                console.log("Stud auction record deleted:", auctionId);
+            }
+        }
     </script>
 
 </body>
