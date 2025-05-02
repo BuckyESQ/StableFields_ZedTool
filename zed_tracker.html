@@ -3546,33 +3546,46 @@
                    return; // Skip for now if no races
                }
 
-               // Group races by augment combination
+               // Sort races by date (oldest first) to properly track MMR progression
+               const sortedRaces = [...horseRaces].sort((a, b) => new Date(a.date) - new Date(b.date));
+               
+               // Group races by augment combination, tracking starting MMR
                const analysis = {};
-               horseRaces.forEach(race => {
+               let currentMMR = horse.initialMmRating || 1000; // Start with initial MMR
+               
+               sortedRaces.forEach(race => {
                    const comboKey = `${race.cpuAugment || 'None'} / ${race.ramAugment || 'None'} / ${race.hydraulicAugment || 'None'}`;
+                   
+                   // Record the starting MMR for this race
+                   const startingMMR = currentMMR;
+                   
+                   // Update MMR for next race
+                   if (race.ratingChange !== null && race.ratingChange !== undefined) {
+                       currentMMR += Number(race.ratingChange);
+                   }
+                   
                    if (!analysis[comboKey]) {
                        analysis[comboKey] = {
                            races: 0,
                            wins: 0,
                            placeSum: 0,
-                           oddsSum: 0
+                           oddsSum: 0,
+                           racesWithOdds: 0,
+                           mmrStartSum: 0 // New field to track sum of starting MMRs
                        };
                    }
+                   
                    analysis[comboKey].races++;
+                   analysis[comboKey].mmrStartSum += startingMMR; // Add starting MMR to sum
+                   
                    if (race.position === 1) analysis[comboKey].wins++;
                    analysis[comboKey].placeSum += race.position;
-                    // Odds might be null/undefined if not entered, handle carefully
-                    if (race.odds !== null && race.odds !== undefined && !isNaN(race.odds)) {
-                         analysis[comboKey].oddsSum += Number(race.odds);
-                    } else {
-                         // Decide how to handle races with missing odds for Avg calculation
-                         // Option 1: Exclude them from Avg Odds (might skew results if many are missing)
-                         // Option 2: Treat as 0 (will lower avg)
-                         // Option 3: Keep a separate count of races with odds
-                         // Let's use Option 1 for now - add a counter
-                         analysis[comboKey].racesWithOdds = (analysis[comboKey].racesWithOdds || 0) + 1;
-                    }
-
+                   
+                   // Odds might be null/undefined if not entered, handle carefully
+                   if (race.odds !== null && race.odds !== undefined && !isNaN(race.odds)) {
+                       analysis[comboKey].oddsSum += Number(race.odds);
+                       analysis[comboKey].racesWithOdds++;
+                   }
                });
 
                // Build HTML for this horse
@@ -3589,6 +3602,7 @@
                            <th>Win %</th>
                            <th>Avg Place</th>
                            <th>Avg Odds</th>
+                           <th>Avg Start MMR</th>
                        </tr>
                    </thead>
                    <tbody>
@@ -3603,8 +3617,9 @@
                  }).forEach(([comboKey, stats]) => {
                     const winRate = stats.races > 0 ? (stats.wins / stats.races) * 100 : 0;
                     const avgPlace = stats.races > 0 ? stats.placeSum / stats.races : 0;
-                    const racesWithOddsCount = stats.races - (stats.racesWithOdds || 0);
+                    const racesWithOddsCount = stats.racesWithOdds || 0;
                     const avgOdds = racesWithOddsCount > 0 ? stats.oddsSum / racesWithOddsCount : 0;
+                    const avgStartMMR = stats.races > 0 ? Math.round(stats.mmrStartSum / stats.races) : 'N/A';
 
                    const row = tbody.insertRow();
                    row.innerHTML = `
@@ -3613,6 +3628,7 @@
                        <td>${winRate.toFixed(1)}%</td>
                        <td>${avgPlace.toFixed(2)}</td>
                        <td>${avgOdds > 0 ? avgOdds.toFixed(1) : 'N/A'}</td>
+                       <td>${avgStartMMR}</td>
                    `;
                });
 
