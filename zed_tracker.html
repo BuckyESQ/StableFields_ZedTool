@@ -1244,6 +1244,30 @@
             margin: 1px 2px; /* Add small vertical and horizontal margin */
         }
 
+        /* Make sure augment combo cells don't wrap to multiple lines */
+        /* Target tables where the first column displays augment combinations */
+        #augment-analysis-content table td:first-child,
+        #augment-triple-table td:first-child,
+        #augment-pair-table td:first-child,
+        #modal-analysis-content table td:first-child,
+        #comboTable td:first-child {
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            min-width: 240px !important; /* Set minimum width for augment combo column */
+            max-width: 280px !important; /* Limit maximum width */
+        }
+        
+        /* Adjust width for MMR column */
+        #augment-analysis-content table td:nth-child(6),
+        #augment-analysis-content table th:nth-child(6) {
+            width: 80px !important; /* Make MMR column narrower */
+        }
+        
+        /* Increase overall table width for augment analysis */
+        #augment-analysis-content table {
+            max-width: 900px !important; /* Increase from default */
+        }
     </style>
 </head>
 <body>
@@ -3657,15 +3681,16 @@
                 horseDiv.innerHTML = `<h3>${horse.name}</h3>`;
 
                 const table = document.createElement('table');
+                table.style.maxWidth = "900px"; // Make table wider
                 table.innerHTML = `
                    <thead>
                        <tr>
-                           <th>Augment Combo (C/R/H)</th>
+                           <th style="min-width: 240px;">Augment Combo (C/R/H)</th>
                            <th>Races</th>
                            <th>Win %</th>
                            <th>Avg Place</th>
                            <th>Avg Odds</th>
-                           <th>Avg Start MMR</th>
+                           <th style="width: 80px;">Avg Start MMR</th>
                        </tr>
                    </thead>
                    <tbody>
@@ -3678,22 +3703,21 @@
                      const oddsB = statsB.racesWithOdds > 0 ? statsB.oddsSum / statsB.racesWithOdds : Number.MAX_VALUE;
                      return oddsA - oddsB; // Sort by ascending odds (lower first)
                  }).forEach(([comboKey, stats]) => {
-                    const winRate = stats.races > 0 ? (stats.wins / stats.races) * 100 : 0;
-                    const avgPlace = stats.races > 0 ? stats.placeSum / stats.races : 0;
-                    const racesWithOddsCount = stats.racesWithOdds || 0;
-                    const avgOdds = racesWithOddsCount > 0 ? stats.oddsSum / racesWithOddsCount : 0;
-                    const avgStartMMR = stats.races > 0 ? Math.round(stats.mmrStartSum / stats.races) : 'N/A';
+                     const winRate = stats.races > 0 ? (stats.wins / stats.races) * 100 : 0;
+                     const avgPlace = stats.races > 0 ? stats.placeSum / stats.races : 0;
+                     const avgOdds = stats.racesWithOdds > 0 ? stats.oddsSum / stats.racesWithOdds : 0;
+                     const avgStartMMR = stats.races > 0 ? Math.round(stats.mmrStartSum / stats.races) : 'N/A';
 
-                   const row = tbody.insertRow();
-                   row.innerHTML = `
-                       <td>${comboKey}</td>
-                       <td>${stats.races}</td>
-                       <td>${winRate.toFixed(1)}%</td>
-                       <td>${avgPlace.toFixed(2)}</td>
-                       <td>${avgOdds > 0 ? avgOdds.toFixed(1) : 'N/A'}</td>
-                       <td>${avgStartMMR}</td>
-                   `;
-               });
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${comboKey}</td>
+                        <td>${stats.races}</td>
+                        <td>${winRate.toFixed(1)}%</td>
+                        <td>${avgPlace.toFixed(2)}</td>
+                        <td>${avgOdds > 0 ? avgOdds.toFixed(1) : 'N/A'}</td>
+                        <td>${avgStartMMR}</td>
+                    `;
+                });
 
                 horseDiv.appendChild(table);
                 container.appendChild(horseDiv);
@@ -4125,10 +4149,11 @@
                 });
 
                  const table = document.createElement('table');
+                 table.style.maxWidth = "900px"; // Make table wider
                  table.innerHTML = `
                     <thead>
                         <tr>
-                            <th>Augment Combo (C/R/H)</th>
+                            <th style="min-width: 240px;">Augment Combo (C/R/H)</th>
                             <th>Races</th>
                             <th>Win %</th>
                             <th>Avg Place</th>
@@ -4150,7 +4175,7 @@
 
                     const row = tbody.insertRow();
                     row.innerHTML = `
-                        <td>${comboKey}</td>
+                        <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${comboKey}</td>
                         <td>${stats.races}</td>
                         <td>${winRate.toFixed(1)}%</td>
                         <td>${avgPlace.toFixed(2)}</td>
@@ -5460,6 +5485,96 @@
             
             alert(`Stud fee for ${bredHorses[bredHorseIndex].name} updated to $${newFee.toFixed(2)}.`);
         }
+
+        // --- Function to edit horses (racing or breeding) ---
+        function editHorse(horseId) {
+            const horse = horses.find(h => h.id === horseId);
+            if (!horse) {
+                console.error("Horse not found for editing:", horseId);
+                return;
+            }
+            
+            // Store the horse being edited
+            currentlyEditingHorse = horse;
+            
+            // Determine which form to use based on horse status
+            if (horse.status === 'racing') {
+                // Populate racing horse form
+                document.getElementById('horse-name').value = horse.name;
+                document.getElementById('horse-bloodline').value = horse.bloodline;
+                document.getElementById('horse-gender').value = horse.gender;
+                document.getElementById('horse-stars').value = horse.stars;
+                document.getElementById('horse-zed-balance').value = horse.initialZedBalance;
+                document.getElementById('horse-mm-rating').value = horse.initialMmRating;
+                
+                // Optional star values
+                if (horse.speedStars !== null && horse.speedStars !== undefined) {
+                    document.getElementById('horse-speed-stars').value = horse.speedStars;
+                } else {
+                    document.getElementById('horse-speed-stars').value = '';
+                }
+                
+                if (horse.sprintStars !== null && horse.sprintStars !== undefined) {
+                    document.getElementById('horse-sprint-stars').value = horse.sprintStars;
+                } else {
+                    document.getElementById('horse-sprint-stars').value = '';
+                }
+                
+                if (horse.enduranceStars !== null && horse.enduranceStars !== undefined) {
+                    document.getElementById('horse-endurance-stars').value = horse.enduranceStars;
+                } else {
+                    document.getElementById('horse-endurance-stars').value = '';
+                }
+                
+                // Update button text
+                addHorseForm.querySelector('button[type="submit"]').textContent = 'Update Racing Horse';
+                
+                // Scroll to the form
+                document.getElementById('horses-section').scrollIntoView({ behavior: 'smooth' });
+                
+            } else if (horse.status === 'breeding') {
+                // Populate breeding horse form
+                document.getElementById('breeding-horse-name').value = horse.name;
+                document.getElementById('breeding-horse-bloodline').value = horse.bloodline;
+                document.getElementById('breeding-horse-gender').value = horse.gender;
+                
+                // Optional star values
+                if (horse.stars !== null && horse.stars !== undefined) {
+                    document.getElementById('breeding-horse-stars').value = horse.stars;
+                } else {
+                    document.getElementById('breeding-horse-stars').value = '';
+                }
+                
+                if (horse.speedStars !== null && horse.speedStars !== undefined) {
+                    document.getElementById('breeding-horse-speed-stars').value = horse.speedStars;
+                } else {
+                    document.getElementById('breeding-horse-speed-stars').value = '';
+                }
+                
+                if (horse.sprintStars !== null && horse.sprintStars !== undefined) {
+                    document.getElementById('breeding-horse-sprint-stars').value = horse.sprintStars;
+                } else {
+                    document.getElementById('breeding-horse-sprint-stars').value = '';
+                }
+                
+                if (horse.enduranceStars !== null && horse.enduranceStars !== undefined) {
+                    document.getElementById('breeding-horse-endurance-stars').value = horse.enduranceStars;
+                } else {
+                    document.getElementById('breeding-horse-endurance-stars').value = '';
+                }
+                
+                // Update button text
+                addBreedingHorseForm.querySelector('button[type="submit"]').textContent = 'Update Breeding Horse';
+                
+                // Scroll to the form and switch to breeding tab if needed
+                if (document.querySelector('.tab-button[data-tab="breeding"]') && !document.querySelector('.tab-button[data-tab="breeding"]').classList.contains('active')) {
+                    activateTab('breeding');
+                }
+                document.getElementById('breeding-horses-section').scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            console.log(`Editing horse: ${horse.name} (${horse.status})`);
+        }
     </script>
 
 </body>
@@ -5478,5 +5593,4 @@
     </div>
 </div>
 
-</html>
 </html>
