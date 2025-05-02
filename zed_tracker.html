@@ -2032,6 +2032,26 @@
                     <strong style="color: var(--error-color);">Warning: This will overwrite all current data in the tracker.</strong>
                 </p>
             </div>
+            
+            <hr style="margin: 2em 0; border-color: var(--border-color);"> <!-- Separator -->
+            
+            <!-- Add Stud Fee Section -->
+            <h2>Manually Add Stud Fee</h2>
+            <p>Use this if a stud fee wasn't properly recorded in the stats.</p>
+            <div style="margin-top: 15px; display: flex; gap: 10px; align-items: flex-end;">
+                <div>
+                    <label for="manual-stud-fee-bred-horse" style="display: block; margin-bottom: 5px;">Select Bred Horse:</label>
+                    <select id="manual-stud-fee-bred-horse" style="width: 250px; padding: 10px; height: 42px; box-sizing: border-box;">
+                        <option value="">--Select Bred Horse--</option>
+                        <!-- Options populated by JS -->
+                    </select>
+                </div>
+                <div>
+                    <label for="manual-stud-fee-amount" style="display: block; margin-bottom: 5px;">Stud Fee Amount:</label>
+                    <input type="number" id="manual-stud-fee-amount" step="any" style="width: 120px; padding: 10px; height: 42px; box-sizing: border-box;">
+                </div>
+                <button id="update-stud-fee-button" class="button" style="height: 42px; margin-bottom: 0; align-self: flex-end; box-sizing: border-box;">Update Stud Fee</button>
+            </div>
             <!-- Import functionality could be added here later -->
         </div>
 
@@ -3089,6 +3109,13 @@
             if (bredHistoryNextPageButton) {
                 bredHistoryNextPageButton.addEventListener('click', handleBredHistoryNextPage);
             }
+
+            // Manual Stud Fee Update listeners
+            const updateStudFeeButton = document.getElementById('update-stud-fee-button');
+            if (updateStudFeeButton) {
+                updateStudFeeButton.addEventListener('click', handleManualStudFeeUpdate);
+                populateManualStudFeeDropdown(); // Populate the dropdown
+            }
         }
 
         function toggleExternalSireFields() {
@@ -3407,7 +3434,16 @@
              if (!newBredHorse.name) { alert("New Horse Name is required."); return; }
              if (!newBredHorse.bloodline) { alert("Please select a Bloodline for the new horse."); return; }
              if (!newBredHorse.gender) { alert("Please select a Gender for the new horse."); return; }
-             if (!newBredHorse.sireId) { alert("Please select the Sire (Father)."); return; }
+             
+             // Updated validation logic for sire - handle external sire case
+             const isExternalSire = useExternalSireCheckbox.checked;
+             if (isExternalSire) {
+                 if (!newBredHorse.externalSireName) { alert("External Sire Name is required."); return; }
+                 if (!newBredHorse.externalSireBloodline) { alert("Please select a Bloodline for the External Sire."); return; }
+             } else {
+                 if (!newBredHorse.sireId) { alert("Please select the Sire (Father)."); return; }
+             }
+             
              if (!newBredHorse.damId) { alert("Please select the Dam (Mother)."); return; }
              if (isNaN(newBredHorse.studFeePaid)) { alert("Please enter a valid number for Stud Fee Paid (or 0)."); return; }
 
@@ -3422,11 +3458,38 @@
              // Optional: Automatically add the bred horse to racing/breeding stable?
              // For now, we just record the breeding event.
 
+             // Add the bred horse to racing horses automatically
+             const studFee = parseFloat(document.getElementById('bred-stud-fee').value) || 0;
+             const initialBalance = studFee / 2; // Half of the stud fee
+             
+             const newRacingHorse = {
+                id: newBredHorse.id,
+                name: newBredHorse.name,
+                bloodline: newBredHorse.bloodline,
+                gender: newBredHorse.gender,
+                stars: newBredHorse.stars,
+                speedStars: newBredHorse.speedStars,
+                sprintStars: newBredHorse.sprintStars,
+                enduranceStars: newBredHorse.enduranceStars,
+                initialZedBalance: initialBalance, // Set initial balance to half the stud fee
+                initialMmRating: 1000, // Default MMR
+                status: 'racing',
+                dateAcquired: new Date().toISOString().split('T')[0],
+                notes: "Bred horse"
+             };
+             
+             horses.push(newRacingHorse);
+
              saveData();
              renderBredHorsesTable();
+             renderHorsesTable(); // Update racing horses table
+             updateOverallStats(); // Update overall stats to include the new stud fee
              addBredHorseForm.reset();
              sireStatsDiv.innerHTML = ''; // Clear parent stats display
              damStatsDiv.innerHTML = '';
+             
+             // Inform user the horse was added to racing horses
+             alert(`Horse "${newBredHorse.name}" has been recorded and added to your Racing Horses list!`);
              console.log("Bred horse recorded:", newBredHorse);
         }
 
@@ -5318,6 +5381,84 @@
                 updateOverallStats();
                 console.log("Stud auction record deleted:", auctionId);
             }
+        }
+
+        // --- Functions for manually updating stud fees ---
+        function populateManualStudFeeDropdown() {
+            const dropdown = document.getElementById('manual-stud-fee-bred-horse');
+            if (!dropdown) return;
+            
+            // Clear existing options except first one
+            while (dropdown.options.length > 1) {
+                dropdown.remove(1);
+            }
+            
+            // Sort bred horses by date (newest first)
+            const sortedBredHorses = [...bredHorses].sort((a, b) => {
+                const dateA = a.bredDate ? new Date(a.bredDate) : new Date(0);
+                const dateB = b.bredDate ? new Date(b.bredDate) : new Date(0);
+                return dateB - dateA; // Descending (newest first)
+            });
+            
+            // Add each bred horse to the dropdown
+            sortedBredHorses.forEach(horse => {
+                const option = document.createElement('option');
+                option.value = horse.id;
+                
+                // Include stud fee in the display
+                const studFee = horse.studFeePaid ? `($${horse.studFeePaid.toFixed(2)})` : '(No fee)';
+                option.textContent = `${horse.name} - ${studFee}`;
+                
+                dropdown.appendChild(option);
+            });
+        }
+        
+        function handleManualStudFeeUpdate() {
+            const dropdown = document.getElementById('manual-stud-fee-bred-horse');
+            const feeInput = document.getElementById('manual-stud-fee-amount');
+            
+            const bredHorseId = dropdown.value;
+            const newFee = parseFloat(feeInput.value);
+            
+            // Validation
+            if (!bredHorseId) {
+                alert("Please select a bred horse.");
+                return;
+            }
+            
+            if (isNaN(newFee) || newFee < 0) {
+                alert("Please enter a valid stud fee amount (0 or greater).");
+                return;
+            }
+            
+            // Find the bred horse
+            const bredHorseIndex = bredHorses.findIndex(h => h.id === bredHorseId);
+            if (bredHorseIndex === -1) {
+                alert("Selected bred horse not found.");
+                return;
+            }
+            
+            // Store the old fee for confirmation
+            const oldFee = bredHorses[bredHorseIndex].studFeePaid || 0;
+            
+            // Confirm the update
+            if (!confirm(`Update stud fee for ${bredHorses[bredHorseIndex].name} from $${oldFee.toFixed(2)} to $${newFee.toFixed(2)}?`)) {
+                return;
+            }
+            
+            // Update the fee
+            bredHorses[bredHorseIndex].studFeePaid = newFee;
+            
+            // Save data and update UI
+            saveData();
+            updateOverallStats();
+            renderBredHorsesTable();
+            populateManualStudFeeDropdown(); // Refresh the dropdown
+            
+            // Clear the input
+            feeInput.value = '';
+            
+            alert(`Stud fee for ${bredHorses[bredHorseIndex].name} updated to $${newFee.toFixed(2)}.`);
         }
     </script>
 
