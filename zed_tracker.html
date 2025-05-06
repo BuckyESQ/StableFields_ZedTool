@@ -1278,6 +1278,7 @@
     <div id="tab-buttons">
         <button class="tab-button active" data-tab="racing">Racing</button>
         <button class="tab-button" data-tab="breeding">Breeding</button>
+        <button class="tab-button" data-tab="transactions">Transactions</button>
         <button class="tab-button" data-tab="augments">Augments List</button>
         <button class="tab-button" data-tab="analysis">Analysis</button>
         <button class="tab-button" data-tab="stats">Overall Stats</button>
@@ -1858,6 +1859,82 @@
              </div>
          </div>
 
+        <!-- Transactions Tab Content -->
+        <div id="tab-content-transactions" class="tab-content">
+            <div class="section" id="transactions-section">
+                <h2>Horse Transactions</h2>
+                <div class="content-wrapper">
+                    <h3>Record Sale or Purchase</h3>
+                    <form id="add-transaction-form">
+                        <div class="form-grid">
+                            <div>
+                                <label for="transaction-type">Transaction Type:</label>
+                                <select id="transaction-type" required>
+                                    <option value="">--Select--</option>
+                                    <option value="sale">Sale</option>
+                                    <option value="purchase">Purchase</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="transaction-horse-name">Horse Name:</label>
+                                <input type="text" id="transaction-horse-name" required>
+                            </div>
+                            <div>
+                                <label for="transaction-date">Date:</label>
+                                <input type="date" id="transaction-date">
+                            </div>
+                            <div>
+                                <label for="transaction-amount">Amount:</label>
+                                <input type="number" id="transaction-amount" step="0.01" min="0" required>
+                            </div>
+                            <div style="grid-column: 1 / -1;">
+                                <button type="submit">Record Transaction</button>
+                            </div>                          
+                            <div>
+                                <label for="transaction-notes">Notes:</label>
+                                <input type="text" id="transaction-notes" placeholder="Optional details">
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+
+                <h3>Transaction History</h3>
+                <div style="overflow-x:auto;">
+                    <table id="transactions-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Horse Name</th>
+                                <th>Amount</th>
+                                <th>Notes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-table-body">
+                            <!-- Transaction data populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination Controls for Transactions Table -->
+                <div id="transactions-pagination-controls" class="pagination-controls">
+                    <div style="display: inline-flex; align-items: center; gap: 5px;">
+                        <label for="transactions-items-per-page" style="margin-right: 5px;">Show:</label>
+                        <select id="transactions-items-per-page" class="pagination-select">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                    <button id="transactions-prev-page" class="button pagination-button">&lt; Previous</button>
+                    <span id="transactions-page-info">Page 1 of 1</span>
+                    <button id="transactions-next-page" class="button pagination-button">Next &gt;</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Augments Tab Content -->
         <div id="tab-content-augments" class="tab-content">
             <div class="content-wrapper">
@@ -2032,8 +2109,10 @@
             <p>Total Retirement Earnings: <span id="total-retirement-earnings"></span></p>
             <p>Total Stud Auction Income: <span id="total-stud-auction-income"></span></p>
             <p>Total Stud Fees Paid: <span id="total-stud-fees"></span></p>
+            <p>Total Sales Income: <span id="total-sales-income"></span></p>
+            <p>Total Purchase Expenses: <span id="total-purchase-expenses"></span></p>
             <hr style="border-color: var(--border-color); margin: 0.8em 0;">
-            <p><strong>Net Earnings (Retire + Auction - Fees):</strong> <strong id="net-earnings" style="font-size: 1.1em;"></strong></p>
+            <p><strong>Net Earnings (All Sources):</strong> <strong id="net-earnings" style="font-size: 1.1em;"></strong></p>
         </div>
     </div>
     </div>
@@ -2089,6 +2168,7 @@
         let breedingHorses = [];
         let bredHorses = [];
         let studAuctions = []; // Stud auction income records
+        let transactions = []; // Horse sales and purchases
         // Augment lists - managed dynamically
         let cpuAugments = [];
         let ramAugments = [];
@@ -2110,11 +2190,15 @@
         // Pagination State for Stud Auction Table
         let studAuctionTableCurrentPage = 1;
         let studAuctionTableItemsPerPage = 10; // Default, will be loaded
+        // Pagination State for Transactions Table
+        let transactionTableCurrentPage = 1;
+        let transactionTableItemsPerPage = 10; // Default, will be loaded
         
         // Editing states
         let currentlyEditingHorse = null; // For editing a horse
         let currentlyEditingRace = null;  // For editing a race
         let currentlyEditingStudAuction = null; // For editing a stud auction
+        let currentlyEditingTransaction = null; // For editing a transaction
 
         // Declare modal variables globally (scoped to the script)
         let modal, modalCloseBtn, modalTitle, modalStatsContent, modalAnalysisContent;
@@ -2211,6 +2295,18 @@
         const bredHistoryNextPageButton = document.getElementById('bred-history-next-page');
         const bredHistoryPageInfoSpan = document.getElementById('bred-history-page-info');
 
+        // Pagination Elements for Stud Auction Table
+        const studAuctionItemsPerPageSelect = document.getElementById('stud-auction-items-per-page');
+        const studAuctionPrevPageButton = document.getElementById('stud-auction-prev-page');
+        const studAuctionNextPageButton = document.getElementById('stud-auction-next-page');
+        const studAuctionPageInfoSpan = document.getElementById('stud-auction-page-info');
+
+        // Pagination Elements for Transactions Table
+        const transactionsItemsPerPageSelect = document.getElementById('transactions-items-per-page');
+        const transactionsPrevPageButton = document.getElementById('transactions-prev-page');
+        const transactionsNextPageButton = document.getElementById('transactions-next-page');
+        const transactionsPageInfoSpan = document.getElementById('transactions-page-info');
+
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
             console.log("Tracker Initializing...");
@@ -2242,6 +2338,7 @@
             renderRacesTable();
             renderBredHorsesTable();
             renderStudAuctionTable(); // Render stud auction table
+            renderTransactionsTable(); // Render transactions table
             renderAugmentAnalysis();
             updateHorseDropdown(); // For race form (only racing horses)
             updateParentDropdowns(); // For bred form (all horses)
@@ -2258,6 +2355,7 @@
             races = JSON.parse(localStorage.getItem('zedTrackerRaces') || '[]');
             bredHorses = JSON.parse(localStorage.getItem('zedTrackerBredHorses') || '[]');
             studAuctions = JSON.parse(localStorage.getItem('zedTrackerStudAuctions') || '[]'); // Load stud auctions
+            transactions = JSON.parse(localStorage.getItem('zedTrackerTransactions') || '[]'); // Load transactions
             cpuAugments = JSON.parse(localStorage.getItem('zedTrackerCpuAugments') || '["Void C100", "Crimson C", "GX-Core C", "Darklight 100C", "Midnight 100C"]');
             ramAugments = JSON.parse(localStorage.getItem('zedTrackerRamAugments') || '["Void R100", "Crimson R", "GX-Core R", "Darklight 100R", "Midnight 100R"]');
             hydraulicAugments = JSON.parse(localStorage.getItem('zedTrackerHydraulicAugments') || '["Void H100", "Crimson H", "GX-Core H", "Darklight 100H", "Midnight 100H"]');
@@ -2268,65 +2366,11 @@
             breedingHorseTableItemsPerPage = parseInt(localStorage.getItem('breedingHorseTableItemsPerPage') || '10', 10); // Load breeding pref
             bredHistoryTableItemsPerPage = parseInt(localStorage.getItem('bredHistoryTableItemsPerPage') || '10', 10); // Load bred history pref
             studAuctionTableItemsPerPage = parseInt(localStorage.getItem('studAuctionTableItemsPerPage') || '10', 10); // Load stud auction pref
-
+            transactionTableItemsPerPage = parseInt(localStorage.getItem('transactionsTableItemsPerPage') || '10', 10); // Load transactions pref
+            
             // --- Data Migration: Merge old breedingHorses into horses if exists --- //
-            const oldBreedingHorsesData = localStorage.getItem('zedTrackerBreedingHorses');
-            if (oldBreedingHorsesData) {
-                console.log("Found old breeding horses data, attempting migration...");
-                try {
-                    const oldBreedingHorses = JSON.parse(oldBreedingHorsesData);
-                    if (Array.isArray(oldBreedingHorses)) {
-                        oldBreedingHorses.forEach(bh => {
-                            // Check if ID already exists in main list
-                            if (!horses.some(h => h.id === bh.id)) {
-                                // Add status and add to main list
-                                bh.status = 'retired';
-                                // Ensure core fields exist, add optional if missing
-                                bh.name = bh.name || 'Unknown';
-                                bh.bloodline = bh.bloodline || 'Unknown';
-                                bh.gender = bh.gender || 'Unknown';
-                                bh.stars = bh.stars || 0;
-                                bh.speedStars = bh.speedStars !== undefined ? bh.speedStars : null;
-                                bh.sprintStars = bh.sprintStars !== undefined ? bh.sprintStars : null;
-                                bh.enduranceStars = bh.enduranceStars !== undefined ? bh.enduranceStars : null;
-                                // Racing stats should NOT be present on purely breeding horses
-                                delete bh.initialZedBalance;
-                                delete bh.initialMmRating;
-
-                                horses.push(bh);
-                                console.log(`Migrated breeding horse: ${bh.name}`);
-                            } else {
-                                console.warn(`Skipping migration for breeding horse ${bh.name} (ID: ${bh.id}) - ID already exists in main horses list.`);
-                            }
-                        });
-                        // Attempt to remove the old key after migration
-                        localStorage.removeItem('zedTrackerBreedingHorses');
-                        console.log("Old breeding horses data removed after migration attempt.");
-                         // Save the potentially updated horses list immediately
-                         saveData();
-                    }
-                } catch (error) {
-                    console.error("Error migrating old breeding horses data:", error);
-                }
-            }
-
-            // Ensure all horses have a status & migrate old 'retired' to 'breeding'
-            horses.forEach(horse => {
-                if (!horse.status) {
-                    console.warn(`Horse ${horse.name} missing status, defaulting to 'racing'.`);
-                    horse.status = 'racing';
-                } else if (horse.status === 'retired') {
-                    console.log(`Migrating horse ${horse.name} status from 'retired' to 'breeding'.`);
-                    horse.status = 'breeding'; // Migrate old status
-                }
-                // Ensure racing horses have initial stats defined (important for retirement calc)
-                 if (horse.status === 'racing') {
-                    if (horse.initialZedBalance === undefined) horse.initialZedBalance = 0;
-                    if (horse.initialMmRating === undefined) horse.initialMmRating = 1000;
-                }
-            });
-
-            console.log(`Loaded ${horses.length} total horses, ${races.length} races, ${bredHorses.length} bred horses, ${studAuctions.length} stud auctions.`);
+            
+            console.log(`Loaded ${horses.length} total horses, ${races.length} races, ${bredHorses.length} bred horses, ${studAuctions.length} stud auctions, ${transactions.length} transactions.`);
             console.log(`Loaded ${cpuAugments.length} CPU, ${ramAugments.length} RAM, ${hydraulicAugments.length} Hydraulic augments.`);
         }
 
@@ -2335,6 +2379,7 @@
             localStorage.setItem('zedTrackerRaces', JSON.stringify(races));
             localStorage.setItem('zedTrackerBredHorses', JSON.stringify(bredHorses));
             localStorage.setItem('zedTrackerStudAuctions', JSON.stringify(studAuctions)); // Save stud auctions
+            localStorage.setItem('zedTrackerTransactions', JSON.stringify(transactions)); // Save transactions
             localStorage.setItem('zedTrackerCpuAugments', JSON.stringify(cpuAugments));
             localStorage.setItem('zedTrackerRamAugments', JSON.stringify(ramAugments));
             localStorage.setItem('zedTrackerHydraulicAugments', JSON.stringify(hydraulicAugments));
@@ -2344,6 +2389,7 @@
             localStorage.setItem('breedingHorseTableItemsPerPage', breedingHorseTableItemsPerPage.toString()); // Save breeding pref
             localStorage.setItem('bredHistoryTableItemsPerPage', bredHistoryTableItemsPerPage.toString()); // Save bred history pref
             localStorage.setItem('studAuctionTableItemsPerPage', studAuctionTableItemsPerPage.toString()); // Save stud auction pref
+            localStorage.setItem('transactionsTableItemsPerPage', transactionTableItemsPerPage.toString()); // Save transactions pref
              console.log("Data saved to localStorage.");
         }
 
@@ -2866,6 +2912,8 @@
             let totalStudFeesPaid = 0;
             let totalStudAuctionIncome = 0;
             let activeRacersBalance = 0;
+            let totalSalesIncome = 0;
+            let totalPurchaseExpenses = 0;
             
             // Calculate based on current balances vs initial balances for *active* racing horses
             horses.forEach(horse => {
@@ -2891,9 +2939,19 @@
                     totalStudAuctionIncome += Number(auction.commission);
                 }
             });
+            
+            // Calculate total sales income and purchase expenses
+            transactions.forEach(transaction => {
+                if (transaction.type === 'sale' && transaction.amount && !isNaN(transaction.amount)) {
+                    totalSalesIncome += Number(transaction.amount);
+                } else if (transaction.type === 'purchase' && transaction.amount && !isNaN(transaction.amount)) {
+                    totalPurchaseExpenses += Number(transaction.amount);
+                }
+            });
 
-            // Calculate Net Earnings
-            const netEarnings = totalRetirementEarnings + totalStudAuctionIncome - totalStudFeesPaid;
+            // Calculate Net Earnings including transactions
+            const netEarnings = totalRetirementEarnings + totalStudAuctionIncome - totalStudFeesPaid + 
+                               totalSalesIncome - totalPurchaseExpenses;
 
             // Update Total Races
             totalRacesSpan.textContent = ` ${races.length}`;
@@ -2925,6 +2983,19 @@
             totalStudFeesSpan.textContent = ` ${totalStudFeesPaid.toFixed(2)}`;
             totalStudFeesSpan.style.color = 'var(--error-color)';
             
+            // Update Sales and Purchase figures
+            const totalSalesIncomeSpan = document.getElementById('total-sales-income');
+            if (totalSalesIncomeSpan) {
+                totalSalesIncomeSpan.textContent = ` ${totalSalesIncome.toFixed(2)}`;
+                totalSalesIncomeSpan.style.color = 'var(--success-color)';
+            }
+            
+            const totalPurchaseExpensesSpan = document.getElementById('total-purchase-expenses');
+            if (totalPurchaseExpensesSpan) {
+                totalPurchaseExpensesSpan.textContent = ` ${totalPurchaseExpenses.toFixed(2)}`;
+                totalPurchaseExpensesSpan.style.color = 'var(--error-color)';
+            }
+            
             // Update Net Earnings
             const netEarningsSpan = document.getElementById('net-earnings');
             if (netEarningsSpan) {
@@ -2943,6 +3014,28 @@
             // Listen for changes on parent dropdowns
             sireSelect.addEventListener('change', (e) => displayParentStats(e.target.value, 'sire'));
             damSelect.addEventListener('change', (e) => displayParentStats(e.target.value, 'dam'));
+
+            // Transactions form listener
+            const addTransactionForm = document.getElementById('add-transaction-form');
+            if (addTransactionForm) {
+                addTransactionForm.addEventListener('submit', handleAddTransaction);
+            }
+            
+            // Transactions pagination listeners
+            const transactionsItemsPerPageSelect = document.getElementById('transactions-items-per-page');
+            const transactionsPrevPageButton = document.getElementById('transactions-prev-page');
+            const transactionsNextPageButton = document.getElementById('transactions-next-page');
+            
+            if (transactionsItemsPerPageSelect) {
+                transactionsItemsPerPageSelect.value = transactionTableItemsPerPage;
+                transactionsItemsPerPageSelect.addEventListener('change', handleTransactionsItemsPerPageChange);
+            }
+            if (transactionsPrevPageButton) {
+                transactionsPrevPageButton.addEventListener('click', handleTransactionsPrevPage);
+            }
+            if (transactionsNextPageButton) {
+                transactionsNextPageButton.addEventListener('click', handleTransactionsNextPage);
+            }
 
             // Stud Auction listeners
             if (addStudAuctionForm) {
@@ -4836,6 +4929,205 @@
             if (bredHistoryTableCurrentPage < totalPages) {
                 bredHistoryTableCurrentPage++;
                 renderBredHorsesTable();
+            }
+        }
+
+        // --- Render Transactions Table ---
+        function renderTransactionsTable() {
+            if (!document.getElementById('transactions-table-body')) return;
+            
+            const tbody = document.getElementById('transactions-table-body');
+            tbody.innerHTML = '';
+            
+            // Sort by date descending
+            const sortedTransactions = [...transactions].sort((a, b) => {
+                const dateA = a.date ? new Date(a.date) : 0;
+                const dateB = b.date ? new Date(b.date) : 0;
+                return dateB - dateA; // Descending
+            });
+            
+            // Pagination Calculation for Transactions
+            const totalItems = sortedTransactions.length;
+            const totalPages = Math.ceil(totalItems / transactionTableItemsPerPage);
+            if (transactionTableCurrentPage > totalPages) {
+                transactionTableCurrentPage = Math.max(totalPages, 1);
+            }
+            const startIndex = (transactionTableCurrentPage - 1) * transactionTableItemsPerPage;
+            const endIndex = startIndex + transactionTableItemsPerPage;
+            const transactionsToShow = sortedTransactions.slice(startIndex, endIndex);
+            
+            // Render the sliced rows
+            transactionsToShow.forEach(transaction => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${transaction.date ? new Date(transaction.date).toLocaleDateString() : '-'}</td>
+                    <td>${transaction.type === 'sale' ? 'Sale' : 'Purchase'}</td>
+                    <td>${transaction.horseName || 'Unknown'}</td>
+                    <td style="color: ${transaction.type === 'sale' ? 'var(--success-color)' : 'var(--error-color)'};">
+                        ${transaction.type === 'sale' ? '+' : '-'}$${transaction.amount.toFixed(2)}
+                    </td>
+                    <td>${transaction.notes || ''}</td>
+                    <td class="actions">
+                        <button class="action-button edit-button" onclick="editTransaction('${transaction.id}')" title="Edit Transaction">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </button>
+                        <button class="action-button delete-button" onclick="deleteTransaction('${transaction.id}')" title="Delete Transaction">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                        </button>
+                    </td>
+                `;
+            });
+            
+            // Render Pagination Controls
+            renderTransactionPaginationControls(totalItems, totalPages);
+        }
+
+        // --- Pagination Control Rendering for Transactions Table ---
+        function renderTransactionPaginationControls(totalItems, totalPages) {
+            const pageNavContainer = transactionsPageInfoSpan?.parentElement;
+            const controlsContainer = document.getElementById('transactions-pagination-controls');
+            
+            if (!transactionsPageInfoSpan || !transactionsPrevPageButton || !transactionsNextPageButton || !controlsContainer || !pageNavContainer) {
+                console.warn("Transaction pagination elements not found, skipping control render.");
+                return;
+            }
+            
+            controlsContainer.style.display = 'flex';
+            
+            if (totalItems === 0) {
+                transactionsPageInfoSpan.textContent = 'No transactions found';
+            } else {
+                transactionsPageInfoSpan.textContent = `Page ${transactionTableCurrentPage} of ${totalPages} (${totalItems} items)`;
+            }
+            
+            transactionsPrevPageButton.disabled = transactionTableCurrentPage <= 1;
+            transactionsNextPageButton.disabled = transactionTableCurrentPage >= totalPages;
+            pageNavContainer.style.display = 'flex';
+        }
+
+        // --- Pagination Event Handlers for Transactions ---
+        function handleTransactionsItemsPerPageChange() {
+            const newSize = parseInt(transactionsItemsPerPageSelect.value, 10);
+            if (!isNaN(newSize) && newSize > 0) {
+                transactionTableItemsPerPage = newSize;
+                transactionTableCurrentPage = 1; // Reset to first page
+                localStorage.setItem('transactionsTableItemsPerPage', transactionTableItemsPerPage.toString()); // Save preference
+                renderTransactionsTable();
+            }
+        }
+
+        function handleTransactionsPrevPage() {
+            if (transactionTableCurrentPage > 1) {
+                transactionTableCurrentPage--;
+                renderTransactionsTable();
+            }
+        }
+
+        function handleTransactionsNextPage() {
+            const totalItems = transactions.length;
+            const totalPages = Math.ceil(totalItems / transactionTableItemsPerPage);
+            if (transactionTableCurrentPage < totalPages) {
+                transactionTableCurrentPage++;
+                renderTransactionsTable();
+            }
+        }
+
+        // --- Transaction Management Functions ---
+        function handleAddTransaction(event) {
+            event.preventDefault();
+            
+            const typeSelect = document.getElementById('transaction-type');
+            const horseNameInput = document.getElementById('transaction-horse-name');
+            const dateInput = document.getElementById('transaction-date');
+            const amountInput = document.getElementById('transaction-amount');
+            const notesInput = document.getElementById('transaction-notes');
+            
+            const transactionData = {
+                id: currentlyEditingTransaction ? currentlyEditingTransaction.id : `transaction-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                type: typeSelect.value,
+                horseName: horseNameInput.value.trim(),
+                date: dateInput.value || new Date().toISOString().split('T')[0], // Today if not specified
+                amount: parseFloat(amountInput.value) || 0,
+                notes: notesInput.value.trim()
+            };
+            
+            // Validation
+            if (!transactionData.type) {
+                alert("Please select a transaction type (sale or purchase).");
+                return;
+            }
+            
+            if (!transactionData.horseName) {
+                alert("Please enter a horse name.");
+                return;
+            }
+            
+            if (transactionData.amount <= 0) {
+                alert("Please enter a valid positive amount.");
+                return;
+            }
+            
+            if (currentlyEditingTransaction) {
+                // Update existing transaction
+                const index = transactions.findIndex(t => t.id === currentlyEditingTransaction.id);
+                if (index !== -1) {
+                    transactions[index] = transactionData;
+                }
+            } else {
+                // Add new transaction
+                transactions.push(transactionData);
+            }
+            
+            // Save, update UI
+            saveData();
+            renderTransactionsTable();
+            updateOverallStats();
+            
+            // Reset form and editing state
+            document.getElementById('add-transaction-form').reset();
+            currentlyEditingTransaction = null;
+            const submitButton = document.getElementById('add-transaction-form').querySelector('button[type="submit"]');
+            if (submitButton) submitButton.textContent = 'Record Transaction';
+        }
+
+        function editTransaction(transactionId) {
+            const transaction = transactions.find(t => t.id === transactionId);
+            if (!transaction) {
+                console.error("Transaction not found for editing:", transactionId);
+                return;
+            }
+            
+            // Store the transaction being edited
+            currentlyEditingTransaction = transaction;
+            
+            // Populate the form
+            document.getElementById('transaction-type').value = transaction.type;
+            document.getElementById('transaction-horse-name').value = transaction.horseName;
+            document.getElementById('transaction-date').value = transaction.date;
+            document.getElementById('transaction-amount').value = transaction.amount.toFixed(2);
+            document.getElementById('transaction-notes').value = transaction.notes || '';
+            
+            // Update button text
+            const submitButton = document.getElementById('add-transaction-form').querySelector('button[type="submit"]');
+            if (submitButton) submitButton.textContent = 'Update Transaction';
+            
+            // Switch to transactions tab and scroll to form
+            if (document.querySelector('.tab-button[data-tab="transactions"]')) {
+                activateTab('transactions');
+            }
+            document.getElementById('transactions-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function deleteTransaction(transactionId) {
+            const transaction = transactions.find(t => t.id === transactionId);
+            if (!transaction) return;
+            
+            if (confirm(`Are you sure you want to delete this ${transaction.type} transaction for ${transaction.horseName}?`)) {
+                transactions = transactions.filter(t => t.id !== transactionId);
+                saveData();
+                renderTransactionsTable();
+                updateOverallStats();
+                console.log("Transaction deleted:", transactionId);
             }
         }
 
