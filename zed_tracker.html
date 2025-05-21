@@ -2378,6 +2378,26 @@ const bloodlineAttributes = {
   Finney:   ['strong finish'],
   Buterin:  ['unpredictable']
 };
+const forms = [
+  { prefix: 'horse',          color:'horse-color',          traits:'horse-traits',           attrs:'horse-attributes' },
+  { prefix: 'breeding-horse', color:'breeding-horse-color', traits:'breeding-horse-traits',  attrs:'breeding-horse-attributes' },
+  { prefix: 'bred',           color:'bred-color',           traits:'bred-horse-traits',      attrs:'bred-horse-attributes' }
+];
+
+forms.forEach(f => {
+  document.getElementById(`${f.prefix}-bloodline`)
+    .addEventListener('change', () => onBloodlineChange(
+      `${f.prefix}-bloodline`,
+      f.color, f.traits, f.attrs
+    ));
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  forms.forEach(f => onBloodlineChange(
+    `${f.prefix}-bloodline`,
+    f.color, f.traits, f.attrs
+  ));
+});
 
 // 3️⃣ UI update functions // populate `select` with id=colorSelectId based on bloodline in bloodSelectId
 function populateColorOptionsFor(bloodSelectId, colorSelectId) {
