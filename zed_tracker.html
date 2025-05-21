@@ -2397,7 +2397,6 @@ function populateColorOptionsFor(bloodSelectId, colorSelectId) {
     o.style.backgroundColor = c.hex;
     sel.appendChild(o);
   });
-}
 
 function displayTraits() {
   const blood = document.getElementById('horse-bloodline').value;
@@ -3653,6 +3652,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 enduranceStars: parseFloatOptional(enduranceStarsInput.value),
                 status: 'breeding' // This form always deals with breeding horses
             };
+
 }
 
 document.getElementById('predict-foal-btn').addEventListener('click', ()=>{
