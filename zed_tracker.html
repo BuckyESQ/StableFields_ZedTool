@@ -2297,23 +2297,33 @@ const bloodlineAttributes = {
   Finney:   ['strong finish'],
   Buterin:  ['unpredictable']
 };
+// 2️⃣ Define traits and Attributes per bloodline
+const bloodlineTraits = {
+  Nakamoto: ['High start','Nervous','Defensive','Sensitive','Reactive'],
+  Szabo:    ['Calm','Focused','Professional'],
+  Finney:   ['Determined','Stubborn','Hungry','Defensive'],
+  Buterin:  ['Goofy','Playful','Distracted','Restless']
+};
+
+const bloodlineAttributes = {
+  Nakamoto: ['strong start'],
+  Szabo:    ['steady'],
+  Finney:   ['strong finish'],
+  Buterin:  ['unpredictable']
+};
 
 // 3️⃣ UI update functions
 function populateColorOptions() {
   const blood = document.getElementById('horse-bloodline').value;
   const sel   = document.getElementById('horse-color');
   sel.innerHTML = '<option value="">--Select--</option>';
-
-  // get { normal: [...], rare: [...], super rare: [...] }
   const pools = breedColorOptions[blood] || {};
-  // flatten into one array of {label,hex}
   const allColors = Object.values(pools).flat();
-
   allColors.forEach(c => {
     const o = document.createElement('option');
-    o.value        = c.hex;
-    o.textContent  = c.label;
-    o.title        = c.hex;
+    o.value               = c.hex;
+    o.textContent         = c.label;
+    o.title               = c.hex;
     o.style.backgroundColor = c.hex;
     sel.appendChild(o);
   });
@@ -2321,7 +2331,7 @@ function populateColorOptions() {
 
 function displayTraits() {
   const blood = document.getElementById('horse-bloodline').value;
-  const list = document.getElementById('horse-traits');
+  const list  = document.getElementById('horse-traits');
   list.innerHTML = '';
   (bloodlineTraits[blood] || []).forEach(t => {
     const li = document.createElement('li');
@@ -2330,17 +2340,31 @@ function displayTraits() {
   });
 }
 
-// 4️⃣ Hook it all up
-document.getElementById('horse-bloodline')
-  .addEventListener('change', () => {
-    populateColorOptions();
-    displayTraits();
+function displayAttributes() {
+  const blood = document.getElementById('horse-bloodline').value;
+  const list  = document.getElementById('horse-attributes');
+  list.innerHTML = '';
+  (bloodlineAttributes[blood] || []).forEach(a => {
+    const li = document.createElement('li');
+    li.textContent = a;
+    list.appendChild(li);
   });
+}
+
+// 4️⃣ Hook it all up
+const bloodSel = document.getElementById('horse-bloodline');
+bloodSel.addEventListener('change', () => {
+  populateColorOptions();
+  displayTraits();
+  displayAttributes();
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   populateColorOptions();
   displayTraits();
+  displayAttributes();
 });
+
 </script>
      <script>
         // --- Global State ---
