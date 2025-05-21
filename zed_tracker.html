@@ -2176,7 +2176,154 @@
 
      </div> <!-- End #tab-content -->
  
- 
+ <script>
+// 1️⃣ Define your color palettes per bloodline.
+//    Replace these sample entries with all your colors + hex from New Color chart :contentReference[oaicite:0]{index=0}
+const breedColorOptions = {
+  Nakamoto: {
+    "normal": [
+        { label:'sea pink',hex:'#FF91A4' },
+        { label:'sun glow',hex:'#FFDD44' },
+        { label:'burnt sienna',hex:'#E97451' },
+        { label:'pomegranate',hex:'#F34723' },
+        { label:'cinnabar',hex:'#E34234' },
+        { label:'Alizarin crimson',hex:'#E32636' },
+        { label:'mauvelous',hex:'#EF98AA' },
+        { label:'fraley',hex:'#EE204D' },
+        { label:'French rose',hex:'#F64A8A' },
+        { label:'amaranth',hex:'#E52B50' },
+        { label:'maroon flush',hex:'#C32148' },
+        { label:'jazzberry jam',hex:'#A50B5E' }
+      ],
+    "rare": [
+        { label:'torch red',hex:'#E25822' },
+        { label:'razzmatazz',hex:'#E3256B' }
+      ],
+    "super rare": [
+        { label:'guardsman red',hex:'#C41E3A' },
+        { label:'black',hex:'#000000' }
+      ]
+  },
+  Szabo: {
+    "normal": [
+        { label:'malibu',hex:'#7DC8F7' },
+        { label:'Jordy blue',hex:'#8AB9F1' },
+        { label:'dodger blue',hex:'#1E90FF' },
+        { label:'cerulean',hex:'#007BA7' },
+        { label:'curious blue',hex:'#4592AF' },
+        { label:'lochmara',hex:'#2E8B57' },
+        { label:'spray',hex:'#85C4CC' },
+        { label:'turquoise blue',hex:'#40E0D0' },
+        { label:'scooter',hex:'#3FD0B9' },
+        { label:'Robins egg blue',hex:'#00CCCC' },
+        { label:'Pacific blue',hex:'#1CA9C9' },
+        { label:'Bondi blue',hex:'#0095B6' }
+      ],
+      "rare": [
+        { label:'aqua',hex:'#00FFFF' },
+        { label:'cyan',hex:'#00B7EB' }
+      ],
+      "super rare": [
+        { label:'wild blue yonder',hex:'#A2ADD0' },
+        { label:'boulder',hex:'#7A7F9A' }
+      ]
+  },
+  Finney: {
+    "normal": [
+        { label:'light wisteria',hex:'#C9A0DC' },
+        { label:'amethyst',hex:'#9966CC' },
+        { label:'mamba',hex:'#4E5180' },
+        { label:'séance',hex:'#6F00FF' },
+        { label:'purple heart',hex:'#69359C' },
+        { label:'eminence',hex:'#6C3082' },
+        { label:'lavender',hex:'#E6E6FA' },
+        { label:'lilac bush',hex:'#9874D3' },
+        { label:'fuchsia blue',hex:'#7D26CD' },
+        { label:'mischka',hex:'#D1C6B3' },
+        { label:'manatee',hex:'#979AAA' },
+        { label:'Daisy Bush',hex:'#FFEB6A' }
+      ],
+      "rare": [
+        { label:'heliotrope',hex:'#DF73FF' },
+        { label:'prelude',hex:'#DF8EAA' }
+      ],
+      "super rare": [
+        { label:'electric violet',hex:'#8F00FF' },
+        { label:'white',hex:'#FFFFFF' }
+      ]
+  },
+  Buterin: {
+    normal:[
+        { label:'picasso',hex:'#7A715C' },
+        { label:'Paris Daisy',hex:'#FFE3A3' },
+        { label:'gorse',hex:'#FADA5E' },
+        { label:'astra',hex:'#F0F8FF' },
+        { label:'bright sun',hex:'#FFAA1D' },
+        { label:'Lightning yellow',hex:'#F8DE7E' },
+        { label:'primrose',hex:'#FDE910' },
+        { label:'Manz',hex:'#FFCF48' },
+        { label:'wattle',hex:'#D4AF37' },
+        { label:'pear',hex:'#D1E231' },
+        { label:'earls',hex:'#C49E3F' },
+        { label:'ginger',hex:'#B06500' }
+      ],
+      rare:[
+        { label:'Electric lime',hex:'#CCFF00' },
+        { label:'shalamar',hex:'#7C1C05' }
+      ],
+      super:[
+        { label:'golf',hex:'#C0C0A8' },
+        { label:'silver',hex:'#C0C0C0' }
+      ]
+  }
+};
+
+// 2️⃣ Define traits per bloodline from Horse Breeds & Traits.pdf :contentReference[oaicite:1]{index=1}
+const bloodlineTraits = {
+  Nakamoto: ['High Stamina', 'Sprint Gene', /* … */],
+  Szabo:    ['Trait A', 'Trait B'],
+  Finney:   ['Trait X', 'Trait Y', 'Trait Z'],
+  Buterin:  ['Trait M', 'Trait N']
+};
+
+// 3️⃣ UI update functions
+function populateColorOptions() {
+  const blood = document.getElementById('horse-bloodline').value;
+  const colorSel = document.getElementById('horse-color');
+  colorSel.innerHTML = '<option value="">--Select--</option>';
+  (breedColorOptions[blood] || []).forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.hex;
+    opt.textContent = c.name;
+    opt.style.backgroundColor = c.hex;
+    opt.title = c.hex;
+    colorSel.appendChild(opt);
+  });
+}
+
+function displayTraits() {
+  const blood = document.getElementById('horse-bloodline').value;
+  const list = document.getElementById('horse-traits');
+  list.innerHTML = '';
+  (bloodlineTraits[blood] || []).forEach(t => {
+    const li = document.createElement('li');
+    li.textContent = t;
+    list.appendChild(li);
+  });
+}
+
+// 4️⃣ Hook it all up
+document.getElementById('horse-bloodline')
+  .addEventListener('change', () => {
+    populateColorOptions();
+    displayTraits();
+  });
+
+document.addEventListener('DOMContentLoaded', () => {
+  populateColorOptions();
+  displayTraits();
+});
+</script>
      <script>
         // --- Global State ---
         let horses = []; // Racing horses
