@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Color & Traits Test</title>
+</head>
+<body>
+  <h3>Add New Racing Horse</h3>
+  <form id="add-horse-form">
+    <label for="horse-bloodline">Bloodline:</label>
+    <select id="horse-bloodline" required>
+      <option value="">--Select--</option>
+      <option value="Nakamoto">Nakamoto</option>
+      <option value="Szabo">Szabo</option>
+      <option value="Finney">Finney</option>
+      <option value="Buterin">Buterin</option>
+    </select>
+
+    <label for="horse-color">Color:</label>
+    <select id="horse-color" required>
+      <option value="">--Select--</option>
+    </select>
+
+    <label>Traits:</label>
+    <ul id="horse-traits"></ul>
+  </form>
+
+  <!-- 1️⃣ Color & Traits script -->
+  <script>
+  const breedColorOptions = {
+    Nakamoto: [
+      { name: 'Sea Pink', hex: '#EF9A9A' },
+      { name: 'Malibu',   hex: '#4FC3F7' }
+    ],
+    Szabo:    [ { name: 'Slate Gray', hex: '#708090' } ],
+    Finney:   [ { name: 'Gold',       hex: '#FFD700' } ],
+    Buterin:  [ { name: 'Mint Cream', hex: '#F5FFFA' } ]
+  };
+  const bloodlineTraits = {
+    Nakamoto: ['High Stamina', 'Sprint Gene'],
+    Szabo:    ['Endurance Boost'],
+    Finney:   ['Quick Recovery'],
+    Buterin:  ['Balanced Skill']
+  };
+
+  function populateColorOptions() {
+    console.log('populateColorOptions');  // <- sanity-check
+    const b = document.getElementById('horse-bloodline').value;
+    const sel = document.getElementById('horse-color');
+    sel.innerHTML = '<option value="">--Select--</option>';
+    (breedColorOptions[b] || []).forEach(c => {
+      const o = document.createElement('option');
+      o.value = c.hex; o.textContent = c.name;
+      o.style.backgroundColor = c.hex;
+      sel.appendChild(o);
+    });
+  }
+
+  function displayTraits() {
+    console.log('displayTraits');  // <- sanity-check
+    const b = document.getElementById('horse-bloodline').value;
+    const ul = document.getElementById('horse-traits');
+    ul.innerHTML = '';
+    (bloodlineTraits[b] || []).forEach(t => {
+      const li = document.createElement('li');
+      li.textContent = t;
+      ul.appendChild(li);
+    });
+  }
+
+  document.getElementById('horse-bloodline')
+    .addEventListener('change', () => {
+      populateColorOptions();
+      displayTraits();
+    });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM ready');
+    populateColorOptions();
+    displayTraits();
+  });
+  </script>
+</body>
+</html>
