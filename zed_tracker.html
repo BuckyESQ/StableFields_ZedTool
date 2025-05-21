@@ -1640,6 +1640,22 @@
                                   <input type="number" id="breeding-horse-endurance-stars" step="0.1" min="0" placeholder="Optional">
                               </div>
                               <div>
+                                <h3>Predict Foal Quality</h3>
+                                <div class="form-grid" id="foal-predictor">
+                                <div>
+                                    <label for="predict-sire">Sire:</label>
+                                    <select id="predict-sire"><option>--Select--</option>…</select>
+                                </div>
+                                <div>
+                                    <label for="predict-dam">Dam:</label>
+                                    <select id="predict-dam"><option>--Select--</option>…</select>
+                                </div>
+                                <div>
+                                    <button id="predict-foal-btn" class="button">Predict</button>
+                                </div>
+                                <div id="foal-prediction-result" style="grid-column:1/-1; margin-top:1em;"></div>
+                                </div>
+
                                   <button type="submit">Add Breeding Horse</button>
                               </div>
                         </div>
