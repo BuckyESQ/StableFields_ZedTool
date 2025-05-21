@@ -1648,6 +1648,7 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Bloodline</th>
+                                    <th>Color</th>
                                     <th>Gender</th>
                                     <th>Stars (O/Sp/Sr/E)</th> <!-- Combined Stars -->
                                     <!-- Removed racing stats columns -->
@@ -1774,11 +1775,19 @@
                          <div>
                              <label for="bred-gender">Gender:</label>
                              <select id="bred-gender" required>
-                                  <option value="">--Select--</option>
+                                 <option value="">--Select--</option>
                                  <option value="Female">Female</option>
                                  <option value="Male">Male</option>
                              </select>
                          </div>
+                           <!-- new: Bred‐horse Color -->
+                        <div>
+                            <label for="bred-color">Color:</label>
+                            <select id="bred-color" required>
+                                <option value="">--Select--</option>
+                             </select>
+                        </div>
+
                           <div>
                              <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px;">
                                  <label for="bred-sire" style="margin-bottom: 0;">Sire (Father):</label>
@@ -1873,6 +1882,7 @@
                                  <th>Bred Date</th>
                                  <th>Name</th>
                                  <th>Bloodline</th>
+                                 <th>Color</th>
                                  <th>Gender</th>
                                  <th>Sire</th>
                                  <th>Dam</th>
@@ -2052,6 +2062,7 @@
                     <thead>
                         <tr>
                             <th>Bloodline</th>
+                            <th>Color</th>
                             <th>Races</th>
                             <th>Win %</th>
                             <th>Avg Place</th>
@@ -4116,6 +4127,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <thead>
                     <tr>
                         <th>Bloodline</th>
+                        <th>Color</th>
                         <th>Races</th>
                         <th>Win %</th>
                         <th>Avg Place</th>
