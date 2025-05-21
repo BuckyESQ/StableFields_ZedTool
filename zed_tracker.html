@@ -2198,25 +2198,27 @@
             </div>
             <!-- Import functionality could be added here later -->
         </div>
-        // Tab‐switching logic
-const tabButtons = document.querySelectorAll('#tab-buttons .tab-button');
-const tabContents = document.querySelectorAll('.tab-content');
-
-tabButtons.forEach(btn => {
-  btn.addEventListener('click', () => {
-    // deactivate everything
-    tabButtons.forEach(b => b.classList.remove('active'));
-    tabContents.forEach(c => c.classList.remove('active'));
-
-    // activate the one we clicked
-    btn.classList.add('active');
-    document
-      .getElementById(btn.dataset.target)
-      .classList.add('active');
-  });
-});
-`
+     
         <!-- End Settings Tab Content -->
+    <script>
+        // Tab‐switching logic
+        const tabButtons = document.querySelectorAll('#tab-buttons .tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // deactivate everything
+                tabButtons.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+
+                // activate the one we clicked
+                btn.classList.add('active');
+                document
+                    .getElementById('tab-content-' + btn.dataset.tab)
+                    .classList.add('active');
+            });
+        });
+    </script>
      </div> <!-- End #tab-content -->
  
  <script>
