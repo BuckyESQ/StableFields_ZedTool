@@ -3653,14 +3653,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 enduranceStars: parseFloatOptional(enduranceStarsInput.value),
                 status: 'breeding' // This form always deals with breeding horses
             };
-            function predictFoalStars(sire, dam) {
-                let avg = ( +sire.stars + +dam.stars ) / 2;
-                    // bonus if they share a hidden attribute
-                const shared = sire.attributes
-                    .filter(a=> dam.attributes.includes(a))
-                    .length;
-                avg += shared * 0.2;            // tweak to taste
-                return +avg.toFixed(1);
 }
 
 document.getElementById('predict-foal-btn').addEventListener('click', ()=>{
