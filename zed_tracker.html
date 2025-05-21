@@ -1272,8 +1272,28 @@
 </head>
 <body>
 
-  <h2>Racing Horses</h2>
-<div class="content-wrapper">
+     <h1>Zed Champions Tracker</h1>
+
+    <!-- Tab Navigation -->
+    <div id="tab-buttons">
+        <button class="tab-button active" data-tab="racing">Racing</button>
+        <button class="tab-button" data-tab="breeding">Breeding</button>
+        <button class="tab-button" data-tab="transactions">Transactions</button>
+        <button class="tab-button" data-tab="augments">Augments List</button>
+        <button class="tab-button" data-tab="analysis">Analysis</button>
+        <button class="tab-button" data-tab="stats">Overall Stats</button>
+        <button class="tab-button" data-tab="settings">Settings</button>
+    </div>
+
+    <!-- Tab Content -->
+    <div id="tab-content">
+
+        <!-- Racing Tab Content -->
+        <div id="tab-content-racing" class="tab-content active">
+            <!-- Section for Managing Racing Horses -->
+    <div class="section" id="horses-section">
+                <h2>Racing Horses</h2>
+                <div class="content-wrapper">
   <h3>Add New Racing Horse</h3>
   <form id="add-horse-form">
     <div class="form-grid">
