@@ -2296,17 +2296,24 @@ const bloodlineAttributes = {
 // 3️⃣ UI update functions
 function populateColorOptions() {
   const blood = document.getElementById('horse-bloodline').value;
-  const colorSel = document.getElementById('horse-color');
-  colorSel.innerHTML = '<option value="">--Select--</option>';
-  (breedColorOptions[blood] || []).forEach(c => {
-    const opt = document.createElement('option');
-    opt.value = c.hex;
-    opt.textContent = c.name;
-    opt.style.backgroundColor = c.hex;
-    opt.title = c.hex;
-    colorSel.appendChild(opt);
+  const sel   = document.getElementById('horse-color');
+  sel.innerHTML = '<option value="">--Select--</option>';
+
+  // get { normal: [...], rare: [...], super rare: [...] }
+  const pools = breedColorOptions[blood] || {};
+  // flatten into one array of {label,hex}
+  const allColors = Object.values(pools).flat();
+
+  allColors.forEach(c => {
+    const o = document.createElement('option');
+    o.value        = c.hex;
+    o.textContent  = c.label;
+    o.title        = c.hex;
+    o.style.backgroundColor = c.hex;
+    sel.appendChild(o);
   });
 }
+
 
 function displayTraits() {
   const blood = document.getElementById('horse-bloodline').value;
