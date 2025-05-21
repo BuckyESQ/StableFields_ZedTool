@@ -2399,20 +2399,34 @@ function displayAttributes() {
   });
 }
 
-// 4️⃣ Hook it all up
-const bloodSel = document.getElementById('horse-bloodline');
-bloodSel.addEventListener('change', () => {
-  populateColorOptions();
-  displayTraits();
-  displayAttributes();
-});
+// 4️⃣ Hook all three bloodline→color pickers + horse traits/attributes on change
+['horse','breeding-horse','bred'].forEach(prefix => {
+  const bloodId = `${prefix}-bloodline`;
+  const colorId = `${prefix}-color`;
+  const bloodEl = document.getElementById(bloodId);
+  if (!bloodEl) return;        // in case one of them isn't on this page
 
+  bloodEl.addEventListener('change', () => {
+    // repopulate that form's color select
+    populateColorOptionsFor(bloodId, colorId);
+
+    // if it's the Racing‐Horse form, also show traits+attributes
+    if (prefix === 'horse') {
+      displayTraits();
+      displayAttributes();
+    }
+  });
+});
+// On page load, prime all three selects (and Racing traits/attributes)
 document.addEventListener('DOMContentLoaded', () => {
-  populateColorOptions();
+  ['horse','breeding-horse','bred'].forEach(prefix => {
+    populateColorOptionsFor(`${prefix}-bloodline`, `${prefix}-color`);
+  });
+  // and show the Racing‐Horse's traits & attributes
   displayTraits();
   displayAttributes();
 });
-
+</script>
 </script>
      <script>
         // --- Global State ---
