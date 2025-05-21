@@ -2303,12 +2303,16 @@ function populateColorOptions() {
   const blood = document.getElementById('horse-bloodline').value;
   const sel   = document.getElementById('horse-color');
   sel.innerHTML = '<option value="">--Select--</option>';
+
+  // get the three rarity‐pools, flatten to one array
   const pools = breedColorOptions[blood] || {};
   const allColors = Object.values(pools).flat();
+
   allColors.forEach(c => {
     const o = document.createElement('option');
     o.value               = c.hex;
-    o.textContent         = c.label;
+    // show both label and hex
+    o.textContent         = `${c.label} (${c.hex})`;
     o.title               = c.hex;
     o.style.backgroundColor = c.hex;
     sel.appendChild(o);
