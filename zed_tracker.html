@@ -1272,83 +1272,99 @@
 </head>
 <body>
 
-    <h1>Zed Champions Tracker</h1>
+  <h2>Racing Horses</h2>
+<div class="content-wrapper">
+  <h3>Add New Racing Horse</h3>
+  <form id="add-horse-form">
+    <div class="form-grid">
 
-    <!-- Tab Navigation -->
-    <div id="tab-buttons">
-        <button class="tab-button active" data-tab="racing">Racing</button>
-        <button class="tab-button" data-tab="breeding">Breeding</button>
-        <button class="tab-button" data-tab="transactions">Transactions</button>
-        <button class="tab-button" data-tab="augments">Augments List</button>
-        <button class="tab-button" data-tab="analysis">Analysis</button>
-        <button class="tab-button" data-tab="stats">Overall Stats</button>
-        <button class="tab-button" data-tab="settings">Settings</button>
-    </div>
+      <!-- Name -->
+      <div>
+        <label for="horse-name">Name:</label>
+        <input type="text" id="horse-name" required>
+      </div>
 
-    <!-- Tab Content -->
-    <div id="tab-content">
+      <!-- Bloodline -->
+      <div>
+        <label for="horse-bloodline">Bloodline:</label>
+        <select id="horse-bloodline" required>
+          <option value="">--Select--</option>
+          <option value="Nakamoto">Nakamoto</option>
+          <option value="Szabo">Szabo</option>
+          <option value="Finney">Finney</option>
+          <option value="Buterin">Buterin</option>
+        </select>
+      </div>
 
-        <!-- Racing Tab Content -->
-        <div id="tab-content-racing" class="tab-content active">
-            <!-- Section for Managing Racing Horses -->
-    <div class="section" id="horses-section">
-                <h2>Racing Horses</h2>
-                <div class="content-wrapper">
-                    <h3>Add New Racing Horse</h3>
-        <form id="add-horse-form">
-            <div class="form-grid">
-                <div>
-                    <label for="horse-name">Name:</label>
-                    <input type="text" id="horse-name" required>
-                </div>
-                <div>
-                    <label for="horse-bloodline">Bloodline:</label>
-                    <select id="horse-bloodline" required>
-                        <option value="">--Select--</option>
-                        <option value="Nakamoto">Nakamoto</option>
-                                    <option value="Szabo">Szabo</option>
-                                    <option value="Finney">Finney</option>
-                        <option value="Buterin">Buterin</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="horse-gender">Gender:</label>
-                    <select id="horse-gender" required>
-                         <option value="">--Select--</option>
-                        <option value="Female">Female</option>
-                        <option value="Male">Male</option>
-                    </select>
-                </div>
-                <div>
-                                <label for="horse-stars">Overall Stars:</label>
-                                <input type="number" id="horse-stars" step="0.1" min="1" required>
-                </div>
-                 <div>
-                    <label for="horse-zed-balance">Initial $ZED Balance:</label>
-                    <input type="number" id="horse-zed-balance" step="any" value="0" required>
-                </div>
-                 <div>
-                    <label for="horse-mm-rating">Initial Matchmaking Rating:</label>
-                    <input type="number" id="horse-mm-rating" step="1" value="1000" required>
-                </div>
-                            <div>
-                                <label for="horse-speed-stars">Speed Stars:</label>
-                                <input type="number" id="horse-speed-stars" step="0.1" min="0" placeholder="Optional (Enter later)">
-            </div>
-                            <div>
-                                <label for="horse-sprint-stars">Sprint Stars:</label>
-                                <input type="number" id="horse-sprint-stars" step="0.1" min="0" placeholder="Optional (Enter later)">
-                            </div>
-                            <div>
-                                <label for="horse-endurance-stars">Endurance Stars:</label>
-                                <input type="number" id="horse-endurance-stars" step="0.1" min="0" placeholder="Optional (Enter later)">
-                            </div>
-                            <div>
-                                <button type="submit">Add Racing Horse</button>
-                            </div>
-                        </div>
-        </form>
-                </div>
+      <!-- Color -->
+      <div>
+        <label for="horse-color">Color:</label>
+        <select id="horse-color" required>
+          <option value="">--Select--</option>
+        </select>
+      </div>
+
+      <!-- Traits -->
+      <div class="traits-container">
+        <label>Traits:</label>
+        <ul id="horse-traits"></ul>
+      </div>
+
+      <!-- Gender -->
+      <div>
+        <label for="horse-gender">Gender:</label>
+        <select id="horse-gender" required>
+          <option value="">--Select--</option>
+          <option value="Female">Female</option>
+          <option value="Male">Male</option>
+        </select>
+      </div>
+
+      <!-- Overall Stars -->
+      <div>
+        <label for="horse-stars">Overall Stars:</label>
+        <input type="number" id="horse-stars" step="0.1" min="1" required>
+      </div>
+
+      <!-- Initial $ZED Balance -->
+      <div>
+        <label for="horse-zed-balance">Initial $ZED Balance:</label>
+        <input type="number" id="horse-zed-balance" step="any" value="0" required>
+      </div>
+
+      <!-- Initial Matchmaking Rating -->
+      <div>
+        <label for="horse-mm-rating">Initial Matchmaking Rating:</label>
+        <input type="number" id="horse-mm-rating" step="1" value="1000" required>
+      </div>
+
+      <!-- Speed Stars -->
+      <div>
+        <label for="horse-speed-stars">Speed Stars:</label>
+        <input type="number" id="horse-speed-stars" step="0.1" min="0" placeholder="Optional">
+      </div>
+
+      <!-- Sprint Stars -->
+      <div>
+        <label for="horse-sprint-stars">Sprint Stars:</label>
+        <input type="number" id="horse-sprint-stars" step="0.1" min="0" placeholder="Optional">
+      </div>
+
+      <!-- Endurance Stars -->
+      <div>
+        <label for="horse-endurance-stars">Endurance Stars:</label>
+        <input type="number" id="horse-endurance-stars" step="0.1" min="0" placeholder="Optional">
+      </div>
+
+      <!-- Submit -->
+      <div>
+        <button type="submit">Add Racing Horse</button>
+      </div>
+
+    </div> <!-- /.form-grid -->
+  </form>
+</div> <!-- /.content-wrapper -->
+
 
                 <h3>Registered Racing Horses</h3>
                 <!-- Simplified Filter Controls -->
