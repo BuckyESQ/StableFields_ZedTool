@@ -2280,12 +2280,20 @@ const breedColorOptions = {
 
 // 2️⃣ Define traits per bloodline
 const bloodlineTraits = {
-  Nakamoto: ['High Stamina', 'Sprint Gene', /* … */],
-  Szabo:    ['Trait A', 'Trait B'],
-  Finney:   ['Trait X', 'Trait Y', 'Trait Z'],
-  Buterin:  ['Trait M', 'Trait N']
+  Nakamoto: ['High start','Nervous','Defensive','Sensitive','Reactive'],
+  Szabo:    ['Calm','Focused','Professional'],
+  Finney:   ['Determined','Stubborn','Hungry','Defensive'],
+  Buterin:  ['Goofy','Playful','Distracted','Restless']
 };
 
+const bloodlineAttributes = {
+  Nakamoto: ['strong start'],
+  Szabo:    ['steady'],
+  Finney:   ['strong finish'],
+  Buterin:  ['unpredictable']
+};
+
+  
 // 3️⃣ UI update functions
 function populateColorOptions() {
   const blood = document.getElementById('horse-bloodline').value;
