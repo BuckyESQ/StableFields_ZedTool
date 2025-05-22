@@ -2437,7 +2437,6 @@ function displayAttributes() {
     li.textContent = a;
     list.appendChild(li);
   });
-}
 
 // 4️⃣ Hook all three bloodline→color pickers + horse traits/attributes on change
 ['horse','breeding-horse','bred'].forEach(prefix => {
@@ -2457,6 +2456,7 @@ function displayAttributes() {
     }
   });
 });
+}
 // On page load, prime all three selects (and Racing traits/attributes)
 document.addEventListener('DOMContentLoaded', () => {
   ['horse','breeding-horse','bred'].forEach(prefix => {
