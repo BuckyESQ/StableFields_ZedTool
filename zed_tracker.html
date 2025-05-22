@@ -2493,6 +2493,33 @@ document.addEventListener('DOMContentLoaded', () => {
   displayTraits();
   displayAttributes();
 });
+// Generalized function for any section
+function populateColorOptionsFor(bloodId, colorId) {
+  const bloodEl = document.getElementById(bloodId);
+  const sel = document.getElementById(colorId);
+  sel.innerHTML = '<option value="">--Select Color--</option>';
+  if (!bloodEl) return;
+  const blood = bloodEl.value;
+  if (!blood || !breedColorOptions[blood]) return;
+  ["normal","rare","super rare"].forEach(rarity => {
+    const group = breedColorOptions[blood][rarity];
+    if (group && group.length) {
+      const optgroup = document.createElement('optgroup');
+      optgroup.label = rarity.charAt(0).toUpperCase() + rarity.slice(1);
+      group.forEach(c => {
+        const o = document.createElement('option');
+        o.value = c.hex;
+        o.textContent = `${c.label} (${c.hex})`;
+        o.title = c.hex;
+        o.style.backgroundColor = c.hex;
+        o.setAttribute('data-rarity', rarity);
+        optgroup.appendChild(o);
+      });
+      sel.appendChild(optgroup);
+    }
+  });
+  if (sel.options.length > 1) sel.selectedIndex = 1;
+}
 </script>
      <script>
         // --- Global State ---
