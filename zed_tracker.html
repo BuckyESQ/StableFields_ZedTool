@@ -3645,6 +3645,7 @@ function populateColorOptionsFor(bloodId, colorId) {
             // Get elements correctly
             const horseNameInput = document.getElementById('horse-name');
             const bloodlineSelect = document.getElementById('horse-bloodline');
+            const colorSelect = document.getElementById('horse-color');
             const genderSelect = document.getElementById('horse-gender');
             const starsInput = document.getElementById('horse-stars');
             const zedBalanceInput = document.getElementById('horse-zed-balance');
@@ -3660,6 +3661,7 @@ function populateColorOptionsFor(bloodId, colorId) {
                 id: currentlyEditingHorse ? currentlyEditingHorse.id : null, // Use existing ID if editing
                 name: horseNameInput.value.trim(),
                 bloodline: bloodlineSelect.value,
+                color: colorSelect.value,
                 gender: genderSelect.value,
                 stars: parseFloat(starsInput.value) || 0,
                 initialZedBalance: parseFloat(zedBalanceInput.value) || 0,
@@ -3730,6 +3732,7 @@ function populateColorOptionsFor(bloodId, colorId) {
             console.log('[handleAddBreedingHorse] Started. currentlyEditingHorse:', currentlyEditingHorse); // Log at start of handleAddBreedingHorse
             const nameInput = document.getElementById('breeding-horse-name');
             const bloodlineSelect = document.getElementById('breeding-horse-bloodline');
+            const colorSelect = document.getElementById('breeding-horse-color');
             const genderSelect = document.getElementById('breeding-horse-gender');
             const starsInput = document.getElementById('breeding-horse-stars');
             const speedStarsInput = document.getElementById('breeding-horse-speed-stars');
@@ -3742,6 +3745,7 @@ function populateColorOptionsFor(bloodId, colorId) {
                 id: currentlyEditingHorse ? currentlyEditingHorse.id : null,
                 name: nameInput.value.trim(),
                 bloodline: bloodlineSelect.value,
+                color: colorSelect.value,
                 gender: genderSelect.value,
                 stars: parseFloatOptional(starsInput.value),
                 speedStars: parseFloatOptional(speedStarsInput.value),
