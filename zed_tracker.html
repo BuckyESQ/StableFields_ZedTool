@@ -2449,6 +2449,17 @@ function getColorLabel(bloodline, hex) {
   }
   return hex || '';
 }
+document.getElementById('horse-bloodline').addEventListener('change', function() {
+  populateColorOptions(this.value);
+  displayTraits();
+  displayAttributes();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  populateColorOptions(document.getElementById('horse-bloodline').value);
+  displayTraits();
+  displayAttributes();
+});
 // Now, hook all three bloodline→color pickers + horse traits/attributes on change
 ['horse', 'breeding-horse', 'bred'].forEach(prefix => {
   const bloodId = `${prefix}-bloodline`;
