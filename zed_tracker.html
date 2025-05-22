@@ -2388,7 +2388,75 @@ const forms = [
   { prefix: 'breeding-horse', color:'breeding-horse-color', traits:'breeding-horse-traits',  attrs:'breeding-horse-attributes' },
   { prefix: 'bred',           color:'bred-color',           traits:'bred-horse-traits',      attrs:'bred-horse-attributes' }
 ];
+// INSERT HERE (after forms array, before DOMContentLoaded)
+function onBloodlineChange(bloodId, colorId, traitsId, attrsId) {
+  const bloodEl = document.getElementById(bloodId);
+  const colorEl = document.getElementById(colorId);
+  const traitsEl = document.getElementById(traitsId);
+  const attrsEl = document.getElementById(attrsId);
 
+  // Update color options
+  if (bloodEl && colorEl) {
+    colorEl.innerHTML = '<option value="">--Select Color--</option>';
+    const blood = bloodEl.value;
+    if (blood && breedColorOptions[blood]) {
+      ["normal","rare","super rare"].forEach(rarity => {
+        const group = breedColorOptions[blood][rarity];
+        if (group && group.length) {
+          const optgroup = document.createElement('optgroup');
+          optgroup.label = rarity.charAt(0).toUpperCase() + rarity.slice(1);
+          group.forEach(c => {
+            const o = document.createElement('option');
+            o.value = c.hex;
+            o.textContent = `${c.label} (${c.hex})`;
+            o.title = c.hex;
+            o.style.backgroundColor = c.hex;
+            o.setAttribute('data-rarity', rarity);
+            optgroup.appendChild(o);
+          });
+          colorEl.appendChild(optgroup);
+        }
+      });
+      if (colorEl.options.length > 1) colorEl.selectedIndex = 1;
+    }
+  }
+
+  // Update traits
+  if (bloodEl && traitsEl) {
+    traitsEl.innerHTML = '';
+    (bloodlineTraits[bloodEl.value] || []).forEach(t => {
+      const li = document.createElement('li');
+      li.textContent = t;
+      traitsEl.appendChild(li);
+    });
+  }
+
+  // Update attributes
+  if (bloodEl && attrsEl) {
+    attrsEl.innerHTML = '';
+    (bloodlineAttributes[bloodEl.value] || []).forEach(a => {
+      const li = document.createElement('li');
+      li.textContent = a;
+      attrsEl.appendChild(li);
+    });
+  }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  forms.forEach(f => {
+    const el = document.getElementById(`${f.prefix}-bloodline`);
+    if (el) {
+      el.addEventListener('change', () => onBloodlineChange(
+        `${f.prefix}-bloodline`,
+        f.color, f.traits, f.attrs
+      ));
+    }
+  });
+
+  forms.forEach(f => onBloodlineChange(
+    `${f.prefix}-bloodline`,
+    f.color, f.traits, f.attrs
+  ));
+});
 // 3️⃣ UI update functions // populate `select` with id=colorSelectId based on bloodline in bloodSelectId
 function populateColorOptions(bloodline) {
   const color = document.getElementById('horse-color').value;
@@ -2442,42 +2510,6 @@ function getColorLabel(bloodline, hex) {
   }
   return hex || '';
 }
-document.getElementById('horse-bloodline').addEventListener('change', function() {
-  populateColorOptions(this.value);
-  displayTraits();
-  displayAttributes();
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-  populateColorOptions(document.getElementById('horse-bloodline').value);
-  displayTraits();
-  displayAttributes();
-});
-// Now, hook all three bloodline→color pickers + horse traits/attributes on change
-['horse', 'breeding-horse', 'bred'].forEach(prefix => {
-  const bloodId = `${prefix}-bloodline`;
-  const colorId = `${prefix}-color`;
-  const bloodEl = document.getElementById(bloodId);
-  if (!bloodEl) return;
-
-  bloodEl.addEventListener('change', () => {
-    populateColorOptionsFor(bloodId, colorId);
-    if (prefix === 'horse') {
-      displayTraits();
-      displayAttributes();
-    }
-  });
-});
-
-// On page load, prime all three selects (and Racing traits/attributes)
-document.addEventListener('DOMContentLoaded', () => {
-  ['horse','breeding-horse','bred'].forEach(prefix => {
-    populateColorOptionsFor(`${prefix}-bloodline`, `${prefix}-color`);
-  });
-  // and show the Racing‐Horse's traits & attributes
-  displayTraits();
-  displayAttributes();
-});
 // Generalized function for any section
 function populateColorOptionsFor(bloodId, colorId) {
   const bloodEl = document.getElementById(bloodId);
