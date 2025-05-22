@@ -2417,7 +2417,14 @@ function populateColorOptionsFor(bloodSelectId, colorSelectId) {
     o.style.backgroundColor = c.hex;
     sel.appendChild(o);
   });
-  
+} // <-- This brace was missing!
+
+// And in breedColorOptions:
+Buterin: {
+  normal: [ ... ],
+  rare: [ ... ],
+  "super rare": [ ... ] // <-- Fix the key here
+}
 
 function displayTraits() {
   const blood = document.getElementById('horse-bloodline').value;
