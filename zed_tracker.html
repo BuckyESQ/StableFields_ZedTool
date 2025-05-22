@@ -2427,8 +2427,9 @@ function displayTraits() {
     const li = document.createElement('li');
     li.textContent = t;
     list.appendChild(li);
-});
+  });
 }
+
 function displayAttributes() {
   const blood = document.getElementById('horse-bloodline').value;
   const list  = document.getElementById('horse-attributes');
@@ -2438,26 +2439,24 @@ function displayAttributes() {
     li.textContent = a;
     list.appendChild(li);
   });
-  }
-// 4️⃣ Hook all three bloodline→color pickers + horse traits/attributes on change
-['horse','breeding-horse','bred'].forEach(prefix => {
+}
+
+// Now, hook all three bloodline→color pickers + horse traits/attributes on change
+['horse', 'breeding-horse', 'bred'].forEach(prefix => {
   const bloodId = `${prefix}-bloodline`;
   const colorId = `${prefix}-color`;
   const bloodEl = document.getElementById(bloodId);
-  if (!bloodEl) return;        // in case one of them isn't on this page
+  if (!bloodEl) return;
 
   bloodEl.addEventListener('change', () => {
-    // repopulate that form's color select
     populateColorOptionsFor(bloodId, colorId);
-
-    // if it's the Racing‐Horse form, also show traits+attributes
     if (prefix === 'horse') {
       displayTraits();
       displayAttributes();
     }
   });
 });
-}
+
 // On page load, prime all three selects (and Racing traits/attributes)
 document.addEventListener('DOMContentLoaded', () => {
   ['horse','breeding-horse','bred'].forEach(prefix => {
