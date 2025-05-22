@@ -2875,7 +2875,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 row.innerHTML = `
                     <td>${horse.name}</td>
                     <td>${horse.bloodline}</td>
-                    <td><span class="swatch" style="background:${horse.color};"></span>${getColorLabel(horse.bloodline, horse.color)}</td>
+                    <td>
+                        <span class="swatch" style="background:
+                        ${horse.color};"></span>${getColorLabel(horse.bloodline, horse.color)}
+                    </td>
                     <td>${horse.gender}</td>
                     <td>${formatStars(horse.stars)}</td>
                     <td>${stats.currentMmr}</td>
