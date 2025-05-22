@@ -2419,13 +2419,6 @@ function populateColorOptionsFor(bloodSelectId, colorSelectId) {
   });
 } // <-- This brace was missing!
 
-// And in breedColorOptions:
-Buterin: {
-  normal: [ ... ],
-  rare: [ ... ],
-  "super rare": [ ... ] // <-- Fix the key here
-}
-
 function displayTraits() {
   const blood = document.getElementById('horse-bloodline').value;
   const list  = document.getElementById('horse-traits');
@@ -2435,7 +2428,6 @@ function displayTraits() {
     li.textContent = t;
     list.appendChild(li);
   });
-}
 
 function displayAttributes() {
   const blood = document.getElementById('horse-bloodline').value;
