@@ -2389,24 +2389,9 @@ const forms = [
   { prefix: 'bred',           color:'bred-color',           traits:'bred-horse-traits',      attrs:'bred-horse-attributes' }
 ];
 
-forms.forEach(f => {
-  document.getElementById(`${f.prefix}-bloodline`)
-    .addEventListener('change', () => onBloodlineChange(
-      `${f.prefix}-bloodline`,
-      f.color, f.traits, f.attrs
-    ));
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  forms.forEach(f => onBloodlineChange(
-    `${f.prefix}-bloodline`,
-    f.color, f.traits, f.attrs
-  ));
-});
-
 // 3️⃣ UI update functions // populate `select` with id=colorSelectId based on bloodline in bloodSelectId
 function populateColorOptions(bloodline) {
-  const colorSelect = document.getElementById('horse-color');
+  const color = document.getElementById('horse-color').value;
   colorSelect.innerHTML = '<option value="">--Select Color--</option>';
   if (!bloodline || !breedColorOptions[bloodline]) return;
   ["normal","rare","super rare"].forEach(rarity => {
