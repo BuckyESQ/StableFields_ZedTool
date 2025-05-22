@@ -1315,25 +1315,23 @@
         <option value="Buterin">Buterin</option>
     </select>
 </div>
+
  <!-- Color -->
 <div>
   <label for="horse-color">Color:</label>
-  <select id="horse-color" required>
-    <option value="">--Select Color--</option>
-    <!-- Options will be auto-filled by JS -->
-  </select>
+    <select id="horse-color" required>
+        <option value="">--Select Color--</option>
+    <!-- Populated dynamically -->
+    </select>
 </div>
-      <!-- Traits -->
-      <div class="traits-container">
-        <label>Traits:</label>
-        <ul id="horse-traits"></ul>
-        </div>
-       
-      <div class="attributes-container">
-        <label>Attributes:</label>
-        <ul id="horse-attributes"></ul>
-      </div>
 
+<!-- TRAITS / ATTRIBUTE DISPLAY (add after Color, can style as needed) -->
+<div style="margin-top:8px;">
+  <label style="color:#77ffe7;font-weight:600;">Traits:</label>
+  <ul id="horse-traits" style="margin:0 0 4px 18px; color:#50fa7b; font-family:'Orbitron', monospace; font-size:1em;"></ul>
+  <label style="color:#f6b600;font-weight:600;">Attribute:</label>
+  <ul id="horse-attributes" style="margin:0 0 0 18px; color:#ffec99; font-family:'Orbitron', monospace; font-size:1em;"></ul>
+</div>
       <!-- Gender -->
       <div>
         <label for="horse-gender">Gender:</label>
