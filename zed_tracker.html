@@ -2397,28 +2397,33 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // 3️⃣ UI update functions // populate `select` with id=colorSelectId based on bloodline in bloodSelectId
-function populateColorOptionsFor(bloodSelectId, colorSelectId) {
-  const blood = document.getElementById(bloodSelectId).value;
-  const sel   = document.getElementById(colorSelectId);
-  sel.innerHTML = '<option value="">--Select--</option>';
-
-  // flatten all pools into one array
-  const pools     = breedColorOptions[blood] || {};
-  const allColors = Object.values(pools).flat();
-
-  allColors.forEach(c => {
-    const o = document.createElement('option');
-    o.value               = c.hex;
-    o.textContent         = `${c.label} (${c.hex})`;
-    o.title               = c.hex;
-    o.style.backgroundColor = c.hex;
-    sel.appendChild(o);
+function populateColorOptions(bloodline) {
+  const colorSelect = document.getElementById('horse-color');
+  colorSelect.innerHTML = '<option value="">--Select Color--</option>';
+  if (!bloodline || !breedColorOptions[bloodline]) return;
+  ["normal","rare","super rare"].forEach(rarity => {
+    const group = breedColorOptions[bloodline][rarity];
+    if (group && group.length) {
+      const optgroup = document.createElement('optgroup');
+      optgroup.label = rarity.charAt(0).toUpperCase() + rarity.slice(1);
+      group.forEach(c => {
+        const o = document.createElement('option');
+        o.value = c.hex;
+        o.textContent = `${c.label} (${c.hex})`;
+        o.title = c.hex;
+        o.style.backgroundColor = c.hex;
+        o.setAttribute('data-rarity', rarity);
+        optgroup.appendChild(o);
+      });
+      colorSelect.appendChild(optgroup);
+    }
   });
-} // <-- This brace was missing!
+  if (colorSelect.options.length > 1) colorSelect.selectedIndex = 1;
+}
 
 function displayTraits() {
   const blood = document.getElementById('horse-bloodline').value;
-  const list  = document.getElementById('horse-traits');
+  const list = document.getElementById('horse-traits');
   list.innerHTML = '';
   (bloodlineTraits[blood] || []).forEach(t => {
     const li = document.createElement('li');
@@ -2426,10 +2431,9 @@ function displayTraits() {
     list.appendChild(li);
   });
 }
-
 function displayAttributes() {
   const blood = document.getElementById('horse-bloodline').value;
-  const list  = document.getElementById('horse-attributes');
+  const list = document.getElementById('horse-attributes');
   list.innerHTML = '';
   (bloodlineAttributes[blood] || []).forEach(a => {
     const li = document.createElement('li');
@@ -2437,7 +2441,14 @@ function displayAttributes() {
     list.appendChild(li);
   });
 }
-
+function getColorLabel(bloodline, hex) {
+  if (!bloodline || !hex || !breedColorOptions[bloodline]) return hex || '';
+  for (const rarity of ["normal","rare","super rare"]) {
+    const found = breedColorOptions[bloodline][rarity].find(opt => opt.hex.toLowerCase() === (hex || '').toLowerCase());
+    if (found) return `${found.label} (${rarity})`;
+  }
+  return hex || '';
+}
 // Now, hook all three bloodline→color pickers + horse traits/attributes on change
 ['horse', 'breeding-horse', 'bred'].forEach(prefix => {
   const bloodId = `${prefix}-bloodline`;
