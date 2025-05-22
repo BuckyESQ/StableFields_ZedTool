@@ -2273,8 +2273,15 @@
 
 const breedColorOptions = {
   Nakamoto: {
-    "normal": [
-        { label:'sea pink',hex:'#FF91A4' },
+  },
+  Szabo: {
+  },
+  Finney: {
+  },
+  Buterin: {
+  }
+};
+4' },
         { label:'sun glow',hex:'#FFDD44' },
         { label:'burnt sienna',hex:'#E97451' },
         { label:'pomegranate',hex:'#F34723' },
@@ -2695,7 +2702,17 @@ function populateColorOptionsFor(bloodId, colorId) {
             modalTitle = document.getElementById('modal-horse-name');
             modalStatsContent = document.getElementById('modal-stats-content');
             modalAnalysisContent = document.getElementById('modal-analysis-content');
-
+            // Initialize modal elements
+        document.getElementById('predict-foal-btn').addEventListener('click', ()=>{
+            const sireName = document.getElementById('predict-sire').value;
+            const damName  = document.getElementById('predict-dam').value;
+            if(!sireName||!damName) return;
+            const sire = horses.find(h => h.name === sireName && h.status === 'breeding' && h.gender === 'Male');
+            const dam  = horses.find(h => h.name === damName && h.status === 'breeding' && h.gender === 'Female');
+            const stars = predictFoalStars(sire, dam);
+            document.getElementById('foal-prediction-result').textContent =
+                `🎯 Predicted Foal Overall Stars: ${stars}`;
+});
             // Event listeners for modal (now safe to add)
             if (modalCloseBtn) {
                 modalCloseBtn.onclick = hideHorseDetailsModal;
@@ -3730,6 +3747,7 @@ function populateColorOptionsFor(bloodId, colorId) {
         function handleAddBreedingHorse(event) {
             event.preventDefault();
             console.log('[handleAddBreedingHorse] Started. currentlyEditingHorse:', currentlyEditingHorse); // Log at start of handleAddBreedingHorse
+            
             const nameInput = document.getElementById('breeding-horse-name');
             const bloodlineSelect = document.getElementById('breeding-horse-bloodline');
             const colorSelect = document.getElementById('breeding-horse-color');
@@ -3753,18 +3771,6 @@ function populateColorOptionsFor(bloodId, colorId) {
                 enduranceStars: parseFloatOptional(enduranceStarsInput.value),
                 status: 'breeding' // This form always deals with breeding horses
             };
-}
-
-document.getElementById('predict-foal-btn').addEventListener('click', ()=>{
-  const sireName = document.getElementById('predict-sire').value;
-  const damName  = document.getElementById('predict-dam').value;
-  if(!sireName||!damName) return;
-  const sire = allBreedingHorses.find(h=>h.name===sireName);
-  const dam  = allBreedingHorses.find(h=>h.name===damName);
-  const stars = predictFoalStars(sire, dam);
-  document.getElementById('foal-prediction-result').textContent =
-    `🎯 Predicted Foal Overall Stars: ${stars}`;
-});
 
             // --- Validation --- //
             if (!breedingHorseData.name) { alert("Horse Name is required."); return; }
@@ -6280,7 +6286,6 @@ document.getElementById('predict-foal-btn').addEventListener('click', ()=>{
             console.log(`Editing horse: ${horse.name} (${horse.status})`);
         }
     </script>
-
 </body>
 <!-- Horse Details Modal Structure -->
 <div id="horse-details-modal" class="modal">
