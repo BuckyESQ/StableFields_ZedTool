@@ -2427,7 +2427,8 @@ function displayTraits() {
     const li = document.createElement('li');
     li.textContent = t;
     list.appendChild(li);
-  });
+});
+}
 function displayAttributes() {
   const blood = document.getElementById('horse-bloodline').value;
   const list  = document.getElementById('horse-attributes');
@@ -2437,7 +2438,6 @@ function displayAttributes() {
     li.textContent = a;
     list.appendChild(li);
   });
-
 // 4️⃣ Hook all three bloodline→color pickers + horse traits/attributes on change
 ['horse','breeding-horse','bred'].forEach(prefix => {
   const bloodId = `${prefix}-bloodline`;
@@ -3730,8 +3730,7 @@ document.getElementById('predict-foal-btn').addEventListener('click', ()=>{
             addBreedingHorseForm.reset();
             addBreedingHorseForm.querySelector('button[type="submit"]').textContent = 'Add Breeding Horse';
             currentlyEditingHorse = null;
-        }
-
+        
         function handleAddRace(event) {
             event.preventDefault();
             // Get elements
