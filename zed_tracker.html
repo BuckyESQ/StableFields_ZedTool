@@ -3909,7 +3909,7 @@ function populateColorOptionsFor(bloodId, colorId) {
             event.preventDefault();
             const nameInput = document.getElementById('bred-name');
             const bloodlineSelect = document.getElementById('bred-bloodline');
-            const colorSelect = document.getElementById('bred-color'); // Get the color select element
+            const colorSelect = document.getElementById('bred-color'); 
             const genderSelect = document.getElementById('bred-gender');
             const sireSelect = document.getElementById('bred-sire');
             const damSelect = document.getElementById('bred-dam');
@@ -3925,7 +3925,7 @@ function populateColorOptionsFor(bloodId, colorId) {
             let sireId = null;
             let externalSireName = null;
             let externalSireBloodline = null;
-            let externalSireColor = null; // Add variable for external sire color
+            let externalSireColor = null;
             let externalSireOverallStars = null;
             let externalSireSpeedStars = null;
             let externalSireSprintStars = null;
@@ -3934,8 +3934,7 @@ function populateColorOptionsFor(bloodId, colorId) {
             if (useExternalSireCheckbox.checked) {
                 externalSireName = externalSireNameInput.value.trim();
                 externalSireBloodline = externalSireBloodlineSelect.value;
-                externalSireColor = document.getElementById('external-sire-color').value; // Get external sire color
-                // Retrieve external sire stars if checkbox is checked
+                externalSireColor = document.getElementById('external-sire-color').value;
                 externalSireOverallStars = parseFloatOptional(document.getElementById('external-sire-overall-stars').value);
                 externalSireSpeedStars = parseFloatOptional(document.getElementById('external-sire-speed-stars').value);
                 externalSireSprintStars = parseFloatOptional(document.getElementById('external-sire-sprint-stars').value);
@@ -3991,7 +3990,7 @@ function populateColorOptionsFor(bloodId, colorId) {
                 alert(`A horse named "${newBredHorse.name}" already exists in the racing or breeding stable. Please choose a unique name for the bred horse.`);
                 return;
             }
-
+            // Add to bred horses collection
             bredHorses.push(newBredHorse);
             // Optional: Automatically add the bred horse to racing/breeding stable?
             // For now, we just record the breeding event.
@@ -4019,19 +4018,25 @@ function populateColorOptionsFor(bloodId, colorId) {
      
             horses.push(newRacingHorse);
 
+            // Save changes to localStorage
             saveData();
+            // Update UI
             renderBredHorsesTable();
-            renderHorsesTable(); // Update racing horses table
-            updateOverallStats(); // Update overall stats to include the new stud fee
+            renderHorsesTable();
+            updateOverallStats();
+            updateHorseDropdown();
+            updateParentDropdowns();
+            populateAugmentAnalysisHorseFilter();
+            
+            // Reset form
             addBredHorseForm.reset();
-            sireStatsDiv.innerHTML = ''; // Clear parent stats display
+            sireStatsDiv.innerHTML = '';
             damStatsDiv.innerHTML = '';
             
             // Inform user the horse was added to racing horses
             alert(`Horse "${newBredHorse.name}" has been recorded and added to your Racing Horses list!`);
             console.log("Bred horse recorded:", newBredHorse);
         }
-
          function deleteHorse(horseId) {
             // Find the horse to get its status and name for confirmation
             const horseIndex = horses.findIndex(horse => horse.id === horseId);
