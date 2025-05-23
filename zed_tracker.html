@@ -1845,6 +1845,14 @@
                                  <option value="Unknown">Unknown</option>
                              </select>
                          </div>
+                         <!-- Add this after the external sire bloodline select -->
+                        <div class="external-sire-fields" style="display: none;">
+                            <label for="external-sire-color">External Sire Color:</label>
+                            <select id="external-sire-color">
+                                <option value="">--Select--</option>
+                                <!-- Populated dynamically by JS -->
+                            </select>
+                        </div>
                          <div class="external-sire-fields" style="display: none;">
                             <label for="external-sire-overall-stars">Ext. Sire Overall Stars:</label>
                             <input type="number" id="external-sire-overall-stars" step="0.1" min="1" placeholder="Optional">
