@@ -2466,6 +2466,16 @@ document.addEventListener('DOMContentLoaded', () => {
       ));
     }
   });
+  document.addEventListener('DOMContentLoaded', () => {
+    // ...existing code...
+    updateHorseDropdown(); // For race form (only racing horses)
+    updateParentDropdowns(); // For bred form (all horses)
+    updateFoalPredictorDropdowns(); // <-- ADD THIS LINE
+    updateStudAuctionSelect(); // For stud auction form (male breeding horses)
+    updateOverallStats();
+    setupEventListeners();
+    console.log("Tracker Initialized.");
+});
 
   forms.forEach(f => onBloodlineChange(
     `${f.prefix}-bloodline`,
@@ -3807,6 +3817,7 @@ function populateColorOptionsFor(bloodId, colorId) {
             currentlyEditingHorse = null;
              // ...inside handleAddBreedingHorse, after currentlyEditingHorse = null;
             updateStudAuctionSelect();
+            updateFoalPredictorDropdowns();
         }
 
         // --- Add Breeding Horse Handler (Needs similar refactor) --- //
@@ -3862,6 +3873,7 @@ function populateColorOptionsFor(bloodId, colorId) {
                     console.error("Could not find breeding horse to update:", currentlyEditingHorse.id);
                     // Reset state even if update failed
                     currentlyEditingHorse = null;
+                    updateFoalPredictorDropdowns();
                     addBreedingHorseForm.querySelector('button[type="submit"]').textContent = 'Add Breeding Horse';
                     addBreedingHorseForm.reset();
                     return; // Stop execution
@@ -4137,6 +4149,7 @@ function populateColorOptionsFor(bloodId, colorId) {
                 console.log(`Horse ${horseToDelete.name} (ID: ${horseId}) deleted.`);
                 // ...inside deleteHorse, after renderAugmentAnalysis();
                 updateStudAuctionSelect();
+                updateFoalPredictorDropdowns();
             }
          }
 
@@ -5935,7 +5948,7 @@ function populateColorOptionsFor(bloodId, colorId) {
             updateOverallStats(); // Update stats to reflect retirement
             // ...inside handleRetireHorse, after updateOverallStats();
             updateStudAuctionSelect();
-            
+            updateFoalPredictorDropdowns();
             console.log(`Horse ${horse.name} retired with earnings of ${earningsFromRacing.toFixed(2)}`);
         }
 
