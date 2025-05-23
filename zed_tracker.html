@@ -3930,7 +3930,7 @@ function populateColorOptionsFor(bloodId, colorId) {
                  id: `bred-${Date.now()}-${Math.random().toString(16).slice(2)}`,
                  name: nameInput.value.trim(),
                  bloodline: bloodlineSelect.value,
-                 color:  document.getElementById('horse-color').value,
+                 color: document.getElementById('bred-color').value, // Get the actual color value
                  traits: bloodlineTraits[bloodlineVal] || [],
                  attributes: bloodlineAttributes[bloodlineVal] || [],
                  gender: genderSelect.value,
