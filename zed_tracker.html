@@ -3758,11 +3758,13 @@ function populateColorOptionsFor(bloodId, colorId) {
             saveData();
             renderHorsesTable();
             updateHorseDropdown();
-             updateParentDropdowns();
-             populateAugmentAnalysisHorseFilter(); // Refresh the horse filter dropdown
-             addHorseForm.reset();
-             addHorseForm.querySelector('button[type="submit"]').textContent = 'Add Racing Horse';
-             currentlyEditingHorse = null;
+            updateParentDropdowns();
+            populateAugmentAnalysisHorseFilter(); // Refresh the horse filter dropdown
+            addHorseForm.reset();
+            addHorseForm.querySelector('button[type="submit"]').textContent = 'Add Racing Horse';
+            currentlyEditingHorse = null;
+             // ...inside handleAddBreedingHorse, after currentlyEditingHorse = null;
+            updateStudAuctionSelect();
         }
 
         // --- Add Breeding Horse Handler (Needs similar refactor) --- //
@@ -4080,7 +4082,7 @@ function populateColorOptionsFor(bloodId, colorId) {
 
                 // Re-render the correct table based on the original status
                 if (originalStatus === 'racing') {
-             renderHorsesTable();
+                    renderHorsesTable();
                 } else if (originalStatus === 'breeding') {
                     renderBreedingHorsesTable();
                 }
@@ -4091,6 +4093,8 @@ function populateColorOptionsFor(bloodId, colorId) {
                 updateOverallStats(); // Stats might be affected if it was a racing horse
                 renderAugmentAnalysis(); // Re-render analysis
                 console.log(`Horse ${horseToDelete.name} (ID: ${horseId}) deleted.`);
+                // ...inside deleteHorse, after renderAugmentAnalysis();
+                updateStudAuctionSelect();
             }
          }
 
@@ -5887,6 +5891,8 @@ function populateColorOptionsFor(bloodId, colorId) {
             updateParentDropdowns(); // Update parent dropdowns for breeding
             populateAugmentAnalysisHorseFilter(); // Update horse filter in analysis
             updateOverallStats(); // Update stats to reflect retirement
+            // ...inside handleRetireHorse, after updateOverallStats();
+            updateStudAuctionSelect();
             
             console.log(`Horse ${horse.name} retired with earnings of ${earningsFromRacing.toFixed(2)}`);
         }
