@@ -2769,7 +2769,8 @@ function populateColorOptionsFor(bloodId, colorId) {
             renderTransactionsTable(); // Render transactions table
             renderAugmentAnalysis();
             updateHorseDropdown(); // For race form (only racing horses)
-            updateParentDropdowns(); // For bred form (all horses)
+            updateParentDropdowns();
+            updateFoalPredictorDropdowns(); // For bred form (all horses)
             updateStudAuctionSelect(); // For stud auction form (male breeding horses)
             updateOverallStats();
             setupEventListeners();
