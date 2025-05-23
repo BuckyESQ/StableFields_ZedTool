@@ -3414,12 +3414,17 @@ function populateColorOptionsFor(bloodId, colorId) {
             sireSelect.addEventListener('change', (e) => displayParentStats(e.target.value, 'sire'));
             damSelect.addEventListener('change', (e) => displayParentStats(e.target.value, 'dam'));
 
+            // Add event listener for External Sire Bloodline change
+            document.getElementById('external-sire-bloodline').addEventListener('change', function() {
+                populateColorOptionsFor('external-sire-bloodline', 'external-sire-color');
+            });
+
             // Transactions form listener
             const addTransactionForm = document.getElementById('add-transaction-form');
             if (addTransactionForm) {
                 addTransactionForm.addEventListener('submit', handleAddTransaction);
             }
-            
+              // Transactions table listener              
             // Transactions pagination listeners
             const transactionsItemsPerPageSelect = document.getElementById('transactions-items-per-page');
             const transactionsPrevPageButton = document.getElementById('transactions-prev-page');
@@ -3928,9 +3933,7 @@ function populateColorOptionsFor(bloodId, colorId) {
 
             if (useExternalSireCheckbox.checked) {
                 externalSireName = externalSireNameInput.value.trim();
-                externalSireBloodline = externalSireBloodlineSelect.value;document.getElementById('external-sire-bloodline').addEventListener('change', function() {
-                populateColorOptionsFor('external-sire-bloodline', 'external-sire-color');
-            });
+                externalSireBloodline = externalSireBloodlineSelect.value;
                 externalSireColor = document.getElementById('external-sire-color').value; // Get external sire color
                 // Retrieve external sire stars if checkbox is checked
                 externalSireOverallStars = parseFloatOptional(document.getElementById('external-sire-overall-stars').value);
