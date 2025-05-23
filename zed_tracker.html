@@ -2696,16 +2696,17 @@ function populateColorOptionsFor(bloodId, colorId) {
             modalStatsContent = document.getElementById('modal-stats-content');
             modalAnalysisContent = document.getElementById('modal-analysis-content');
             // Initialize modal elements
-        document.getElementById('predict-foal-btn').addEventListener('click', ()=>{
+        document.getElementById('predict-foal-btn').addEventListener('click', (event)=>{
+            event.preventDefault();
             const sireName = document.getElementById('predict-sire').value;
             const damName  = document.getElementById('predict-dam').value;
             if(!sireName||!damName) return;
-            const sire = horses.find(h => h.name === sireName && h.status === 'breeding' && h.gender === 'Male');
-            const dam  = horses.find(h => h.name === damName && h.status === 'breeding' && h.gender === 'Female');
+            const sire = horses.find(h=>h.name===sireName && h.status === 'breeding' && h.gender === 'Male');
+            const dam  = horses.find(h=>h.name===damName && h.status === 'breeding' && h.gender === 'Female');
             const stars = predictFoalStars(sire, dam);
             document.getElementById('foal-prediction-result').textContent =
-                `🎯 Predicted Foal Overall Stars: ${stars}`;
-});
+        `       🎯 Predicted Foal Overall Stars: ${stars}`;
+        }); 
             // Event listeners for modal (now safe to add)
             if (modalCloseBtn) {
                 modalCloseBtn.onclick = hideHorseDetailsModal;
