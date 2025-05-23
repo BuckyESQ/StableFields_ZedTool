@@ -3646,9 +3646,16 @@ function populateColorOptionsFor(bloodId, colorId) {
                 displayParentStats(null, 'sire'); // Clear stats display
                 externalSireNameInput.required = true; // Make external name required
                 externalSireBloodlineSelect.required = true; // Make external bloodline required
+                document.getElementById('external-sire-color').required = true; // Make external color required
+                
+                // Populate color options if bloodline is already selected
+                if (externalSireBloodlineSelect.value) {
+                    populateColorOptionsFor('external-sire-bloodline', 'external-sire-color');
+                }
             } else {
                 externalSireNameInput.required = false;
                 externalSireBloodlineSelect.required = false;
+                document.getElementById('external-sire-color').required = false;
                 sireSelect.required = true; // Ensure internal sire is required again
             }
         }
@@ -3921,7 +3928,9 @@ function populateColorOptionsFor(bloodId, colorId) {
 
             if (useExternalSireCheckbox.checked) {
                 externalSireName = externalSireNameInput.value.trim();
-                externalSireBloodline = externalSireBloodlineSelect.value;
+                externalSireBloodline = externalSireBloodlineSelect.value;document.getElementById('external-sire-bloodline').addEventListener('change', function() {
+                populateColorOptionsFor('external-sire-bloodline', 'external-sire-color');
+            });
                 externalSireColor = document.getElementById('external-sire-color').value; // Get external sire color
                 // Retrieve external sire stars if checkbox is checked
                 externalSireOverallStars = parseFloatOptional(document.getElementById('external-sire-overall-stars').value);
