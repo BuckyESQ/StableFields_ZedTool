@@ -2893,7 +2893,7 @@ function populateColorOptionsFor(bloodId, colorId) {
                 }
             });
 
-             // Restore previous selections if possible
+            // Restore previous selections if possible
              if (allHorses.some(h => h.id === currentSire && h.gender === 'Male')) sireSelect.value = currentSire;
              if (allHorses.some(h => h.id === currentDam && h.gender === 'Female')) damSelect.value = currentDam;
 
@@ -2901,7 +2901,34 @@ function populateColorOptionsFor(bloodId, colorId) {
              displayParentStats(sireSelect.value, 'sire');
              displayParentStats(damSelect.value, 'dam');
         }
+             
+        function updateFoalPredictorDropdowns() {
+            const sireSelect = document.getElementById('predict-sire');
+            const damSelect = document.getElementById('predict-dam');
+            if (!sireSelect || !damSelect) return;
 
+            // Clear existing options
+            sireSelect.innerHTML = '<option value="">--Select--</option>';
+            damSelect.innerHTML = '<option value="">--Select--</option>';
+
+            // Filter breeding horses by gender
+            const breedingMales = horses.filter(h => h.status === 'breeding' && h.gender === 'Male');
+            const breedingFemales = horses.filter(h => h.status === 'breeding' && h.gender === 'Female');
+
+            breedingMales.forEach(horse => {
+                const option = document.createElement('option');
+                option.value = horse.name;
+                option.textContent = horse.name;
+                sireSelect.appendChild(option);
+            });
+
+            breedingFemales.forEach(horse => {
+                const option = document.createElement('option');
+                option.value = horse.name;
+                option.textContent = horse.name;
+                damSelect.appendChild(option);
+            });        
+        }
 
         // --- Rendering ---
         function renderHorsesTable() {
@@ -3170,7 +3197,7 @@ function populateColorOptionsFor(bloodId, colorId) {
         function renderBreedingHorsesTable() { // Renamed function
             breedingStableTableBody.innerHTML = ''; // Use distinct variable name
             const formatStars = (stars) => (stars !== null && stars !== undefined && stars !== '') ? Number(stars).toFixed(1) : '-';
-
+            
             // Filter for breeding horses
             const breedingHorsesFiltered = horses.filter(h => h.status === 'breeding'); // Filter for 'breeding' status
             // TODO: Add sorting if needed later (e.g., by name)
