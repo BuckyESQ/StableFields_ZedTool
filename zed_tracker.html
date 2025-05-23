@@ -2711,6 +2711,14 @@ function populateColorOptionsFor(bloodId, colorId) {
             modalStatsContent = document.getElementById('modal-stats-content');
             modalAnalysisContent = document.getElementById('modal-analysis-content');
             // Initialize modal elements
+        function predictFoalStars(sire, dam) {
+            // Simple average of overall stars, fallback to 0 if missing
+            if (!sire || !dam) return 0;
+            const sireStars = typeof sire.stars === 'number' ? sire.stars : parseFloat(sire.stars) || 0;
+            const damStars = typeof dam.stars === 'number' ? dam.stars : parseFloat(dam.stars) || 0;
+            // You can adjust the formula as needed
+            return ((sireStars + damStars) / 2).toFixed(1);
+        }
         function predictFoalBloodline(sire, dam) {
             // 75% chance Sire's bloodline, 25% Dam's bloodline
             if (!sire || !dam) return '';
