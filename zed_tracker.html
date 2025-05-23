@@ -3907,17 +3907,17 @@ function populateColorOptionsFor(bloodId, colorId) {
 
         function handleAddBredHorse(event) {
             event.preventDefault();
-            const nameInput = document.getElementById('bred-name');
-            const bloodlineSelect = document.getElementById('bred-bloodline');
-            const colorSelect = document.getElementById('bred-color'); 
-            const genderSelect = document.getElementById('bred-gender');
-            const sireSelect = document.getElementById('bred-sire');
-            const damSelect = document.getElementById('bred-dam');
-            const dateInput = document.getElementById('bred-date');
-            const starsInput = document.getElementById('bred-overall-stars');
-            const speedStarsInput = document.getElementById('bred-speed-stars');
-            const sprintStarsInput = document.getElementById('bred-sprint-stars');
-            const enduranceStarsInput = document.getElementById('bred-endurance-stars');
+            // Debug: check all fields
+            const ids = [
+                'bred-name', 'bred-bloodline', 'bred-color', 'bred-gender',
+                'bred-sire', 'bred-dam', 'bred-date', 'bred-stud-fee',
+                'bred-overall-stars', 'bred-speed-stars', 'bred-sprint-stars', 'bred-endurance-stars'
+            ];
+            ids.forEach(id => {
+                if (!document.getElementById(id)) {
+                    console.error('Missing field:', id);
+                }
+            });
 
             const parseFloatOptional = (value) => value ? parseFloat(value) : null;
 
