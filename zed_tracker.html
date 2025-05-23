@@ -2711,6 +2711,12 @@ function populateColorOptionsFor(bloodId, colorId) {
             modalStatsContent = document.getElementById('modal-stats-content');
             modalAnalysisContent = document.getElementById('modal-analysis-content');
             // Initialize modal elements
+        function predictFoalBloodline(sire, dam) {
+            // 75% chance Sire's bloodline, 25% Dam's bloodline
+            if (!sire || !dam) return '';
+            return Math.random() < 0.75 ? sire.bloodline : dam.bloodline;
+        }
+
         document.getElementById('predict-foal-btn').addEventListener('click', (event)=>{
             event.preventDefault();
             const sireName = document.getElementById('predict-sire').value;
@@ -2719,10 +2725,11 @@ function populateColorOptionsFor(bloodId, colorId) {
             const sire = horses.find(h=>h.name===sireName && h.status === 'breeding' && h.gender === 'Male');
             const dam  = horses.find(h=>h.name===damName && h.status === 'breeding' && h.gender === 'Female');
             const stars = predictFoalStars(sire, dam);
+            const predictedBloodline = predictFoalBloodline(sire, dam);
             document.getElementById('foal-prediction-result').textContent =
-        `       🎯 Predicted Foal Overall Stars: ${stars}`;
-        }); 
-            // Event listeners for modal (now safe to add)
+                `🎯 Predicted Foal Overall Stars: ${stars}\n🧬 Predicted Bloodline: ${predictedBloodline}`;
+        });
+                    // Event listeners for modal (now safe to add)
             if (modalCloseBtn) {
                 modalCloseBtn.onclick = hideHorseDetailsModal;
             }
