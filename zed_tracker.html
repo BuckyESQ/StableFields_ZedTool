@@ -3958,7 +3958,7 @@ function populateColorOptionsFor(bloodId, colorId) {
                 externalSireSprintStars: externalSireSprintStars,
                 externalSireEnduranceStars: externalSireEnduranceStars,
                 damId: damSelect.value,
-                bredDate: dateInput.value || null,
+                bredDate: dateInput.value || new Date().toISOString().split('T')[0], // Default to today if not specified
                 studFeePaid: parseFloat(document.getElementById('bred-stud-fee').value) || 0,
                 stars: parseFloatOptional(starsInput.value),
                 speedStars: parseFloatOptional(speedStarsInput.value),
@@ -3970,6 +3970,7 @@ function populateColorOptionsFor(bloodId, colorId) {
             if (!newBredHorse.name) { alert("New Horse Name is required."); return; }
             if (!newBredHorse.bloodline) { alert("Please select a Bloodline for the new horse."); return; }
             if (!newBredHorse.gender) { alert("Please select a Gender for the new horse."); return; }
+            if (!newBredHorse.color) { alert("Please select a Color for the new horse."); return; }
             
             // Updated validation logic for sire - handle external sire case
             const isExternalSire = useExternalSireCheckbox.checked;
@@ -3985,15 +3986,14 @@ function populateColorOptionsFor(bloodId, colorId) {
             if (isNaN(newBredHorse.studFeePaid)) { alert("Please enter a valid number for Stud Fee Paid (or 0)."); return; }
 
             // Check for duplicate names across ALL horses
-            const allHorseNames = [...horses].map(h => h.name.toLowerCase());
+            const allHorseNames = horses.map(h => h.name.toLowerCase());
             if (allHorseNames.includes(newBredHorse.name.toLowerCase())) {
                 alert(`A horse named "${newBredHorse.name}" already exists in the racing or breeding stable. Please choose a unique name for the bred horse.`);
                 return;
             }
+
             // Add to bred horses collection
             bredHorses.push(newBredHorse);
-            // Optional: Automatically add the bred horse to racing/breeding stable?
-            // For now, we just record the breeding event.
 
             // Add the bred horse to racing horses automatically
             const studFee = parseFloat(document.getElementById('bred-stud-fee').value) || 0;
@@ -4003,23 +4003,24 @@ function populateColorOptionsFor(bloodId, colorId) {
                 id: newBredHorse.id,
                 name: newBredHorse.name,
                 bloodline: newBredHorse.bloodline,
-                color: newBredHorse.color, // Use the correct color value
+                color: newBredHorse.color,
                 gender: newBredHorse.gender,
                 stars: newBredHorse.stars,
                 speedStars: newBredHorse.speedStars,
                 sprintStars: newBredHorse.sprintStars,
                 enduranceStars: newBredHorse.enduranceStars,
-                initialZedBalance: initialBalance, // Set initial balance to half the stud fee
-                initialMmRating: 1000, // Default MMR
+                initialZedBalance: initialBalance,
+                initialMmRating: 1000,
                 status: 'racing',
                 dateAcquired: new Date().toISOString().split('T')[0],
                 notes: "Bred horse"
             };
-     
+            
             horses.push(newRacingHorse);
 
             // Save changes to localStorage
             saveData();
+            
             // Update UI
             renderBredHorsesTable();
             renderHorsesTable();
@@ -4033,9 +4034,14 @@ function populateColorOptionsFor(bloodId, colorId) {
             sireStatsDiv.innerHTML = '';
             damStatsDiv.innerHTML = '';
             
+            // Also reset external sire fields display
+            externalSireFields.forEach(field => {
+                field.style.display = 'none';
+            });
+            useExternalSireCheckbox.checked = false;
+            
             // Inform user the horse was added to racing horses
-            alert(`Horse "${newBredHorse.name}" has been recorded and added to your Racing Horses list!`);
-            console.log("Bred horse recorded:", newBredHorse);
+            alert(`Horse "${newBredHorse.name}" has been recorded and added to your Racing Horses list!`);;
         }
          function deleteHorse(horseId) {
             // Find the horse to get its status and name for confirmation
