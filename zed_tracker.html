@@ -3921,7 +3921,7 @@ function populateColorOptionsFor(bloodId, colorId) {
 
             const parseFloatOptional = (value) => value ? parseFloat(value) : null;
 
-            // Determine Sire details based on checkbox
+            // Initialize variables for both internal and external sire cases
             let sireId = null;
             let externalSireName = null;
             let externalSireBloodline = null;
@@ -3931,15 +3931,20 @@ function populateColorOptionsFor(bloodId, colorId) {
             let externalSireSprintStars = null;
             let externalSireEnduranceStars = null;
 
-            if (useExternalSireCheckbox.checked) {
-                externalSireName = externalSireNameInput.value.trim();
-                externalSireBloodline = externalSireBloodlineSelect.value;
+            // Check if using external sire
+            const isExternalSire = useExternalSireCheckbox.checked;
+
+            if (isExternalSire) {
+                // External sire - get values from external sire fields
+                externalSireName = document.getElementById('external-sire-name').value.trim();
+                externalSireBloodline = document.getElementById('external-sire-bloodline').value;
                 externalSireColor = document.getElementById('external-sire-color').value;
                 externalSireOverallStars = parseFloatOptional(document.getElementById('external-sire-overall-stars').value);
                 externalSireSpeedStars = parseFloatOptional(document.getElementById('external-sire-speed-stars').value);
                 externalSireSprintStars = parseFloatOptional(document.getElementById('external-sire-sprint-stars').value);
                 externalSireEnduranceStars = parseFloatOptional(document.getElementById('external-sire-endurance-stars').value);
             } else {
+                // Internal sire - get ID from select
                 sireId = sireSelect.value;
             }
 
@@ -3947,18 +3952,18 @@ function populateColorOptionsFor(bloodId, colorId) {
                 id: `bred-${Date.now()}-${Math.random().toString(16).slice(2)}`,
                 name: nameInput.value.trim(),
                 bloodline: bloodlineSelect.value,
-                color: colorSelect.value, // Use the color from color select
+                color: colorSelect.value,
                 gender: genderSelect.value,
-                sireId: sireId, // Can be null if external
-                externalSireName: externalSireName, // Name if external
-                externalSireBloodline: externalSireBloodline, // Bloodline if external
-                externalSireColor: externalSireColor, // Color if external
-                externalSireOverallStars: externalSireOverallStars, // Store external sire stars
+                sireId: sireId, // Will be null for external sire
+                externalSireName: externalSireName,
+                externalSireBloodline: externalSireBloodline,
+                externalSireColor: externalSireColor,
+                externalSireOverallStars: externalSireOverallStars,
                 externalSireSpeedStars: externalSireSpeedStars,
                 externalSireSprintStars: externalSireSprintStars,
                 externalSireEnduranceStars: externalSireEnduranceStars,
                 damId: damSelect.value,
-                bredDate: dateInput.value || new Date().toISOString().split('T')[0], // Default to today if not specified
+                bredDate: dateInput.value || new Date().toISOString().split('T')[0], // Default to today
                 studFeePaid: parseFloat(document.getElementById('bred-stud-fee').value) || 0,
                 stars: parseFloatOptional(starsInput.value),
                 speedStars: parseFloatOptional(speedStarsInput.value),
@@ -3972,8 +3977,7 @@ function populateColorOptionsFor(bloodId, colorId) {
             if (!newBredHorse.gender) { alert("Please select a Gender for the new horse."); return; }
             if (!newBredHorse.color) { alert("Please select a Color for the new horse."); return; }
             
-            // Updated validation logic for sire - handle external sire case
-            const isExternalSire = useExternalSireCheckbox.checked;
+            // Validation specifically for sire
             if (isExternalSire) {
                 if (!newBredHorse.externalSireName) { alert("External Sire Name is required."); return; }
                 if (!newBredHorse.externalSireBloodline) { alert("Please select a Bloodline for the External Sire."); return; }
@@ -3985,7 +3989,7 @@ function populateColorOptionsFor(bloodId, colorId) {
             if (!newBredHorse.damId) { alert("Please select the Dam (Mother)."); return; }
             if (isNaN(newBredHorse.studFeePaid)) { alert("Please enter a valid number for Stud Fee Paid (or 0)."); return; }
 
-            // Check for duplicate names across ALL horses
+            // Check for duplicate names
             const allHorseNames = horses.map(h => h.name.toLowerCase());
             if (allHorseNames.includes(newBredHorse.name.toLowerCase())) {
                 alert(`A horse named "${newBredHorse.name}" already exists in the racing or breeding stable. Please choose a unique name for the bred horse.`);
@@ -4041,7 +4045,7 @@ function populateColorOptionsFor(bloodId, colorId) {
             useExternalSireCheckbox.checked = false;
             
             // Inform user the horse was added to racing horses
-            alert(`Horse "${newBredHorse.name}" has been recorded and added to your Racing Horses list!`);;
+            alert(`Horse "${newBredHorse.name}" has been recorded and added to your Racing Horses list!`);
         }
          function deleteHorse(horseId) {
             // Find the horse to get its status and name for confirmation
@@ -5920,6 +5924,8 @@ function populateColorOptionsFor(bloodId, colorId) {
             event.preventDefault();
             
             const horseId = studAuctionHorseSelect.value;
+            
+            // Make sure we parse as floats and handle cases where values might be empty
             let auctionPrice = parseFloat(studAuctionPriceInput.value) || 0;
             let commission = parseFloat(studAuctionCommissionInput.value) || 0;
             const auctionDate = studAuctionDateInput.value || new Date().toISOString().split('T')[0]; // Today if not specified
@@ -5958,13 +5964,14 @@ function populateColorOptionsFor(bloodId, colorId) {
                 // Update existing record
                 const index = studAuctions.findIndex(sa => sa.id === currentlyEditingStudAuction.id);
                 if (index !== -1) {
-                    currentlyEditingStudAuction.horseId = horseId;
-                    currentlyEditingStudAuction.horseName = horse.name;
-                    currentlyEditingStudAuction.auctionPrice = auctionPrice;
-                    currentlyEditingStudAuction.commission = commission;
-                    currentlyEditingStudAuction.date = auctionDate;
-                    
-                    studAuctions[index] = currentlyEditingStudAuction;
+                    studAuctions[index] = {
+                        ...currentlyEditingStudAuction,
+                        horseId: horseId,
+                        horseName: horse.name,
+                        auctionPrice: auctionPrice,
+                        commission: commission,
+                        date: auctionDate
+                    };
                 }
             } else {
                 // Create new record
