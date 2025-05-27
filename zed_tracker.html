@@ -3935,6 +3935,12 @@ function populateColorOptionsFor(bloodId, colorId) {
             const cpuSelect = document.getElementById('race-cpu-augment');
             const ramSelect = document.getElementById('race-ram-augment');
             const hydraulicSelect = document.getElementById('race-hydraulic-augment');
+            const raceNameInput = document.getElementById('race-name');
+            const raceDateInput = document.getElementById('race-date');
+            const split1Input = document.getElementById('race-split-1');
+            const split2Input = document.getElementById('race-split-2');
+            const split3Input = document.getElementById('race-split-3');
+            const split4Input = document.getElementById('race-split-4');
 
              const raceData = {
                 horseId: horseSelect.value,
@@ -3950,17 +3956,18 @@ function populateColorOptionsFor(bloodId, colorId) {
              };
 
             // Validation
-            if (!raceData.horseId) { alert("Please select a horse."); return; }
-            if (isNaN(raceData.position) || raceData.position < 1) { alert("Please enter a valid finishing place (1 or higher)."); return; }
-            if (isNaN(raceData.odds) || raceData.odds < 1) { alert("Please enter valid odds (1 or higher)."); return; }
-            // time is optional
-            if (isNaN(raceData.zedChange)) { alert("Please enter the $ZED Won/Lost."); return; }
-            // MM Change is now optional
-            // Ensure MM Change is a number if provided
-            if (ratingChangeInput.value && isNaN(raceData.ratingChange)) {
-                alert("Please enter a valid number for the Matchmaking Rating Change, or leave it empty.");
-                 return;
-            }
+            if (!horseSelect.value) { alert("Please select a horse."); return; }
+            if (isNaN(parseInt(positionInput.value)) || parseInt(positionInput.value) < 1) { alert("Please enter a valid finishing place (1 or higher)."); return; }
+            if (isNaN(parseFloat(oddsInput.value)) || parseFloat(oddsInput.value) < 1) { alert("Please enter valid odds (1 or higher)."); return; }
+            if (isNaN(parseFloat(zedChangeInput.value))) { alert("Please enter the $ZED Won/Lost."); return; }
+            if (ratingChangeInput.value && isNaN(parseInt(ratingChangeInput.value))) { alert("Please enter a valid number for the Matchmaking Rating Change, or leave it empty."); return; }
+            // Splits validation (optional, but must be positive if filled)
+            for (let i = 1; i <= 4; i++) {
+                const splitVal = document.getElementById(`race-split-${i}`).value;
+                if (splitVal && (isNaN(parseFloat(splitVal)) || parseFloat(splitVal) < 0)) {
+                    alert(`Please enter a valid positive number for Split ${i}, or leave it empty.`);
+                    return;
+                }
 
             if (!horses.some(h => h.id === raceData.horseId)) {
                 alert("Selected horse not found. Please add the horse first or refresh.");
