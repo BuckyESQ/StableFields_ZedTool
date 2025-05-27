@@ -2628,19 +2628,58 @@ function setupZedApiUI() {
     `;
     
     // Add section to settings tab
-    settingsTab.appendChild(apiSection);
+    settingsTab.insertBefore(apiSection, settingsTab.firstChild);
     
-    // Add event listeners
+// Replace your existing setupZedApiUI function
+
+function setupZedApiUI() {
+    const settingsTab = document.getElementById('tab-content-settings');
+    if (!settingsTab) return;
+    
+    const apiSection = document.createElement('div');
+    apiSection.className = 'section';
+    apiSection.innerHTML = `
+        <h2>ZedChampions API Integration</h2>
+        
+        <div class="token-notice">
+            <p><strong>Note:</strong> ZedChampions API tokens expire after 24 hours. You'll need to get a new token daily.</p>
+            <p>To get a new token: Open ZedChampions in your browser, open Developer Tools (F12), 
+            go to Network tab, reload the page, find any API request, and copy the "Authorization" header value.</p>
+        </div>
+        
+        <div style="margin-top: 15px;">
+            <label for="zed-api-token" style="display: block; margin-bottom: 5px;">API Token:</label>
+            <input type="password" id="zed-api-token" style="width: 400px; padding: 10px;" placeholder="Enter your ZedChampions API token">
+        </div>
+        
+        <div style="margin-top: 15px; display: flex; gap: 10px;">
+            <button id="save-api-token-btn" class="button">Save Token</button>
+            <button id="test-api-connection-btn" class="button">Test Connection</button>
+        </div>
+        
+        <div id="api-connection-status" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;"></div>
+    `;
+    
+    // Add to beginning of settings tab
+    settingsTab.insertBefore(apiSection, settingsTab.firstChild);
+    
+    // Add event handlers
     const saveTokenBtn = document.getElementById('save-api-token-btn');
     const testConnectionBtn = document.getElementById('test-api-connection-btn');
-    const searchHorseBtn = document.getElementById('search-zed-horse-btn');
     
     if (saveTokenBtn) {
-        saveTokenBtn.addEventListener('click', () => {
+        saveTokenBtn.addEventListener('click', function() {
             const tokenInput = document.getElementById('zed-api-token');
             if (tokenInput && tokenInput.value) {
-                ZED_API.setAuthToken(tokenInput.value);
-                showConnectionStatus('Token saved successfully.', true);
+                if (ZED_API.setAuthToken(tokenInput.value)) {
+                    showConnectionStatus('Token saved successfully. Testing connection...', null);
+                    
+                    ZED_API.testConnection().then(result => {
+                        showConnectionStatus(result.message, result.success);
+                    });
+                } else {
+                    showConnectionStatus('Invalid token format. Token should be a JWT.', false);
+                }
             } else {
                 showConnectionStatus('Please enter a valid token.', false);
             }
@@ -2648,7 +2687,7 @@ function setupZedApiUI() {
     }
     
     if (testConnectionBtn) {
-        testConnectionBtn.addEventListener('click', async () => {
+        testConnectionBtn.addEventListener('click', async function() {
             showConnectionStatus('Testing connection...', null);
             
             const result = await ZED_API.testConnection();
@@ -2656,68 +2695,42 @@ function setupZedApiUI() {
         });
     }
     
-    if (searchHorseBtn) {
-        searchHorseBtn.addEventListener('click', async () => {
-            const horseInput = document.getElementById('zed-import-horse-id');
-            if (!horseInput || !horseInput.value) {
-                showConnectionStatus('Please enter a horse ID or name.', false);
-                return;
-            }
-            
-            const searchResults = document.getElementById('zed-search-results');
-            const resultsContent = document.getElementById('zed-search-results-content');
-            
-            if (searchResults) searchResults.style.display = 'block';
-            if (resultsContent) resultsContent.innerHTML = '<p>Searching...</p>';
-            
-            const result = await ZED_API.searchHorses(horseInput.value);
-            
-            if (result.success && resultsContent) {
-                if (result.data.length === 0) {
-                    resultsContent.innerHTML = '<p>No horses found matching your search.</p>';
-                } else {
-                    resultsContent.innerHTML = `
-                        <table style="width: 100%;">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Bloodline</th>
-                                    <th>Gen</th>
-                                    <th>Gender</th>
-                                    <th>Stars</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${result.data.map(horse => `
-                                    <tr>
-                                        <td>${horse.name}</td>
-                                        <td>${horse.bloodline}</td>
-                                        <td>${horse.genotype || 'N/A'}</td>
-                                        <td>${horse.gender}</td>
-                                        <td>${horse.overall_rating || 'N/A'}</td>
-                                        <td>
-                                            <button class="button" onclick="importHorseFromZed('${horse.id}')">Import</button>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    `;
-                }
-            } else if (resultsContent) {
-                resultsContent.innerHTML = `<p style="color: var(--error-color);">Error: ${result.message}</p>`;
-            }
-        });
-    }
-    
-    // Load token from storage
+    // Load token from storage and check status
     if (ZED_API.loadAuthToken()) {
         const tokenInput = document.getElementById('zed-api-token');
         if (tokenInput) {
             tokenInput.value = "••••••••••••••••••••••"; // Mask the actual token
         }
+        
+        if (ZED_API.isTokenExpired()) {
+            showConnectionStatus("Your API token has expired. Please get a new token.", false);
+        } else {
+            ZED_API.testConnection().then(result => {
+                if (result.success) {
+                    const expiryMsg = ZED_API.tokenExpiry ? 
+                        ` Token valid until ${ZED_API.tokenExpiry.toLocaleString()}.` : '';
+                    showConnectionStatus(result.message + expiryMsg, true);
+                } else {
+                    showConnectionStatus(result.message, false);
+                }
+            });
+        }
     }
+    
+    // Add CSS for token notice
+    const style = document.createElement('style');
+    style.textContent = `
+        .token-notice {
+            background-color: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #ffc107;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+    `;
+    document.head.appendChild(style);
 }
 
 // Helper function to display API connection status
@@ -2796,7 +2809,43 @@ function importHorseFromZed(horseId) {
         activateTab(newHorse.status === 'racing' ? 'racing' : 'breeding');
     });
 }
-
+            // Load token from storage and check status
+    if (ZED_API.loadAuthToken()) {
+        const tokenInput = document.getElementById('zed-api-token');
+        if (tokenInput) {
+            tokenInput.value = "••••••••••••••••••••••"; // Mask the actual token
+        }
+        
+        if (ZED_API.isTokenExpired()) {
+            showConnectionStatus("Your API token has expired. Please get a new token.", false);
+        } else {
+            ZED_API.testConnection().then(result => {
+                if (result.success) {
+                    const expiryMsg = ZED_API.tokenExpiry ? 
+                        ` Token valid until ${ZED_API.tokenExpiry.toLocaleString()}.` : '';
+                    showConnectionStatus(result.message + expiryMsg, true);
+                } else {
+                    showConnectionStatus(result.message, false);
+                }
+            });
+        }
+    }
+    
+    // Add CSS for token notice
+    const style = document.createElement('style');
+    style.textContent = `
+        .token-notice {
+            background-color: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #ffc107;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+    `;
+    document.head.appendChild(style);
+}
 // Add to setupEventListeners function
 const originalSetupEventListeners = setupEventListeners;
 setupEventListeners = function() {
