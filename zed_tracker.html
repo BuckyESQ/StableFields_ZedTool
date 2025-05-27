@@ -2316,289 +2316,285 @@
  <script>
 // 1️⃣ Define your color palettes per bloodline.
 
-const breedColorOptions = {
-  Nakamoto: {
-  },
-  Szabo: {
-  },
-  Finney: {
-  },
-  Buterin: {
-  }
-};
-4' },
-        { label:'sun glow',hex:'#FFDD44' },
-        { label:'burnt sienna',hex:'#E97451' },
-        { label:'pomegranate',hex:'#F34723' },
-        { label:'cinnabar',hex:'#E34234' },
-        { label:'Alizarin crimson',hex:'#E32636' },
-        { label:'mauvelous',hex:'#EF98AA' },
-        { label:'fraley',hex:'#EE204D' },
-        { label:'French rose',hex:'#F64A8A' },
-        { label:'amaranth',hex:'#E52B50' },
-        { label:'maroon flush',hex:'#C32148' },
-        { label:'jazzberry jam',hex:'#A50B5E' }
-      ],
-    "rare": [
-        { label:'torch red',hex:'#E25822' },
-        { label:'razzmatazz',hex:'#E3256B' }
-      ],
-    "super rare": [
-        { label:'guardsman red',hex:'#C41E3A' },
-        { label:'black',hex:'#000000' }
-      ]
-  },
-  Szabo: {
-    "normal": [
-        { label:'malibu',hex:'#7DC8F7' },
-        { label:'Jordy blue',hex:'#8AB9F1' },
-        { label:'dodger blue',hex:'#1E90FF' },
-        { label:'cerulean',hex:'#007BA7' },
-        { label:'curious blue',hex:'#4592AF' },
-        { label:'lochmara',hex:'#2E8B57' },
-        { label:'spray',hex:'#85C4CC' },
-        { label:'turquoise blue',hex:'#40E0D0' },
-        { label:'scooter',hex:'#3FD0B9' },
-        { label:'Robins egg blue',hex:'#00CCCC' },
-        { label:'Pacific blue',hex:'#1CA9C9' },
-        { label:'Bondi blue',hex:'#0095B6' }
-      ],
-      "rare": [
-        { label:'aqua',hex:'#00FFFF' },
-        { label:'cyan',hex:'#00B7EB' }
-      ],
-      "super rare": [
-        { label:'wild blue yonder',hex:'#A2ADD0' },
-        { label:'boulder',hex:'#7A7F9A' }
-      ]
-  },
-  Finney: {
-    "normal": [
-        { label:'light wisteria',hex:'#C9A0DC' },
-        { label:'amethyst',hex:'#9966CC' },
-        { label:'mamba',hex:'#4E5180' },
-        { label:'séance',hex:'#6F00FF' },
-        { label:'purple heart',hex:'#69359C' },
-        { label:'eminence',hex:'#6C3082' },
-        { label:'lavender',hex:'#E6E6FA' },
-        { label:'lilac bush',hex:'#9874D3' },
-        { label:'fuchsia blue',hex:'#7D26CD' },
-        { label:'mischka',hex:'#D1C6B3' },
-        { label:'manatee',hex:'#979AAA' },
-        { label:'Daisy Bush',hex:'#FFEB6A' }
-      ],
-      "rare": [
-        { label:'heliotrope',hex:'#DF73FF' },
-        { label:'prelude',hex:'#DF8EAA' }
-      ],
-      "super rare": [
-        { label:'electric violet',hex:'#8F00FF' },
-        { label:'white',hex:'#FFFFFF' }
-      ]
-  },
-  Buterin: {
-    "normal":[
-        { label:'picasso',hex:'#7A715C' },
-        { label:'Paris Daisy',hex:'#FFE3A3' },
-        { label:'gorse',hex:'#FADA5E' },
-        { label:'astra',hex:'#F0F8FF' },
-        { label:'bright sun',hex:'#FFAA1D' },
-        { label:'Lightning yellow',hex:'#F8DE7E' },
-        { label:'primrose',hex:'#FDE910' },
-        { label:'Manz',hex:'#FFCF48' },
-        { label:'wattle',hex:'#D4AF37' },
-        { label:'pear',hex:'#D1E231' },
-        { label:'earls',hex:'#C49E3F' },
-        { label:'ginger',hex:'#B06500' }
-      ],
-      "rare":[
-        { label:'Electric lime',hex:'#CCFF00' },
-        { label:'shalamar',hex:'#7C1C05' }
-      ],
-      "super rare":[
-        { label:'golf',hex:'#C0C0A8' },
-        { label:'silver',hex:'#C0C0C0' }
-      ]
-  }
-};
-// 2️⃣ Define traits and Attributes per bloodline
-const bloodlineTraits = {
-  Nakamoto: ['High start','Nervous','Defensive','Sensitive','Reactive'],
-  Szabo:    ['Calm','Focused','Professional'],
-  Finney:   ['Determined','Stubborn','Hungry','Defensive'],
-  Buterin:  ['Goofy','Playful','Distracted','Restless']
-};
-
-const bloodlineAttributes = {
-  Nakamoto: ['strong start'],
-  Szabo:    ['steady'],
-  Finney:   ['strong finish'],
-  Buterin:  ['unpredictable']
-};
-const forms = [
-  { prefix: 'horse',          color:'horse-color',          traits:'horse-traits',           attrs:'horse-attributes' },
-  { prefix: 'breeding-horse', color:'breeding-horse-color', traits:'breeding-horse-traits',  attrs:'breeding-horse-attributes' },
-  { prefix: 'bred',           color:'bred-color',           traits:'bred-horse-traits',      attrs:'bred-horse-attributes' }
-];
-// INSERT HERE (after forms array, before DOMContentLoaded)
-function onBloodlineChange(bloodId, colorId, traitsId, attrsId) {
-  const bloodEl = document.getElementById(bloodId);
-  const colorEl = document.getElementById(colorId);
-  const traitsEl = document.getElementById(traitsId);
-  const attrsEl = document.getElementById(attrsId);
-
-  // Update color options
-  if (bloodEl && colorEl) {
-    colorEl.innerHTML = '<option value="">--Select Color--</option>';
-    const blood = bloodEl.value;
-    if (blood && breedColorOptions[blood]) {
-      ["normal","rare","super rare"].forEach(rarity => {
-        const group = breedColorOptions[blood][rarity];
-        if (group && group.length) {
-          const optgroup = document.createElement('optgroup');
-          optgroup.label = rarity.charAt(0).toUpperCase() + rarity.slice(1);
-          group.forEach(c => {
-            const o = document.createElement('option');
-            o.value = c.hex;
-            o.textContent = `${c.label} (${c.hex})`;
-            o.title = c.hex;
-            o.style.backgroundColor = c.hex;
-            o.setAttribute('data-rarity', rarity);
-            optgroup.appendChild(o);
-          });
-          colorEl.appendChild(optgroup);
+        const breedColorOptions = {
+        Nakamoto: {
+            "normal": [
+            { label:'crimson',hex:'#DC143C' },
+            { label:'fire brick',hex:'#B22222' },
+            { label:'red',hex:'#FF0000' },
+            { label:'vermilion',hex:'#E34234' },
+            { label:'bittersweet',hex:'#FE6F5E' },
+            { label:'sun glow',hex:'#FFDD44' },
+            { label:'burnt sienna',hex:'#E97451' },
+            { label:'pomegranate',hex:'#F34723' },
+            { label:'cinnabar',hex:'#E34234' },
+            { label:'Alizarin crimson',hex:'#E32636' },
+            { label:'mauvelous',hex:'#EF98AA' },
+            { label:'fraley',hex:'#EE204D' },
+            { label:'French rose',hex:'#F64A8A' },
+            { label:'amaranth',hex:'#E52B50' },
+            { label:'maroon flush',hex:'#C32148' },
+            { label:'jazzberry jam',hex:'#A50B5E' }
+            ],
+            "rare": [
+            { label:'torch red',hex:'#E25822' },
+            { label:'razzmatazz',hex:'#E3256B' }
+            ],
+            "super rare": [
+            { label:'guardsman red',hex:'#C41E3A' },
+            { label:'black',hex:'#000000' }
+            ]
+        },
+        Szabo: {
+            "normal": [
+                { label:'malibu',hex:'#7DC8F7' },
+                { label:'Jordy blue',hex:'#8AB9F1' },
+                { label:'dodger blue',hex:'#1E90FF' },
+                { label:'cerulean',hex:'#007BA7' },
+                { label:'curious blue',hex:'#4592AF' },
+                { label:'lochmara',hex:'#2E8B57' },
+                { label:'spray',hex:'#85C4CC' },
+                { label:'turquoise blue',hex:'#40E0D0' },
+                { label:'scooter',hex:'#3FD0B9' },
+                { label:'Robins egg blue',hex:'#00CCCC' },
+                { label:'Pacific blue',hex:'#1CA9C9' },
+                { label:'Bondi blue',hex:'#0095B6' }
+            ],
+            "rare": [
+                { label:'aqua',hex:'#00FFFF' },
+                { label:'cyan',hex:'#00B7EB' }
+            ],
+            "super rare": [
+                { label:'wild blue yonder',hex:'#A2ADD0' },
+                { label:'boulder',hex:'#7A7F9A' }
+            ]
+        },
+        Finney: {
+            "normal": [
+                { label:'light wisteria',hex:'#C9A0DC' },
+                { label:'amethyst',hex:'#9966CC' },
+                { label:'mamba',hex:'#4E5180' },
+                { label:'séance',hex:'#6F00FF' },
+                { label:'purple heart',hex:'#69359C' },
+                { label:'eminence',hex:'#6C3082' },
+                { label:'lavender',hex:'#E6E6FA' },
+                { label:'lilac bush',hex:'#9874D3' },
+                { label:'fuchsia blue',hex:'#7D26CD' },
+                { label:'mischka',hex:'#D1C6B3' },
+                { label:'manatee',hex:'#979AAA' },
+                { label:'Daisy Bush',hex:'#FFEB6A' }
+            ],
+            "rare": [
+                { label:'heliotrope',hex:'#DF73FF' },
+                { label:'prelude',hex:'#DF8EAA' }
+            ],
+            "super rare": [
+                { label:'electric violet',hex:'#8F00FF' },
+                { label:'white',hex:'#FFFFFF' }
+            ]
+        },
+        Buterin: {
+            "normal":[
+                { label:'picasso',hex:'#7A715C' },
+                { label:'Paris Daisy',hex:'#FFE3A3' },
+                { label:'gorse',hex:'#FADA5E' },
+                { label:'astra',hex:'#F0F8FF' },
+                { label:'bright sun',hex:'#FFAA1D' },
+                { label:'Lightning yellow',hex:'#F8DE7E' },
+                { label:'primrose',hex:'#FDE910' },
+                { label:'Manz',hex:'#FFCF48' },
+                { label:'wattle',hex:'#D4AF37' },
+                { label:'pear',hex:'#D1E231' },
+                { label:'earls',hex:'#C49E3F' },
+                { label:'ginger',hex:'#B06500' }
+            ],
+            "rare":[
+                { label:'Electric lime',hex:'#CCFF00' },
+                { label:'shalamar',hex:'#7C1C05' }
+            ],
+            "super rare":[
+                { label:'golf',hex:'#C0C0A8' },
+                { label:'silver',hex:'#C0C0C0' }
+            ]
         }
-      });
-      if (colorEl.options.length > 1) colorEl.selectedIndex = 1;
-    }
-  }
+        };
+        // 2️⃣ Define traits and Attributes per bloodline
+        const bloodlineTraits = {
+        Nakamoto: ['High start','Nervous','Defensive','Sensitive','Reactive'],
+        Szabo:    ['Calm','Focused','Professional'],
+        Finney:   ['Determined','Stubborn','Hungry','Defensive'],
+        Buterin:  ['Goofy','Playful','Distracted','Restless']
+        };
 
-  // Update traits
-  if (bloodEl && traitsEl) {
-    traitsEl.innerHTML = '';
-    (bloodlineTraits[bloodEl.value] || []).forEach(t => {
-      const li = document.createElement('li');
-      li.textContent = t;
-      traitsEl.appendChild(li);
-    });
-  }
+        const bloodlineAttributes = {
+        Nakamoto: ['strong start'],
+        Szabo:    ['steady'],
+        Finney:   ['strong finish'],
+        Buterin:  ['unpredictable']
+        };
+        const forms = [
+        { prefix: 'horse',          color:'horse-color',          traits:'horse-traits',           attrs:'horse-attributes' },
+        { prefix: 'breeding-horse', color:'breeding-horse-color', traits:'breeding-horse-traits',  attrs:'breeding-horse-attributes' },
+        { prefix: 'bred',           color:'bred-color',           traits:'bred-horse-traits',      attrs:'bred-horse-attributes' }
+        ];
+        // INSERT HERE (after forms array, before DOMContentLoaded)
+        function onBloodlineChange(bloodId, colorId, traitsId, attrsId) {
+        const bloodEl = document.getElementById(bloodId);
+        const colorEl = document.getElementById(colorId);
+        const traitsEl = document.getElementById(traitsId);
+        const attrsEl = document.getElementById(attrsId);
 
-  // Update attributes
-  if (bloodEl && attrsEl) {
-    attrsEl.innerHTML = '';
-    (bloodlineAttributes[bloodEl.value] || []).forEach(a => {
-      const li = document.createElement('li');
-      li.textContent = a;
-      attrsEl.appendChild(li);
-    });
-  }
-}
-document.addEventListener('DOMContentLoaded', () => {
-  forms.forEach(f => {
-    const el = document.getElementById(`${f.prefix}-bloodline`);
-    if (el) {
-      el.addEventListener('change', () => onBloodlineChange(
-        `${f.prefix}-bloodline`,
-        f.color, f.traits, f.attrs
-      ));
-    }
-  });
-  document.addEventListener('DOMContentLoaded', () => {
-    // ...existing code...
-    updateHorseDropdown(); // For race form (only racing horses)
-    updateParentDropdowns(); // For bred form (all horses)
-    updateFoalPredictorDropdowns(); // <-- ADD THIS LINE
-    updateStudAuctionSelect(); // For stud auction form (male breeding horses)
-    updateOverallStats();
-    setupEventListeners();
-    console.log("Tracker Initialized.");
-});
+        // Update color options
+        if (bloodEl && colorEl) {
+            colorEl.innerHTML = '<option value="">--Select Color--</option>';
+            const blood = bloodEl.value;
+            if (blood && breedColorOptions[blood]) {
+            ["normal","rare","super rare"].forEach(rarity => {
+                const group = breedColorOptions[blood][rarity];
+                if (group && group.length) {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = rarity.charAt(0).toUpperCase() + rarity.slice(1);
+                group.forEach(c => {
+                    const o = document.createElement('option');
+                    o.value = c.hex;
+                    o.textContent = `${c.label} (${c.hex})`;
+                    o.title = c.hex;
+                    o.style.backgroundColor = c.hex;
+                    o.setAttribute('data-rarity', rarity);
+                    optgroup.appendChild(o);
+                });
+                colorEl.appendChild(optgroup);
+                }
+            });
+            if (colorEl.options.length > 1) colorEl.selectedIndex = 1;
+            }
+        }
 
-  forms.forEach(f => onBloodlineChange(
-    `${f.prefix}-bloodline`,
-    f.color, f.traits, f.attrs
-  ));
-});
-// 3️⃣ UI update functions // populate `select` with id=colorSelectId based on bloodline in bloodSelectId
-function populateColorOptions(bloodline) {
-  const color = document.getElementById('horse-color').value;
-  colorSelect.innerHTML = '<option value="">--Select Color--</option>';
-  if (!bloodline || !breedColorOptions[bloodline]) return;
-  ["normal","rare","super rare"].forEach(rarity => {
-    const group = breedColorOptions[bloodline][rarity];
-    if (group && group.length) {
-      const optgroup = document.createElement('optgroup');
-      optgroup.label = rarity.charAt(0).toUpperCase() + rarity.slice(1);
-      group.forEach(c => {
-        const o = document.createElement('option');
-        o.value = c.hex;
-        o.textContent = `${c.label} (${c.hex})`;
-        o.title = c.hex;
-        o.style.backgroundColor = c.hex;
-        o.setAttribute('data-rarity', rarity);
-        optgroup.appendChild(o);
-      });
-      colorSelect.appendChild(optgroup);
-    }
-  });
-  if (colorSelect.options.length > 1) colorSelect.selectedIndex = 1;
-}
+        // Update traits
+        if (bloodEl && traitsEl) {
+            traitsEl.innerHTML = '';
+            (bloodlineTraits[bloodEl.value] || []).forEach(t => {
+            const li = document.createElement('li');
+            li.textContent = t;
+            traitsEl.appendChild(li);
+            });
+        }
 
-function displayTraits() {
-  const blood = document.getElementById('horse-bloodline').value;
-  const list = document.getElementById('horse-traits');
-  list.innerHTML = '';
-  (bloodlineTraits[blood] || []).forEach(t => {
-    const li = document.createElement('li');
-    li.textContent = t;
-    list.appendChild(li);
-  });
-}
-function displayAttributes() {
-  const blood = document.getElementById('horse-bloodline').value;
-  const list = document.getElementById('horse-attributes');
-  list.innerHTML = '';
-  (bloodlineAttributes[blood] || []).forEach(a => {
-    const li = document.createElement('li');
-    li.textContent = a;
-    list.appendChild(li);
-  });
-}
-function getColorLabel(bloodline, hex) {
-  if (!bloodline || !hex || !breedColorOptions[bloodline]) return hex || '';
-  for (const rarity of ["normal","rare","super rare"]) {
-    const found = breedColorOptions[bloodline][rarity].find(opt => opt.hex.toLowerCase() === (hex || '').toLowerCase());
-    if (found) return `${found.label} (${rarity})`;
-  }
-  return hex || '';
-}
-// Generalized function for any section
-function populateColorOptionsFor(bloodId, colorId) {
-  const bloodEl = document.getElementById(bloodId);
-  const sel = document.getElementById(colorId);
-  sel.innerHTML = '<option value="">--Select Color--</option>';
-  if (!bloodEl) return;
-  const blood = bloodEl.value;
-  if (!blood || !breedColorOptions[blood]) return;
-  ["normal","rare","super rare"].forEach(rarity => {
-    const group = breedColorOptions[blood][rarity];
-    if (group && group.length) {
-      const optgroup = document.createElement('optgroup');
-      optgroup.label = rarity.charAt(0).toUpperCase() + rarity.slice(1);
-      group.forEach(c => {
-        const o = document.createElement('option');
-        o.value = c.hex;
-        o.textContent = `${c.label} (${c.hex})`;
-        o.title = c.hex;
-        o.style.backgroundColor = c.hex;
-        o.setAttribute('data-rarity', rarity);
-        optgroup.appendChild(o);
-      });
-      sel.appendChild(optgroup);
-    }
-  });
-  if (sel.options.length > 1) sel.selectedIndex = 1;
-}
+        // Update attributes
+        if (bloodEl && attrsEl) {
+            attrsEl.innerHTML = '';
+            (bloodlineAttributes[bloodEl.value] || []).forEach(a => {
+            const li = document.createElement('li');
+            li.textContent = a;
+            attrsEl.appendChild(li);
+            });
+        }
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+        forms.forEach(f => {
+            const el = document.getElementById(`${f.prefix}-bloodline`);
+            if (el) {
+            el.addEventListener('change', () => onBloodlineChange(
+                `${f.prefix}-bloodline`,
+                f.color, f.traits, f.attrs
+            ));
+            }
+        });
+                
+        // REMOVE THE NESTED DOMContentLoaded here and just include its contents:
+        updateHorseDropdown(); // For race form (only racing horses)
+        updateParentDropdowns(); // For bred form (all horses)
+        updateFoalPredictorDropdowns(); // For foal predictor
+        updateStudAuctionSelect(); // For stud auction form (male breeding horses)
+        updateOverallStats();
+        setupEventListeners();
+        console.log("Tracker Initialized.");
+
+        forms.forEach(f => onBloodlineChange(
+            `${f.prefix}-bloodline`,
+            f.color, f.traits, f.attrs
+        ));
+        });
+        // 3️⃣ UI update functions // populate `select` with id=colorSelectId based on bloodline in bloodSelectId
+        function populateColorOptions(bloodline) {
+        const color = document.getElementById('horse-color').value;
+        colorSelect.innerHTML = '<option value="">--Select Color--</option>';
+        if (!bloodline || !breedColorOptions[bloodline]) return;
+        ["normal","rare","super rare"].forEach(rarity => {
+            const group = breedColorOptions[bloodline][rarity];
+            if (group && group.length) {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = rarity.charAt(0).toUpperCase() + rarity.slice(1);
+            group.forEach(c => {
+                const o = document.createElement('option');
+                o.value = c.hex;
+                o.textContent = `${c.label} (${c.hex})`;
+                o.title = c.hex;
+                o.style.backgroundColor = c.hex;
+                o.setAttribute('data-rarity', rarity);
+                optgroup.appendChild(o);
+            });
+            colorSelect.appendChild(optgroup);
+            }
+        });
+        if (colorSelect.options.length > 1) colorSelect.selectedIndex = 1;
+        }
+
+        function displayTraits() {
+        const blood = document.getElementById('horse-bloodline').value;
+        const list = document.getElementById('horse-traits');
+        list.innerHTML = '';
+        (bloodlineTraits[blood] || []).forEach(t => {
+            const li = document.createElement('li');
+            li.textContent = t;
+            list.appendChild(li);
+        });
+        }
+        function displayAttributes() {
+        const blood = document.getElementById('horse-bloodline').value;
+        const list = document.getElementById('horse-attributes');
+        list.innerHTML = '';
+        (bloodlineAttributes[blood] || []).forEach(a => {
+            const li = document.createElement('li');
+            li.textContent = a;
+            list.appendChild(li);
+        });
+        }
+        function getColorLabel(bloodline, hex) {
+        if (!bloodline || !hex || !breedColorOptions[bloodline]) return hex || '';
+        for (const rarity of ["normal","rare","super rare"]) {
+            const found = breedColorOptions[bloodline][rarity].find(opt => opt.hex.toLowerCase() === (hex || '').toLowerCase());
+            if (found) return `${found.label} (${rarity})`;
+        }
+        return hex || '';
+        }
+        // Generalized function for any section
+        function populateColorOptionsFor(bloodId, colorId) {
+        const bloodEl = document.getElementById(bloodId);
+        const sel = document.getElementById(colorId);
+        sel.innerHTML = '<option value="">--Select Color--</option>';
+        if (!bloodEl) return;
+        const blood = bloodEl.value;
+        if (!blood || !breedColorOptions[blood]) return;
+        ["normal","rare","super rare"].forEach(rarity => {
+            const group = breedColorOptions[blood][rarity];
+            if (group && group.length) {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = rarity.charAt(0).toUpperCase() + rarity.slice(1);
+            group.forEach(c => {
+                const o = document.createElement('option');
+                o.value = c.hex;
+                o.textContent = `${c.label} (${c.hex})`;
+                o.title = c.hex;
+                o.style.backgroundColor = c.hex;
+                o.setAttribute('data-rarity', rarity);
+                optgroup.appendChild(o);
+            });
+            sel.appendChild(optgroup);
+            }
+        });
+        if (sel.options.length > 1) sel.selectedIndex = 1;
+        }
 </script>
      <script>
         // --- Global State ---
@@ -3941,94 +3937,99 @@ function populateColorOptionsFor(bloodId, colorId) {
             addBreedingHorseForm.querySelector('button[type="submit"]').textContent = 'Add Breeding Horse';
             currentlyEditingHorse = null;
         }
-        function handleAddRace(event) {
-            event.preventDefault();
-            // Get elements
-            const horseSelect = document.getElementById('race-horse');
-            const positionInput = document.getElementById('race-position');
-            const oddsInput = document.getElementById('race-odds');
-            const timeInput = document.getElementById('race-finish-time');
-            const zedChangeInput = document.getElementById('race-zed-change');
-            const ratingChangeInput = document.getElementById('race-rating-change');
-            const cpuSelect = document.getElementById('race-cpu-augment');
-            const ramSelect = document.getElementById('race-ram-augment');
-            const hydraulicSelect = document.getElementById('race-hydraulic-augment');
-            const raceNameInput = document.getElementById('race-name');
-            const raceDateInput = document.getElementById('race-date');
-            const split1Input = document.getElementById('race-split-1');
-            const split2Input = document.getElementById('race-split-2');
-            const split3Input = document.getElementById('race-split-3');
-            const split4Input = document.getElementById('race-split-4');
+        
+function handleAddRace(event) {
+    event.preventDefault();
+    // Get elements
+    const horseSelect = document.getElementById('race-horse');
+    const positionInput = document.getElementById('race-position');
+    const oddsInput = document.getElementById('race-odds');
+    const timeInput = document.getElementById('race-finish-time');
+    const zedChangeInput = document.getElementById('race-zed-change');
+    const ratingChangeInput = document.getElementById('race-rating-change');
+    const cpuSelect = document.getElementById('race-cpu-augment');
+    const ramSelect = document.getElementById('race-ram-augment');
+    const hydraulicSelect = document.getElementById('race-hydraulic-augment');
+    const raceNameInput = document.getElementById('race-name');
+    const raceDateInput = document.getElementById('race-date');
+    const split1Input = document.getElementById('race-split-1');
+    const split2Input = document.getElementById('race-split-2');
+    const split3Input = document.getElementById('race-split-3');
+    const split4Input = document.getElementById('race-split-4');
 
-             const raceData = {
-                horseId: horseSelect.value,
-                position: parseInt(positionInput.value),
-                odds: parseFloat(oddsInput.value),
-                finishTime: parseFloat(timeInput.value) || null,
-                zedChange: parseFloat(zedChangeInput.value),
-                ratingChange: ratingChangeInput.value ? parseInt(ratingChangeInput.value) : null,
-                cpuAugment: cpuSelect.value,
-                ramAugment: ramSelect.value,
-                hydraulicAugment: hydraulicSelect.value,
-                raceName: raceNameInput.value.trim(),
-                raceDate: raceDateInput.value || new Date().toISOString().split('T')[0],
-                split1: split1Input.value ? parseFloat(split1Input.value) : null,
-                split2: split2Input.value ? parseFloat(split2Input.value) : null,
-                split3: split3Input.value ? parseFloat(split3Input.value) : null,
-                split4: split4Input.value ? parseFloat(split4Input.value) : null,
-                date: new Date().toISOString()
-            };
+    // Prepare data object
+    const raceData = {
+        horseId: horseSelect.value,
+        position: parseInt(positionInput.value),
+        odds: parseFloat(oddsInput.value),
+        finishTime: parseFloat(timeInput.value) || null,
+        zedChange: parseFloat(zedChangeInput.value),
+        ratingChange: ratingChangeInput.value ? parseInt(ratingChangeInput.value) : null,
+        cpuAugment: cpuSelect.value,
+        ramAugment: ramSelect.value,
+        hydraulicAugment: hydraulicSelect.value,
+        raceName: raceNameInput.value.trim(),
+        raceDate: raceDateInput.value || new Date().toISOString().split('T')[0],
+        split1: split1Input.value ? parseFloat(split1Input.value) : null,
+        split2: split2Input.value ? parseFloat(split2Input.value) : null,
+        split3: split3Input.value ? parseFloat(split3Input.value) : null,
+        split4: split4Input.value ? parseFloat(split4Input.value) : null,
+        date: new Date().toISOString()
+    };
 
-            // Validation
-            if (!horseSelect.value) { alert("Please select a horse."); return; }
-            if (isNaN(parseInt(positionInput.value)) || parseInt(positionInput.value) < 1) { alert("Please enter a valid finishing place (1 or higher)."); return; }
-            if (isNaN(parseFloat(oddsInput.value)) || parseFloat(oddsInput.value) < 1) { alert("Please enter valid odds (1 or higher)."); return; }
-            if (isNaN(parseFloat(zedChangeInput.value))) { alert("Please enter the $ZED Won/Lost."); return; }
-            if (ratingChangeInput.value && isNaN(parseInt(ratingChangeInput.value))) { alert("Please enter a valid number for the Matchmaking Rating Change, or leave it empty."); return; }
-            // Splits validation (optional, but must be positive if filled)
-            for (let i = 1; i <= 4; i++) {
-                const splitVal = document.getElementById(`race-split-${i}`).value;
-                if (splitVal && (isNaN(parseFloat(splitVal)) || parseFloat(splitVal) < 0)) {
-                    alert(`Please enter a valid positive number for Split ${i}, or leave it empty.`);
-                    return;
-                }
-
-            if (!horses.some(h => h.id === raceData.horseId)) {
-                alert("Selected horse not found. Please add the horse first or refresh.");
-                return;
-            }
-
-            if (currentlyEditingRace) {
-                // Update existing race
-                const index = races.findIndex(r => r.id === currentlyEditingRace.id);
-                if (index !== -1) {
-                    // Preserve the id and date from the original race
-                    raceData.id = currentlyEditingRace.id;
-                    raceData.date = currentlyEditingRace.date;
-                    races[index] = raceData;
-                    console.log("Race updated:", raceData);
-                }
-            } else {
-                // Add new race
-                raceData.id = `race-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-                raceData.date = new Date().toISOString();
-            races.push(raceData);
-                console.log("Race added:", raceData);
-            }
-
-            saveData();
-            renderRacesTable();
-            renderHorsesTable(); // Re-render horses to update calculated stats
-            updateOverallStats();
-            renderAugmentAnalysis();
-            
-            // Reset form and editing state
-            addRaceForm.reset();
-            horseSelect.value = ""; // Reset dropdown selection
-            const submitButton = addRaceForm.querySelector('button[type="submit"]');
-            submitButton.textContent = 'Record Race';
-            currentlyEditingRace = null;
+    // Validation
+    if (!horseSelect.value) { alert("Please select a horse."); return; }
+    if (isNaN(parseInt(positionInput.value)) || parseInt(positionInput.value) < 1) { alert("Please enter a valid finishing place (1 or higher)."); return; }
+    if (isNaN(parseFloat(oddsInput.value)) || parseFloat(oddsInput.value) < 1) { alert("Please enter valid odds (1 or higher)."); return; }
+    if (isNaN(parseFloat(zedChangeInput.value))) { alert("Please enter the $ZED Won/Lost."); return; }
+    if (ratingChangeInput.value && isNaN(parseInt(ratingChangeInput.value))) { alert("Please enter a valid number for the Matchmaking Rating Change, or leave it empty."); return; }
+    
+    // Splits validation (optional, but must be positive if filled)
+    for (let i = 1; i <= 4; i++) {
+        const splitVal = document.getElementById(`race-split-${i}`).value;
+        if (splitVal && (isNaN(parseFloat(splitVal)) || parseFloat(splitVal) < 0)) {
+            alert(`Please enter a valid positive number for Split ${i}, or leave it empty.`);
+            return;
         }
+    }
+
+    if (!horses.some(h => h.id === raceData.horseId)) {
+        alert("Selected horse not found. Please add the horse first or refresh.");
+        return;
+    }
+
+    if (currentlyEditingRace) {
+        // Update existing race
+        const index = races.findIndex(r => r.id === currentlyEditingRace.id);
+        if (index !== -1) {
+            // Preserve the id and date from the original race
+            raceData.id = currentlyEditingRace.id;
+            raceData.date = currentlyEditingRace.date;
+            races[index] = raceData;
+            console.log("Race updated:", raceData);
+        }
+    } else {
+        // Add new race
+        raceData.id = `race-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        raceData.date = new Date().toISOString();
+        races.push(raceData);
+        console.log("Race added:", raceData);
+    }
+
+    saveData();
+    renderRacesTable();
+    renderHorsesTable(); // Re-render horses to update calculated stats
+    updateOverallStats();
+    renderAugmentAnalysis();
+    
+    // Reset form and editing state
+    addRaceForm.reset();
+    horseSelect.value = ""; // Reset dropdown selection
+    const submitButton = addRaceForm.querySelector('button[type="submit"]');
+    submitButton.textContent = 'Record Race';
+    currentlyEditingRace = null;
+}
+
             // ...existing code...
             function handleAddBredHorse(event) {
                 event.preventDefault();
