@@ -1553,18 +1553,24 @@
           <div style="overflow-x:auto;">
              <table id="races-table">
                  <thead>
-                     <tr>
-                         <th>Date</th>
-                         <th>Horse</th>
-                         <th>Pos</th>
-                         <th>Odds</th>
-                         <th>Time</th>
-                         <th>ZED +/-</th>
-                                <th>MM +/-</th>
-                         <th>Augs (C/R/H)</th>
-                         <th>Actions</th>
-                     </tr>
-                 </thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Race Name</th>
+                        <th>Horse</th>
+                        <th>Pos</th>
+                        <th>Odds</th>
+                        <th>Time</th>
+                        <th>Split 1</th>
+                        <th>Split 2</th>
+                        <th>Split 3</th>
+                        <th>Split 4</th>
+                        <th>ZED +/-</th>
+                        <th>MM +/-</th>
+                        <th>Augs (C/R/H)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
                  <tbody id="races-table-body">
                      <!-- Race results populated by JS -->
                  </tbody>
@@ -3163,15 +3169,20 @@ function populateColorOptionsFor(bloodId, colorId) {
                 const row = racesTableBody.insertRow();
                 // Updated row structure to remove deleted columns
                 row.innerHTML = `
-                    <td>${new Date(race.date).toLocaleDateString()} ${new Date(race.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                    <td>${race.raceDate ? new Date(race.raceDate).toLocaleDateString() : (race.date ? new Date(race.date).toLocaleDateString() : '-')}</td>
+                    <td>${race.raceName || '-'}</td>
                     <td>${horse ? horse.name : 'N/A'}</td>
                     <td>${race.position}</td>
                     <td>${race.odds}</td>
                     <td>${race.finishTime ? race.finishTime.toFixed(3) : '-'}</td>
+                    <td>${race.split1 !== null && race.split1 !== undefined ? race.split1 : '-'}</td>
+                    <td>${race.split2 !== null && race.split2 !== undefined ? race.split2 : '-'}</td>
+                    <td>${race.split3 !== null && race.split3 !== undefined ? race.split3 : '-'}</td>
+                    <td>${race.split4 !== null && race.split4 !== undefined ? race.split4 : '-'}</td>
                     <td style="color: ${race.zedChange >= 0 ? 'var(--success-color)' : 'var(--error-color)'};">${race.zedChange >= 0 ? '+' : ''}${Math.round(race.zedChange)}</td>
                     <td style="color: ${race.ratingChange > 0 ? 'var(--success-color)' : (race.ratingChange < 0 ? 'var(--error-color)' : 'inherit')};">${race.ratingChange > 0 ? '+' : ''}${race.ratingChange !== null ? race.ratingChange : '-'}</td>
                     <td>${race.cpuAugment !== 'None' ? 'C' : '-'}/${race.ramAugment !== 'None' ? 'R' : '-'}/${race.hydraulicAugment !== 'None' ? 'H' : '-'}</td>
-                     <td class="actions">
+                    <td class="actions">
                         <button class="action-button edit-button" onclick="editRace('${race.id}')" title="Edit Race">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                         </button>
@@ -3952,8 +3963,14 @@ function populateColorOptionsFor(bloodId, colorId) {
                 cpuAugment: cpuSelect.value,
                 ramAugment: ramSelect.value,
                 hydraulicAugment: hydraulicSelect.value,
-                 date: new Date().toISOString()
-             };
+                raceName: raceNameInput.value.trim(),
+                raceDate: raceDateInput.value || new Date().toISOString().split('T')[0],
+                split1: split1Input.value ? parseFloat(split1Input.value) : null,
+                split2: split2Input.value ? parseFloat(split2Input.value) : null,
+                split3: split3Input.value ? parseFloat(split3Input.value) : null,
+                split4: split4Input.value ? parseFloat(split4Input.value) : null,
+                date: new Date().toISOString()
+            };
 
             // Validation
             if (!horseSelect.value) { alert("Please select a horse."); return; }
@@ -5919,6 +5936,13 @@ function populateColorOptionsFor(bloodId, colorId) {
             const cpuSelect = document.getElementById('race-cpu-augment');
             const ramSelect = document.getElementById('race-ram-augment');
             const hydraulicSelect = document.getElementById('race-hydraulic-augment');
+            // ...inside editRace...
+            document.getElementById('race-name').value = race.raceName || '';
+            document.getElementById('race-date').value = race.raceDate || '';
+            document.getElementById('race-split-1').value = race.split1 !== null && race.split1 !== undefined ? race.split1 : '';
+            document.getElementById('race-split-2').value = race.split2 !== null && race.split2 !== undefined ? race.split2 : '';
+            document.getElementById('race-split-3').value = race.split3 !== null && race.split3 !== undefined ? race.split3 : '';
+            document.getElementById('race-split-4').value = race.split4 !== null && race.split4 !== undefined ? race.split4 : '';
             
             // Set form values
             raceHorseSelect.value = race.horseId;
