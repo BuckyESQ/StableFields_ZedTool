@@ -2851,6 +2851,8 @@ const originalSetupEventListeners = setupEventListeners;
 setupEventListeners = function() {
     originalSetupEventListeners();
     setupZedApiUI();
+    addZedChampionsImportUI();
+    ZED_API.loadAuthToken(); // Load token on startup
 };
 // Enhanced event listener for predict button - replaces the existing one
 document.addEventListener('DOMContentLoaded', function() {
