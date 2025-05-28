@@ -3140,8 +3140,28 @@ async function fetchAllHorses(type = 'racing') {
         setupEventListeners = function() {
             originalSetupEventListeners();
             setupZedApiUI();
-            addZedChampionsImportUI(); // Add the new import UI
-            ZED_API.loadAuthToken();
+            addZedChampionsImportUI(); // This ensures the UI is created
+            ZED_API.loadAuthToken(); // Load token on startup
+            
+            // Add explicit listeners for the import buttons
+            setTimeout(() => {
+                const importRacingButton = document.getElementById('import-racing-stable-btn');
+                const importBreedingButton = document.getElementById('import-breeding-stable-btn');
+                const importSingleButton = document.getElementById('import-single-horse-btn');
+                
+                if (importRacingButton) {
+                    importRacingButton.addEventListener('click', importRacingStable);
+                    console.log("Racing import button listener added");
+                }
+                if (importBreedingButton) {
+                    importBreedingButton.addEventListener('click', importBreedingStable);
+                    console.log("Breeding import button listener added");
+                }
+                if (importSingleButton) {
+                    importSingleButton.addEventListener('click', importSingleHorse);
+                    console.log("Single horse import button listener added");
+                }
+            }, 500); // Small delay to ensure DOM elements exist
         };
             // Add CSS for token notice
             const style = document.createElement('style');
