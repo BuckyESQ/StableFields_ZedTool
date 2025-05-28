@@ -2558,10 +2558,8 @@
                 statusElement.style.borderRadius = '4px';
             }
         }
-        
-        // --- REPLACE the entire ZED_API and all duplicate fetchHorse/searchHorses definitions with this block ---
-
-        // ...existing code...
+            // --- REPLACE the entire ZED_API and all duplicate fetchHorse/searchHorses definitions with this block ---
+            
             const ZED_API = {
                 authToken: null,
                 tokenExpiry: null,
@@ -2699,94 +2697,11 @@
                     }
                 }
             };
-            // Fetch all horses (racing or breeding)
-            async fetchAllHorses(type = 'racing') {
-                try {
-                    if (!this.authToken) {
-                        return { success: false, message: "No authentication token set" };
-                    }
-                    // API endpoint differs by type
-                    const endpoint = type === 'racing'
-                        ? 'https://api.zedchampions.com/v1/stable/racing'
-                        : 'https://api.zedchampions.com/v1/stable/breeding';
-
-                    const response = await fetch(endpoint, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${this.authToken}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-
-                    if (!response.ok) {
-                        return {
-                            success: false,
-                            message: `API Error: ${response.status} ${response.statusText}`
-                        };
-                    }
-
-                    const data = await response.json();
-                    return { success: true, data: data.horses || [] };
-                } catch (error) {
-                    return { success: false, message: `Connection error: ${error.message}` };
-                }
-            },
-
-            // Fetch a horse by ID from ZedChampions
-            async fetchHorse(horseId) {
-                if (!this.authToken) return { success: false, message: "No auth token set" };
-
-                try {
-                    const response = await fetch(`https://api.zedchampions.com/v1/horses/${horseId}`, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${this.authToken}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        return { success: true, data };
-                    } else {
-                        return { success: false, message: `API Error: ${response.status} ${response.statusText}` };
-                    }
-                } catch (error) {
-                    return { success: false, message: `Connection error: ${error.message}` };
-                }
-            },
-
-            // Search for horses by name in ZedChampions
-
-            async searchHorses(query) {
-                if (!this.authToken) return { success: false, message: "No auth token set" };
-
-                try {
-                    const response = await fetch(`https://api.zedchampions.com/v1/horses/search?q=${encodeURIComponent(query)}`, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${this.authToken}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        return { success: true, data: data.results || [] };
-                    } else {
-                        return { success: false, message: `API Error: ${response.status} ${response.statusText}` };
-                    }
-                } catch (error) {
-                    return { success: false, message: `Connection error: ${error.message}` };
-                }
-            }
-        };
-        // --- END ZED_API ---
+            
 
 // Remove ALL duplicate/standalone async fetchHorse and async searchHorses functions after this object!
 
-         // Replace this function (around line 2995)
-       function setupZedApiUI() {
+        function setupZedApiUI() {
             const settingsTab = document.getElementById('tab-content-settings');
             if (!settingsTab) return;
             
