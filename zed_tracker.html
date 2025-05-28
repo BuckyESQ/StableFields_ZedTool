@@ -3185,55 +3185,7 @@ async function fetchAllHorses(type = 'racing') {
                 statusEl.style.color = '#2196F3';
             }
         }              
-                const horseData = result.data;
-                
-                // Convert ZedChampions data format to our app's format
-                const newHorse = {
-                    id: `horse-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-                    name: horseData.name,
-                    bloodline: horseData.bloodline,
-                    color: horseData.color || '#CCCCCC', // Default if color missing
-                    gender: horseData.gender,
-                    stars: horseData.overall_rating || null,
-                    speedStars: horseData.speed_rating || null,
-                    sprintStars: horseData.sprint_rating || null,
-                    enduranceStars: horseData.endurance_rating || null,
-                    initialZedBalance: 0, // Default values
-                    initialMmRating: 1000,
-                    status: 'racing', // Default to racing
-                    generation: horseData.genotype || 0,
-                    importedFromZed: true,
-                    zedId: horseData.id
-                };
-                
-                // Ask user if they want to import as racing or breeding
-                const status = confirm("Import this horse as a racing horse?\n\nClick OK for racing, Cancel for breeding.");
-                newHorse.status = status ? 'racing' : 'breeding';
-                
-                // Add the horse to our collection
-                horses.push(newHorse);
-                saveData();
-                
-                // Update UI based on status
-                if (newHorse.status === 'racing') {
-                    renderHorsesTable();
-                    updateHorseDropdown();
-                } else {
-                    renderBreedingHorsesTable();
-                }
-                
-                updateParentDropdowns();
-                populateAugmentAnalysisHorseFilter();
-                updateStudAuctionSelect();
-                updateFoalPredictorDropdowns();
-                
-                alert(`Successfully imported ${horseData.name} as a ${newHorse.status} horse.`);
-                
-                // Switch to appropriate tab
-                activateTab(newHorse.status === 'racing' ? 'racing' : 'breeding');
-            });
-        }
-            
+               
         // Find and enhance the predict button if it exists
         const predictButton = document.getElementById('predict-foal-btn');
         if (predictButton) {
