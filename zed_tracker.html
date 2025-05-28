@@ -2454,7 +2454,6 @@
             predictedStars = Math.max(Math.min(predictedStars, Math.max(sireVal, damVal) + 0.5), Math.min(sireVal, damVal) - 0.3);
             
             return predictedStars.toFixed(1);
-        }
 
         function predictFoal(sire, dam) {
             if (!sire || !dam) return null;
@@ -6823,6 +6822,15 @@ function handleAddRace(event) {
             // Store the horse being edited
             currentlyEditingHorse = horse;
             
+            // Then continue with your conditions
+            if (horse.status === 'racing') {
+                // Racing horse code...
+            } else if (horse.status === 'breeding') {
+                // Breeding horse code...
+            }
+            // Store the horse being edited
+            currentlyEditingHorse = horse;
+        }          
             // Determine which form to use based on horse status
             if (horse.status === 'racing') {
                 // Populate racing horse form
@@ -6899,23 +6907,23 @@ function handleAddRace(event) {
                 document.getElementById('breeding-horses-section').scrollIntoView({ behavior: 'smooth' });
             }
             
-            console.log(`Editing horse: ${horse.name} (${horse.status})`);
-        }
+        console.log(`Editing horse: ${horse.name} (${horse.status})`);
+    }
     </script>
-        
-        <!-- Horse Details Modal Structure -->
-        <div id="horse-details-modal" class="modal">
-                <div class="modal-content">
-                    <span class="modal-close" id="modal-close-button">&times;</span>
-                    <h3 id="modal-horse-name">Horse Details</h3>
-                    <div id="modal-stats-content" class="modal-stats">
-                        <!-- Basic stats loaded here -->
-                    </div>
-                    <h4>Augment Performance</h4>
-                    <div id="modal-analysis-content">
-                        <!-- Augment analysis table loaded here -->
-                    </div>
+    
+    <!-- Horse Details Modal Structure -->
+    <div id="horse-details-modal" class="modal">
+            <div class="modal-content">
+                <span class="modal-close" id="modal-close-button">&times;</span>
+                <h3 id="modal-horse-name">Horse Details</h3>
+                <div id="modal-stats-content" class="modal-stats">
+                    <!-- Basic stats loaded here -->
+                </div>
+                <h4>Augment Performance</h4>
+                <div id="modal-analysis-content">
+                    <!-- Augment analysis table loaded here -->
                 </div>
             </div>
-        </body>
-        </html>
+        </div>
+    </body>
+    </html>
