@@ -6812,106 +6812,106 @@ function handleAddRace(event) {
         }
 
         // --- Function to edit horses (racing or breeding) ---
-        function editHorse(horseId) {
-            const horse = horses.find(h => h.id === horseId);
-            if (!horse) {
-                console.error("Horse not found for editing:", horseId);
-                return;
+       function editHorse(horseId) {
+        const horse = horses.find(h => h.id === horseId);
+        if (!horse) {
+            console.error("Horse not found for editing:", horseId);
+            return;
+        }
+        
+        // Store the horse being edited
+        currentlyEditingHorse = horse;
+        
+        // Determine which form to use based on horse status
+        if (horse.status === 'racing') {
+            // Populate racing horse form
+            document.getElementById('horse-name').value = horse.name;
+            document.getElementById('horse-bloodline').value = horse.bloodline;
+            document.getElementById('horse-gender').value = horse.gender;
+            document.getElementById('horse-stars').value = horse.stars;
+            document.getElementById('horse-zed-balance').value = horse.initialZedBalance;
+            document.getElementById('horse-mm-rating').value = horse.initialMmRating;
+            
+            if (horse.color) {
+                document.getElementById('horse-color').value = horse.color;
             }
             
-            // Store the horse being edited
-            currentlyEditingHorse = horse;
-            
-            // Then continue with your conditions
-            if (horse.status === 'racing') {
-                // Racing horse code...
-            } else if (horse.status === 'breeding') {
-                // Breeding horse code...
-            }
-            // Store the horse being edited
-            currentlyEditingHorse = horse;
-        }          
-            // Determine which form to use based on horse status
-            if (horse.status === 'racing') {
-                // Populate racing horse form
-                document.getElementById('horse-name').value = horse.name;
-                document.getElementById('horse-bloodline').value = horse.bloodline;
-                document.getElementById('horse-gender').value = horse.gender;
-                document.getElementById('horse-stars').value = horse.stars;
-                document.getElementById('horse-zed-balance').value = horse.initialZedBalance;
-                document.getElementById('horse-mm-rating').value = horse.initialMmRating;
-                
-                // Optional star values
-                if (horse.speedStars !== null && horse.speedStars !== undefined) {
-                    document.getElementById('horse-speed-stars').value = horse.speedStars;
-                } else {
-                    document.getElementById('horse-speed-stars').value = '';
-                }
-                
-                if (horse.sprintStars !== null && horse.sprintStars !== undefined) {
-                    document.getElementById('horse-sprint-stars').value = horse.sprintStars;
-                } else {
-                    document.getElementById('horse-sprint-stars').value = '';
-                }
-                
-                if (horse.enduranceStars !== null && horse.enduranceStars !== undefined) {
-                    document.getElementById('horse-endurance-stars').value = horse.enduranceStars;
-                } else {
-                    document.getElementById('horse-endurance-stars').value = '';
-                }
-                
-                // Update button text
-                addHorseForm.querySelector('button[type="submit"]').textContent = 'Update Racing Horse';
-                
-                // Scroll to the form
-                document.getElementById('horses-section').scrollIntoView({ behavior: 'smooth' });
-                
-            } else if (horse.status === 'breeding') {
-                // Populate breeding horse form
-                document.getElementById('breeding-horse-name').value = horse.name;
-                document.getElementById('breeding-horse-bloodline').value = horse.bloodline;
-                document.getElementById('breeding-horse-gender').value = horse.gender;
-                
-                // Optional star values
-                if (horse.stars !== null && horse.stars !== undefined) {
-                    document.getElementById('breeding-horse-stars').value = horse.stars;
-                } else {
-                    document.getElementById('breeding-horse-stars').value = '';
-                }
-                
-                if (horse.speedStars !== null && horse.speedStars !== undefined) {
-                    document.getElementById('breeding-horse-speed-stars').value = horse.speedStars;
-                } else {
-                    document.getElementById('breeding-horse-speed-stars').value = '';
-                }
-                
-                if (horse.sprintStars !== null && horse.sprintStars !== undefined) {
-                    document.getElementById('breeding-horse-sprint-stars').value = horse.sprintStars;
-                } else {
-                    document.getElementById('breeding-horse-sprint-stars').value = '';
-                }
-                
-                if (horse.enduranceStars !== null && horse.enduranceStars !== undefined) {
-                    document.getElementById('breeding-horse-endurance-stars').value = horse.enduranceStars;
-                } else {
-                    document.getElementById('breeding-horse-endurance-stars').value = '';
-                }
-                
-                // Update button text
-                addBreedingHorseForm.querySelector('button[type="submit"]').textContent = 'Update Breeding Horse';
-                
-                // Scroll to the form and switch to breeding tab if needed
-                if (document.querySelector('.tab-button[data-tab="breeding"]') && !document.querySelector('.tab-button[data-tab="breeding"]').classList.contains('active')) {
-                    activateTab('breeding');
-                }
-                document.getElementById('breeding-horses-section').scrollIntoView({ behavior: 'smooth' });
+            // Optional star values
+            if (horse.speedStars !== null && horse.speedStars !== undefined) {
+                document.getElementById('horse-speed-stars').value = horse.speedStars;
+            } else {
+                document.getElementById('horse-speed-stars').value = '';
             }
             
-        console.log(`Editing horse: ${horse.name} (${horse.status})`);
+            if (horse.sprintStars !== null && horse.sprintStars !== undefined) {
+                document.getElementById('horse-sprint-stars').value = horse.sprintStars;
+            } else {
+                document.getElementById('horse-sprint-stars').value = '';
+            }
+            
+            if (horse.enduranceStars !== null && horse.enduranceStars !== undefined) {
+                document.getElementById('horse-endurance-stars').value = horse.enduranceStars;
+            } else {
+                document.getElementById('horse-endurance-stars').value = '';
+            }
+            
+            // Update button text
+            addHorseForm.querySelector('button[type="submit"]').textContent = 'Update Racing Horse';
+            
+            // Scroll to the form
+            document.getElementById('horses-section').scrollIntoView({ behavior: 'smooth' });
+            
+        } else if (horse.status === 'breeding') {
+            // Populate breeding horse form
+            document.getElementById('breeding-horse-name').value = horse.name;
+            document.getElementById('breeding-horse-bloodline').value = horse.bloodline;
+            document.getElementById('breeding-horse-gender').value = horse.gender;
+            
+            if (horse.color) {
+                document.getElementById('breeding-horse-color').value = horse.color;
+            }
+            
+            // Optional star values
+            if (horse.stars !== null && horse.stars !== undefined) {
+                document.getElementById('breeding-horse-stars').value = horse.stars;
+            } else {
+                document.getElementById('breeding-horse-stars').value = '';
+            }
+            
+            if (horse.speedStars !== null && horse.speedStars !== undefined) {
+                document.getElementById('breeding-horse-speed-stars').value = horse.speedStars;
+            } else {
+                document.getElementById('breeding-horse-speed-stars').value = '';
+            }
+            
+            if (horse.sprintStars !== null && horse.sprintStars !== undefined) {
+                document.getElementById('breeding-horse-sprint-stars').value = horse.sprintStars;
+            } else {
+                document.getElementById('breeding-horse-sprint-stars').value = '';
+            }
+            
+            if (horse.enduranceStars !== null && horse.enduranceStars !== undefined) {
+                document.getElementById('breeding-horse-endurance-stars').value = horse.enduranceStars;
+            } else {
+                document.getElementById('breeding-horse-endurance-stars').value = '';
+            }
+            
+            // Update button text
+            addBreedingHorseForm.querySelector('button[type="submit"]').textContent = 'Update Breeding Horse';
+            
+            // Scroll to the form and switch to breeding tab if needed
+            if (document.querySelector('.tab-button[data-tab="breeding"]') && !document.querySelector('.tab-button[data-tab="breeding"]').classList.contains('active')) {
+                activateTab('breeding');
+            }
+            document.getElementById('breeding-horses-section').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+            console.log(`Editing horse: ${horse.name} (${horse.status})`);
+        }
     }
-    </script>
-    
-    <!-- Horse Details Modal Structure -->
+        </script>
+        
+        <!-- Horse Details Modal Structure -->
     <div id="horse-details-modal" class="modal">
             <div class="modal-content">
                 <span class="modal-close" id="modal-close-button">&times;</span>
