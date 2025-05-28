@@ -10,27 +10,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* Basic Reset & Variables */
-        :root {
-            --bg-color: #1a1a1a;
-            --text-color: #f0f0f0;
-            --text-muted-color: #a0a0a0;
-            --border-color: #444; /* Default border */
-            --border-color-stars: #7d681f; /* Subtle gold/yellow for stars */
-            --border-color-parent: #5e5570; /* Subtle purple for lineage */
-            --border-color-money: #2a704a;  /* Subtle green for currency */
-            --accent-color: #3498db; /* Brighter Blue accent (Used for focus) */
-            --link-color: #85c1e9;  /* Brighter Light Blue link */
-            --input-bg: #333;
-            --button-bg: #2e86c1;  /* Brighter Button Blue */
-            --button-hover-bg: #2471a3; /* Deeper blue for hover */
-            --tab-bg: #2a2a2a;
-            --tab-active-bg: #3a3a3a;
-            --section-bg: #252525; /* Slightly darker section background */
-            --error-color: #f44336;
-            --success-color: #4caf50;
-            --title-font: 'Orbitron', sans-serif;
-            --body-font: 'Inter', sans-serif;
-            --text-highlight-bg: var(--bg-color); /* Use main bg for TH text highlight */
+       :root {
+        --bg-color: #1a1a1a;
+        --text-color: #f0f0f0;
+        --text-muted-color: #a0a0a0;
+        --border-color: #444; /* Default border */
+        --border-color-stars: #7d681f; /* Subtle gold/yellow for stars */
+        --border-color-parent: #5e5570; /* Subtle purple for lineage */
+        --border-color-money: #2a704a;  /* Subtle green for currency */
+        --accent-color: #3498db; /* Brighter Blue accent (Used for focus) */
+        --link-color: #85c1e9;  /* Brighter Light Blue link */
+        --input-bg: #333;
+        --button-bg: #2e86c1;  /* Brighter Button Blue */
+        --button-hover-bg: #2471a3; /* Deeper blue for hover */
+        --tab-bg: #2a2a2a;
+        --tab-active-bg: #3a3a3a;
+        --section-bg: #252525; /* Slightly darker section background */
+        --error-color: #f44336;
+        --success-color: #4caf50;
+        --title-font: 'Orbitron', sans-serif;
+        --body-font: 'Inter', sans-serif;
+        --text-highlight-bg: var(--bg-color); /* Use main bg for TH text highlight */
+        }
+
         body {
             font-family: var(--body-font);
             background-color: var(--bg-color);
@@ -2436,62 +2438,39 @@
         ];
         
         // Foal Prediction Algorithm - Insert after forms array, before onBloodlineChange function
-            function calculateStars(sireStars, damStars) {
-            // Get values as numbers, defaulting to 0 if not provided
-            const sireVal = parseFloat(sireStars) || 0;
-            const damVal = parseFloat(damStars) || 0;
+          function calculateStars(sireStars, damStars) {
+    // Get values as numbers, defaulting to 0 if not provided
+    const sireVal = parseFloat(sireStars) || 0;
+    const damVal = parseFloat(damStars) || 0;
+    
+    // Basic average
+    let baseStars = (sireVal + damVal) / 2;
+    
+    // Add some randomness (-0.4 to +0.6)
+    const randomFactor = (Math.random() * 1.0) - 0.4;
+    
+    // Final prediction (with some limits)
+    let predictedStars = baseStars + randomFactor;
+    
+    // Ensure it's within reasonable bounds
+    predictedStars = Math.max(Math.min(predictedStars, Math.max(sireVal, damVal) + 0.5), Math.min(sireVal, damVal) - 0.3);
+    
+    return predictedStars.toFixed(1);
+}
+
+        function predictFoalBloodline(sire, dam) {
+            if (!sire || !dam) return "Unknown";
             
-            // Basic average
-            let baseStars = (sireVal + damVal) / 2;
-            
-            // Add some randomness (-0.4 to +0.6)
-            const randomFactor = (Math.random() * 1.0) - 0.4;
-            
-            // Final prediction (with some limits)
-            let predictedStars = baseStars + randomFactor;
-            
-            // Ensure it's within reasonable bounds
-            predictedStars = Math.max(Math.min(predictedStars, Math.max(sireVal, damVal) + 0.5), Math.min(sireVal, damVal) - 0.3);
-            
-            return predictedStars.toFixed(1);
+            // 75% chance to inherit from sire, 25% from dam
+            return Math.random() < 0.75 ? sire.bloodline : dam.bloodline;
+        }
 
         function predictFoal(sire, dam) {
             if (!sire || !dam) return null;
+            
+            // Get bloodline first
             const bloodline = predictFoalBloodline(sire, dam);
             
-            // Color inheritance (80% from parents, 20% new from bloodline)
-            // ... rest of your predictFoal function ...
-        }
-            
-                function predictFoalStars(sire, dam) {
-                if (!sire || !dam) return "N/A";
-                
-                // Base calculation: average of parents' stars with randomness
-                const sireStars = parseFloat(sire.stars) || 0;
-                const damStars = parseFloat(dam.stars) || 0;
-                
-                // Basic average
-                let baseStars = (sireStars + damStars) / 2;
-                
-                // Add some randomness (-0.4 to +0.6)
-                const randomFactor = (Math.random() * 1.0) - 0.4;
-                
-                // Final prediction (with some limits)
-                let predictedStars = baseStars + randomFactor;
-                
-                // Ensure it's within reasonable bounds
-                predictedStars = Math.max(Math.min(predictedStars, Math.max(sireStars, damStars) + 0.5), Math.min(sireStars, damStars) - 0.3);
-                
-                return predictedStars.toFixed(1);
-            }
-
-    function predictFoalBloodline(sire, dam) {
-        if (!sire || !dam) return "Unknown";
-        
-        // 75% chance to inherit from sire, 25% from dam
-        return Math.random() < 0.75 ? sire.bloodline : dam.bloodline;
-    }
-        function predictFoal(sire, dam) {
             // Color inheritance (80% from parents, 20% new from bloodline)
             const predictColor = () => {
                 if (Math.random() < 0.8) {
@@ -6812,103 +6791,102 @@ function handleAddRace(event) {
         }
 
         // --- Function to edit horses (racing or breeding) ---
-       function editHorse(horseId) {
-        const horse = horses.find(h => h.id === horseId);
-        if (!horse) {
-            console.error("Horse not found for editing:", horseId);
-            return;
-        }
-        
-        // Store the horse being edited
-        currentlyEditingHorse = horse;
-        
-        // Determine which form to use based on horse status
-        if (horse.status === 'racing') {
-            // Populate racing horse form
-            document.getElementById('horse-name').value = horse.name;
-            document.getElementById('horse-bloodline').value = horse.bloodline;
-            document.getElementById('horse-gender').value = horse.gender;
-            document.getElementById('horse-stars').value = horse.stars;
-            document.getElementById('horse-zed-balance').value = horse.initialZedBalance;
-            document.getElementById('horse-mm-rating').value = horse.initialMmRating;
-            
-            if (horse.color) {
-                document.getElementById('horse-color').value = horse.color;
+      function editHorse(horseId) {
+            const horse = horses.find(h => h.id === horseId);
+            if (!horse) {
+                console.error("Horse not found for editing:", horseId);
+                return;
             }
             
-            // Optional star values
-            if (horse.speedStars !== null && horse.speedStars !== undefined) {
-                document.getElementById('horse-speed-stars').value = horse.speedStars;
-            } else {
-                document.getElementById('horse-speed-stars').value = '';
+            // Store the horse being edited
+            currentlyEditingHorse = horse;
+            
+            // Determine which form to use based on horse status
+            if (horse.status === 'racing') {
+                // Populate racing horse form
+                document.getElementById('horse-name').value = horse.name;
+                document.getElementById('horse-bloodline').value = horse.bloodline;
+                document.getElementById('horse-gender').value = horse.gender;
+                document.getElementById('horse-stars').value = horse.stars;
+                document.getElementById('horse-zed-balance').value = horse.initialZedBalance;
+                document.getElementById('horse-mm-rating').value = horse.initialMmRating;
+                
+                if (horse.color) {
+                    document.getElementById('horse-color').value = horse.color;
+                }
+                
+                // Optional star values
+                if (horse.speedStars !== null && horse.speedStars !== undefined) {
+                    document.getElementById('horse-speed-stars').value = horse.speedStars;
+                } else {
+                    document.getElementById('horse-speed-stars').value = '';
+                }
+                
+                if (horse.sprintStars !== null && horse.sprintStars !== undefined) {
+                    document.getElementById('horse-sprint-stars').value = horse.sprintStars;
+                } else {
+                    document.getElementById('horse-sprint-stars').value = '';
+                }
+                
+                if (horse.enduranceStars !== null && horse.enduranceStars !== undefined) {
+                    document.getElementById('horse-endurance-stars').value = horse.enduranceStars;
+                } else {
+                    document.getElementById('horse-endurance-stars').value = '';
+                }
+                
+                // Update button text
+                addHorseForm.querySelector('button[type="submit"]').textContent = 'Update Racing Horse';
+                
+                // Scroll to the form
+                document.getElementById('horses-section').scrollIntoView({ behavior: 'smooth' });
+                
+            } else if (horse.status === 'breeding') {
+                // Populate breeding horse form
+                document.getElementById('breeding-horse-name').value = horse.name;
+                document.getElementById('breeding-horse-bloodline').value = horse.bloodline;
+                document.getElementById('breeding-horse-gender').value = horse.gender;
+                
+                if (horse.color) {
+                    document.getElementById('breeding-horse-color').value = horse.color;
+                }
+                
+                // Optional star values
+                if (horse.stars !== null && horse.stars !== undefined) {
+                    document.getElementById('breeding-horse-stars').value = horse.stars;
+                } else {
+                    document.getElementById('breeding-horse-stars').value = '';
+                }
+                
+                if (horse.speedStars !== null && horse.speedStars !== undefined) {
+                    document.getElementById('breeding-horse-speed-stars').value = horse.speedStars;
+                } else {
+                    document.getElementById('breeding-horse-speed-stars').value = '';
+                }
+                
+                if (horse.sprintStars !== null && horse.sprintStars !== undefined) {
+                    document.getElementById('breeding-horse-sprint-stars').value = horse.sprintStars;
+                } else {
+                    document.getElementById('breeding-horse-sprint-stars').value = '';
+                }
+                
+                if (horse.enduranceStars !== null && horse.enduranceStars !== undefined) {
+                    document.getElementById('breeding-horse-endurance-stars').value = horse.enduranceStars;
+                } else {
+                    document.getElementById('breeding-horse-endurance-stars').value = '';
+                }
+                
+                // Update button text
+                addBreedingHorseForm.querySelector('button[type="submit"]').textContent = 'Update Breeding Horse';
+                
+                // Scroll to the form and switch to breeding tab if needed
+                if (document.querySelector('.tab-button[data-tab="breeding"]') && !document.querySelector('.tab-button[data-tab="breeding"]').classList.contains('active')) {
+                    activateTab('breeding');
+                }
+                document.getElementById('breeding-horses-section').scrollIntoView({ behavior: 'smooth' });
             }
             
-            if (horse.sprintStars !== null && horse.sprintStars !== undefined) {
-                document.getElementById('horse-sprint-stars').value = horse.sprintStars;
-            } else {
-                document.getElementById('horse-sprint-stars').value = '';
-            }
-            
-            if (horse.enduranceStars !== null && horse.enduranceStars !== undefined) {
-                document.getElementById('horse-endurance-stars').value = horse.enduranceStars;
-            } else {
-                document.getElementById('horse-endurance-stars').value = '';
-            }
-            
-            // Update button text
-            addHorseForm.querySelector('button[type="submit"]').textContent = 'Update Racing Horse';
-            
-            // Scroll to the form
-            document.getElementById('horses-section').scrollIntoView({ behavior: 'smooth' });
-            
-        } else if (horse.status === 'breeding') {
-            // Populate breeding horse form
-            document.getElementById('breeding-horse-name').value = horse.name;
-            document.getElementById('breeding-horse-bloodline').value = horse.bloodline;
-            document.getElementById('breeding-horse-gender').value = horse.gender;
-            
-            if (horse.color) {
-                document.getElementById('breeding-horse-color').value = horse.color;
-            }
-            
-            // Optional star values
-            if (horse.stars !== null && horse.stars !== undefined) {
-                document.getElementById('breeding-horse-stars').value = horse.stars;
-            } else {
-                document.getElementById('breeding-horse-stars').value = '';
-            }
-            
-            if (horse.speedStars !== null && horse.speedStars !== undefined) {
-                document.getElementById('breeding-horse-speed-stars').value = horse.speedStars;
-            } else {
-                document.getElementById('breeding-horse-speed-stars').value = '';
-            }
-            
-            if (horse.sprintStars !== null && horse.sprintStars !== undefined) {
-                document.getElementById('breeding-horse-sprint-stars').value = horse.sprintStars;
-            } else {
-                document.getElementById('breeding-horse-sprint-stars').value = '';
-            }
-            
-            if (horse.enduranceStars !== null && horse.enduranceStars !== undefined) {
-                document.getElementById('breeding-horse-endurance-stars').value = horse.enduranceStars;
-            } else {
-                document.getElementById('breeding-horse-endurance-stars').value = '';
-            }
-            
-            // Update button text
-            addBreedingHorseForm.querySelector('button[type="submit"]').textContent = 'Update Breeding Horse';
-            
-            // Scroll to the form and switch to breeding tab if needed
-            if (document.querySelector('.tab-button[data-tab="breeding"]') && !document.querySelector('.tab-button[data-tab="breeding"]').classList.contains('active')) {
-                activateTab('breeding');
-            }
-            document.getElementById('breeding-horses-section').scrollIntoView({ behavior: 'smooth' });
-        }
-        
             console.log(`Editing horse: ${horse.name} (${horse.status})`);
         }
-    }
         </script>
         
         <!-- Horse Details Modal Structure -->
