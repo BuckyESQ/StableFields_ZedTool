@@ -3125,20 +3125,6 @@ async function fetchAllHorses(type = 'racing') {
         return { success: false, message: `Connection error: ${error.message}` };
     }
 }
-            // Add CSS for token notice
-            const style = document.createElement('style');
-            style.textContent = `
-                .token-notice {
-                    background-color: rgba(255, 193, 7, 0.1);
-                    border-left: 4px solid #ffc107;
-                    padding: 10px 15px;
-                    margin-bottom: 20px;
-                    border-radius: 4px;
-                    font-size: 0.9em;
-                    line-height: 1.4;
-                }
-            `;
-            document.head.appendChild(style);
         }
         // Helper function to display API connection status
         function showConnectionStatus(message, isSuccess) {
