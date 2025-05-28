@@ -765,7 +765,7 @@
         }
         #bred-horses-table th:nth-child(5), /* Sire */
         #bred-horses-table td:nth-child(5),
-        #bred-horses-table th:nth-child(6) /* Dam */
+        #bred-horses-table th:nth-child(6), /* Dam */
         #bred-horses-table td:nth-child(6) {
              width: 220px; /* Increased width */
               overflow: hidden; /* May need text-overflow if parent names get long */
@@ -778,7 +778,7 @@
         #bred-horses-table td:nth-child(8),
         #bred-horses-table th:nth-child(9), /* Sprint */
         #bred-horses-table td:nth-child(9),
-        #bred-horses-table th:nth-child(10) /* Endurance */
+        #bred-horses-table th:nth-child(10), /* Endurance */
         #bred-horses-table td:nth-child(10) {
             width: 75px; /* Slightly increased width */
             text-align: center;
@@ -2291,27 +2291,7 @@
         </div>
      
         <!-- End Settings Tab Content -->
-    <script>
-        // Tab‐switching logic
-        const tabButtons = document.querySelectorAll('#tab-buttons .tab-button');
-        const tabContents = document.querySelectorAll('.tab-content');
 
-        tabButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                // deactivate everything
-                tabButtons.forEach(b => b.classList.remove('active'));
-                tabContents.forEach(c => c.classList.remove('active'));
-
-                // activate the one we clicked
-                btn.classList.add('active');
-                document
-                    .getElementById('tab-content-' + btn.dataset.tab)
-                    .classList.add('active');
-        });
-    </script>
-     </div> <!-- End #tab-content -->
- 
- <script>
 // 1️⃣ Define your color palettes per bloodline.
 
         const breedColorOptions = {
@@ -3184,7 +3164,7 @@ function importSingleHorse() {
                         <h4 style="margin-top: 0; color: var(--accent-color);">Predicted Foal Attributes</h4>
                         <p><strong>Bloodline:</strong> ${prediction.bloodline}</p>
                         <p><strong>Gender:</strong> ${prediction.gender}</p>
-                        <p><strong>Color:</strong> <span class="swatch" style="background:${prediction.color};"></span> ${getColorLabel(prediction.bloodline, prediction.color)}</p>
+                        <p><strong>Color:</strong> <span class="swatch"></span> <!-- Color label will be inserted by JS --></p>
                         <p><strong>Overall Stars:</strong> ${prediction.overallStars}</p>
                         <p><strong>Speed Stars:</strong> ${prediction.speedStars || 'Unknown'}</p>
                         <p><strong>Sprint Stars:</strong> ${prediction.sprintStars || 'Unknown'}</p>
