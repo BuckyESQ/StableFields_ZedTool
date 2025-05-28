@@ -1290,6 +1290,7 @@
         <button class="tab-button" data-tab="augments">Augments List</button>
         <button class="tab-button" data-tab="analysis">Analysis</button>
         <button class="tab-button" data-tab="stats">Overall Stats</button>
+        <button class="tab-button" data-tab="import">Import</button>
         <button class="tab-button" data-tab="settings">Settings</button>
     </div>
     <!-- Tab Content -->
@@ -2229,6 +2230,9 @@
 
         <!-- Stats Tab Content -->
         <div id="tab-content-stats" class="tab-content">
+        <div id="tab-content-import" class="tab-content section">
+
+        </div>
      <!-- Section for Displaying Overall Stats -->
      <div class="section" id="stats-section">
         <h2>Overall Statistics</h2>
@@ -3512,8 +3516,8 @@ function importSingleHorse() {
             setupEventListeners();
 
             // --- ZedChampions API UI and Import UI ---
-            setupZedApiUI();
-            addZedChampionsImportUI();
+            setupZedApiUI('tab-content-import');
+            addZedChampionsImportUI('tab-content-import');
             ZED_API.loadAuthToken();
 
             console.log("Tracker Initialized.");
