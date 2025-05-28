@@ -3470,7 +3470,13 @@ function importSingleHorse() {
                         f.color, f.traits, f.attrs
                     ));
                 }
-            });
+            }); // <-- This closes the forEach!
+
+// Initialize color/traits/attributes for all forms
+forms.forEach(f => onBloodlineChange(
+    `${f.prefix}-bloodline`,
+    f.color, f.traits, f.attrs
+));
 
             // Initialize color/traits/attributes for all forms
             forms.forEach(f => onBloodlineChange(
