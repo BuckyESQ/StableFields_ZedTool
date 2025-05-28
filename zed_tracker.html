@@ -31,7 +31,6 @@
             --title-font: 'Orbitron', sans-serif;
             --body-font: 'Inter', sans-serif;
             --text-highlight-bg: var(--bg-color); /* Use main bg for TH text highlight */
-        }
 
         body {
             font-family: var(--body-font);
@@ -40,25 +39,21 @@
             margin: 0;
             padding: 20px;
             line-height: 1.6;
-        }
 
         h1, h2, h3 {
             color: var(--accent-color);
             padding-bottom: 0.3em;
             margin-top: 1.5em;
             margin-bottom: 1em;
-        }
         h1 {
             font-size: 2.2em; /* Slightly larger */
             font-family: var(--title-font);
             font-weight: 700; /* Boldness for Orbitron */
             letter-spacing: 1px; /* Slight spacing */
-        }
         h2 { 
             font-size: 1.6em; 
             border-bottom: 1px solid var(--border-color); /* Restore original border */
             padding-bottom: 0.3em; /* Restore original padding */
-        }
         h3 { 
             font-size: 1.3em; 
             margin-top: 1em; 
@@ -2504,15 +2499,20 @@ function predictFoal(sire, dam) {
 // Add after the predictFoal function
 
 // ZedChampions API integration
+
 const ZED_API = {
     // Store the auth token
     authToken: null,
+    tokenExpiry: null,
     
     // Set the auth token
     setAuthToken(token) {
         this.authToken = token;
         localStorage.setItem('zedTrackerAuthToken', token);
         console.log("ZedChampions API token set successfully");
+        // Check expiration when setting token
+        this.isTokenExpired();
+        return true;
     },
     
     // Load the stored auth token
@@ -2525,28 +2525,24 @@ const ZED_API = {
         return false;
     },
     
-    // Test if the token is valid
-    async testConnection() {
-        if (!this.authToken) return { success: false, message: "No auth token set" };
+    // Check if token is expired
+    isTokenExpired() {
+      if (!this.authToken) return true;
+      
+      try {
+        // Parse JWT (split by dots and decode middle part)
+        const base64Url = this.authToken.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const payload = JSON.parse(window.atob(base64));
         
-        try {
-            const response = await fetch('https://api.zedchampions.com/v1/user/profile', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${this.authToken}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                return { success: true, message: `Connected as ${data.username || 'User'}`, data };
-            } else {
-                return { success: false, message: `API Error: ${response.status} ${response.statusText}` };
-            }
-        } catch (error) {
-            return { success: false, message: `Connection error: ${error.message}` };
-        }
+        // Get expiration timestamp and compare with current time
+        const expiryTime = payload.exp * 1000; // Convert to milliseconds
+        this.tokenExpiry = new Date(expiryTime);
+        return Date.now() >= expiryTime;
+      } catch (e) {
+        console.error("Error checking token expiration:", e);
+        return true; // Assume expired if can't parse
+      }
     },
     
     // Fetch a horse by ID from ZedChampions
@@ -2597,94 +2593,95 @@ const ZED_API = {
         }
     }
 };
-
-// Add UI for entering and testing the API token
-function setupZedApiUI() {
-    const settingsTab = document.getElementById('tab-content-settings');
-    if (!settingsTab) return;
-    
-    const apiSection = document.createElement('div');
-    apiSection.className = 'section';
-    apiSection.innerHTML = `
-        <h2>ZedChampions API Integration</h2>
-        
-        <div class="token-notice">
-            <p><strong>Note:</strong> ZedChampions API tokens expire after 24 hours. You'll need to get a new token daily.</p>
-            <p>To get a new token: Open ZedChampions in your browser, open Developer Tools (F12), 
-            go to Network tab, reload the page, find any API request, and copy the "Authorization" header value.</p>
-        </div>
-        
-        <div style="margin-top: 15px;">
-            <label for="zed-api-token" style="display: block; margin-bottom: 5px;">API Token:</label>
-            <input type="password" id="zed-api-token" style="width: 400px; padding: 10px;" placeholder="Enter your ZedChampions API token">
-        </div>
-        
-        <div style="margin-top: 15px; display: flex; gap: 10px;">
-            <button id="save-api-token-btn" class="button">Save Token</button>
-            <button id="test-api-connection-btn" class="button">Test Connection</button>
-        </div>
-        
-        <div id="api-connection-status" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;"></div>
-    `;
-    
-    // Add section to settings tab
-    settingsTab.insertBefore(apiSection, settingsTab.firstChild);
-    
+ 
 // Replace your existing setupZedApiUI function
 
-function setupZedApiUI() {
-    const settingsTab = document.getElementById('tab-content-settings');
-    if (!settingsTab) return;
-    
-    const apiSection = document.createElement('div');
-    apiSection.className = 'section';
-    apiSection.innerHTML = `
-        <h2>ZedChampions API Integration</h2>
+        // Replace this function (around line 2995)
+        function setupZedApiUI() {
+            const settingsTab = document.getElementById('tab-content-settings');
+            if (!settingsTab) return;
+            
+            const apiSection = document.createElement('div');
+            apiSection.className = 'section';
+            apiSection.innerHTML = `
+                <h2>ZedChampions API Integration</h2>
         
-        <div class="token-notice">
-            <p><strong>Note:</strong> ZedChampions API tokens expire after 24 hours. You'll need to get a new token daily.</p>
-            <p>To get a new token: Open ZedChampions in your browser, open Developer Tools (F12), 
-            go to Network tab, reload the page, find any API request, and copy the "Authorization" header value.</p>
-        </div>
-        
-        <div style="margin-top: 15px;">
-            <label for="zed-api-token" style="display: block; margin-bottom: 5px;">API Token:</label>
-            <input type="password" id="zed-api-token" style="width: 400px; padding: 10px;" placeholder="Enter your ZedChampions API token">
-        </div>
-        
-        <div style="margin-top: 15px; display: flex; gap: 10px;">
-            <button id="save-api-token-btn" class="button">Save Token</button>
-            <button id="test-api-connection-btn" class="button">Test Connection</button>
-        </div>
-        
-        <div id="api-connection-status" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;"></div>
-    `;
-    
-    // Add to beginning of settings tab
-    settingsTab.insertBefore(apiSection, settingsTab.firstChild);
-    
-    // Add event handlers
-    const saveTokenBtn = document.getElementById('save-api-token-btn');
-    const testConnectionBtn = document.getElementById('test-api-connection-btn');
-    
-    if (saveTokenBtn) {
-        saveTokenBtn.addEventListener('click', function() {
-            const tokenInput = document.getElementById('zed-api-token');
-            if (tokenInput && tokenInput.value) {
-                if (ZED_API.setAuthToken(tokenInput.value)) {
-                    showConnectionStatus('Token saved successfully. Testing connection...', null);
-                    
-                    ZED_API.testConnection().then(result => {
-                        showConnectionStatus(result.message, result.success);
-                    });
-                } else {
-                    showConnectionStatus('Invalid token format. Token should be a JWT.', false);
-                }
-            } else {
-                showConnectionStatus('Please enter a valid token.', false);
+                <div class="token-notice">
+                    <p><strong>Note:</strong> ZedChampions API tokens expire after 24 hours. You'll need to get a new token daily.</p>
+                    <p>To get a new token: Open ZedChampions in your browser, open Developer Tools (F12), 
+                    go to Network tab, reload the page, find any API request, and copy the "Authorization" header value.</p>
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label for="zed-api-token" style="display: block; margin-bottom: 5px;">API Token:</label>
+                    <input type="password" id="zed-api-token" style="width: 400px; padding: 10px;" placeholder="Enter your ZedChampions API token">
+                </div>
+                
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button id="save-api-token-btn" class="button">Save Token</button>
+                    <button id="test-api-connection-btn" class="button">Test Connection</button>
+                </div>
+                
+                <div id="api-connection-status" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;"></div>
+            `;
+            
+            // Add to beginning of settings tab
+            settingsTab.insertBefore(apiSection, settingsTab.firstChild);
+            
+            // Add event handlers
+            const saveTokenBtn = document.getElementById('save-api-token-btn');
+            const testConnectionBtn = document.getElementById('test-api-connection-btn');
+            
+            if (saveTokenBtn) {
+                saveTokenBtn.addEventListener('click', function() {
+                    const tokenInput = document.getElementById('zed-api-token');
+                    if (tokenInput && tokenInput.value) {
+                        if (ZED_API.setAuthToken(tokenInput.value)) {
+                            showConnectionStatus('Token saved successfully. Testing connection...', null);
+                            
+                            ZED_API.testConnection().then(result => {
+                                showConnectionStatus(result.message, result.success);
+                            });
+                        } else {
+                            showConnectionStatus('Invalid token format. Token should be a JWT.', false);
+                        }
+                    } else {
+                        showConnectionStatus('Please enter a valid token.', false);
+                    }
+                });
             }
-        });
-    }
+            
+            if (testConnectionBtn) {
+                testConnectionBtn.addEventListener('click', async function() {
+                    showConnectionStatus('Testing connection...', null);
+                    
+                    const result = await ZED_API.testConnection();
+                    showConnectionStatus(result.message, result.success);
+                });
+            }
+            
+            // Load token from storage and check status
+            if (ZED_API.loadAuthToken()) {
+                const tokenInput = document.getElementById('zed-api-token');
+                if (tokenInput) {
+                    tokenInput.value = "••••••••••••••••••••••"; // Mask the actual token
+                }
+                
+                if (ZED_API.isTokenExpired()) {
+                    showConnectionStatus("Your API token has expired. Please get a new token.", false);
+                } else {
+                    ZED_API.testConnection().then(result => {
+                        if (result.success) {
+                            const expiryMsg = ZED_API.tokenExpiry ? 
+                                ` Token valid until ${ZED_API.tokenExpiry.toLocaleString()}.` : '';
+                            showConnectionStatus(result.message + expiryMsg, true);
+                        } else {
+                            showConnectionStatus(result.message, false);
+                        }
+                    });
+                }
+            }
+        }
     
     if (testConnectionBtn) {
         testConnectionBtn.addEventListener('click', async function() {
