@@ -1292,7 +1292,6 @@
         <button class="tab-button" data-tab="stats">Overall Stats</button>
         <button class="tab-button" data-tab="settings">Settings</button>
     </div>
-
     <!-- Tab Content -->
     <div id="tab-content">
 
@@ -2419,25 +2418,43 @@
         };
         // 2️⃣ Define traits and Attributes per bloodline
         const bloodlineTraits = {
-        Nakamoto: ['High start','Nervous','Defensive','Sensitive','Reactive'],
-        Szabo:    ['Calm','Focused','Professional'],
-        Finney:   ['Determined','Stubborn','Hungry','Defensive'],
-        Buterin:  ['Goofy','Playful','Distracted','Restless']
+            Nakamoto: ['High start','Nervous','Defensive','Sensitive','Reactive'],
+            Szabo:    ['Calm','Focused','Professional'],
+            Finney:   ['Determined','Stubborn','Hungry','Defensive'],
+            Buterin:  ['Goofy','Playful','Distracted','Restless']
         };
 
         const bloodlineAttributes = {
-        Nakamoto: ['strong start'],
-        Szabo:    ['steady'],
-        Finney:   ['strong finish'],
-        Buterin:  ['unpredictable']
+            Nakamoto: ['strong start'],
+            Szabo:    ['steady'],
+            Finney:   ['strong finish'],
+            Buterin:  ['unpredictable']
         };
         const forms = [
-        { prefix: 'horse',          color:'horse-color',          traits:'horse-traits',           attrs:'horse-attributes' },
-        { prefix: 'breeding-horse', color:'breeding-horse-color', traits:'breeding-horse-traits',  attrs:'breeding-horse-attributes' },
-        { prefix: 'bred',           color:'bred-color',           traits:'bred-horse-traits',      attrs:'bred-horse-attributes' }
+            { prefix: 'horse',          color:'horse-color',          traits:'horse-traits',           attrs:'horse-attributes' },
+            { prefix: 'breeding-horse', color:'breeding-horse-color', traits:'breeding-horse-traits',  attrs:'breeding-horse-attributes' },
+            { prefix: 'bred',           color:'bred-color',           traits:'bred-horse-traits',      attrs:'bred-horse-attributes' }
         ];
+
+        // Add event listeners for bloodline changes on all forms
+        forms.forEach(f => {
+            const el = document.getElementById(`${f.prefix}-bloodline`);
+            if (el) {
+                el.addEventListener('change', () => onBloodlineChange(
+                    `${f.prefix}-bloodline`,
+                    f.color, f.traits, f.attrs
+                ));
+            }
+        });
+
+        // Initialize color/traits/attributes for all forms
+        forms.forEach(f => onBloodlineChange(
+            `${f.prefix}-bloodline`,
+            f.color, f.traits, f.attrs
+        ));
         
         // Foal Prediction Algorithm - Insert after forms array, before onBloodlineChange function
+
           function calculateStars(sireStars, damStars) {
     // Get values as numbers, defaulting to 0 if not provided
     const sireVal = parseFloat(sireStars) || 0;
@@ -2544,83 +2561,145 @@
         
         // --- REPLACE the entire ZED_API and all duplicate fetchHorse/searchHorses definitions with this block ---
 
-        const ZED_API = {
-            // Store the auth token
-            authToken: null,
-            tokenExpiry: null,
+        // ...existing code...
+            const ZED_API = {
+                authToken: null,
+                tokenExpiry: null,
 
-            // Set the auth token
-            setAuthToken(token) {
-                this.authToken = token;
-                localStorage.setItem('zedTrackerAuthToken', token);
-                console.log("ZedChampions API token set successfully");
-                // Check expiration when setting token
-                this.isTokenExpired();
-                return true;
-            },
-
-            // Load the auth token from localStorage
-            loadAuthToken() {
-                const token = localStorage.getItem('zedTrackerAuthToken');
-                if (token) {
+                setAuthToken(token) {
                     this.authToken = token;
+                    localStorage.setItem('zedTrackerAuthToken', token);
+                    // Check expiration when setting token
+                    this.isTokenExpired();
                     return true;
-                }
-                return false;
-            },
+                },
 
-            // Check if token is expired
-            isTokenExpired() {
-                if (!this.authToken) return true;
-
-                try {
-                    // Parse JWT (split by dots and decode middle part)
-                    const base64Url = this.authToken.split('.')[1];
-                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                    const payload = JSON.parse(window.atob(base64));
-
-                    // Get expiration timestamp and compare with current time
-                    const expiryTime = payload.exp * 1000; // Convert to milliseconds
-                    this.tokenExpiry = new Date(expiryTime);
-                    return Date.now() >= expiryTime;
-                } catch (e) {
-                    console.error("Error checking token expiration:", e);
-                    return true; // Assume expired if can't parse
-                }
-            },
-
-            // Test API connection
-            async testConnection() {
-                if (!this.authToken) {
-                    return { success: false, message: "No authentication token set" };
-                }
-
-                if (this.isTokenExpired()) {
-                    return { success: false, message: "Authentication token has expired" };
-                }
-
-                try {
-                    // Try to fetch basic account info as a test
-                    const response = await fetch('https://api.zedchampions.com/v1/account', {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${this.authToken}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-
-                    if (response.ok) {
-                        return { success: true, message: "Connection successful!" };
-                    } else {
-                        return { 
-                            success: false, 
-                            message: `API Error: ${response.status} ${response.statusText}` 
-                        };
+                loadAuthToken() {
+                    const token = localStorage.getItem('zedTrackerAuthToken');
+                    if (token) {
+                        this.authToken = token;
+                        return true;
                     }
-                } catch (error) {
-                    return { success: false, message: `Connection error: ${error.message}` };
+                    return false;
+                },
+
+                isTokenExpired() {
+                    if (!this.authToken) return true;
+                    try {
+                        const base64Url = this.authToken.split('.')[1];
+                        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                        const payload = JSON.parse(window.atob(base64));
+                        const expiryTime = payload.exp * 1000;
+                        this.tokenExpiry = new Date(expiryTime);
+                        return Date.now() >= expiryTime;
+                    } catch (e) {
+                        console.error("Error checking token expiration:", e);
+                        return true;
+                    }
+                },
+
+                async testConnection() {
+                    if (!this.authToken) {
+                        return { success: false, message: "No authentication token set" };
+                    }
+                    if (this.isTokenExpired()) {
+                        return { success: false, message: "Authentication token has expired" };
+                    }
+                    try {
+                        const response = await fetch('https://api.zedchampions.com/v1/account', {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${this.authToken}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        if (response.ok) {
+                            return { success: true, message: "Connection successful!" };
+                        } else {
+                            return { 
+                                success: false, 
+                                message: `API Error: ${response.status} ${response.statusText}` 
+                            };
+                        }
+                    } catch (error) {
+                        return { success: false, message: `Connection error: ${error.message}` };
+                    }
+                },
+
+                async fetchAllHorses(type = 'racing') {
+                    try {
+                        if (!this.authToken) {
+                            return { success: false, message: "No authentication token set" };
+                        }
+                        const endpoint = type === 'racing'
+                            ? 'https://api.zedchampions.com/v1/stable/racing'
+                            : 'https://api.zedchampions.com/v1/stable/breeding';
+
+                        const response = await fetch(endpoint, {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${this.authToken}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        if (!response.ok) {
+                            return {
+                                success: false,
+                                message: `API Error: ${response.status} ${response.statusText}`
+                            };
+                        }
+
+                        const data = await response.json();
+                        return { success: true, data: data.horses || [] };
+                    } catch (error) {
+                        return { success: false, message: `Connection error: ${error.message}` };
+                    }
+                },
+
+                async fetchHorse(horseId) {
+                    if (!this.authToken) return { success: false, message: "No auth token set" };
+                    try {
+                        const response = await fetch(`https://api.zedchampions.com/v1/horses/${horseId}`, {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${this.authToken}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        if (response.ok) {
+                            const data = await response.json();
+                            return { success: true, data };
+                        } else {
+                            return { success: false, message: `API Error: ${response.status} ${response.statusText}` };
+                        }
+                    } catch (error) {
+                        return { success: false, message: `Connection error: ${error.message}` };
+                    }
+                },
+
+                async searchHorses(query) {
+                    if (!this.authToken) return { success: false, message: "No auth token set" };
+                    try {
+                        const response = await fetch(`https://api.zedchampions.com/v1/horses/search?q=${encodeURIComponent(query)}`, {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${this.authToken}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        if (response.ok) {
+                            const data = await response.json();
+                            return { success: true, data: data.results || [] };
+                        } else {
+                            return { success: false, message: `API Error: ${response.status} ${response.statusText}` };
+                        }
+                    } catch (error) {
+                        return { success: false, message: `Connection error: ${error.message}` };
+                    }
                 }
-            },
+            };
+
 
             // Fetch all horses (racing or breeding)
             async fetchAllHorses(type = 'racing') {
@@ -2680,6 +2759,7 @@
             },
 
             // Search for horses by name in ZedChampions
+
             async searchHorses(query) {
                 if (!this.authToken) return { success: false, message: "No auth token set" };
 
@@ -4238,7 +4318,6 @@ function importSingleHorse() {
                 netEarningsSpan.style.color = netEarnings >= 0 ? 'var(--success-color)' : 'var(--error-color)';
             }
         }
-
 
         // --- Event Handlers ---
         function setupEventListeners() {
