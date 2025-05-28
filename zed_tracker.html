@@ -2683,9 +2683,9 @@
 
 // Remove ALL duplicate/standalone async fetchHorse and async searchHorses functions after this object!
 
-        function setupZedApiUI() {
-            const settingsTab = document.getElementById('tab-content-settings');
-            if (!settingsTab) return;
+        function setupZedApiUI(tabId = 'tab-content-settings') {
+            const tab = document.getElementById(tabId);
+            if (!tab) return;
             
             const apiSection = document.createElement('div');
             apiSection.className = 'section';
