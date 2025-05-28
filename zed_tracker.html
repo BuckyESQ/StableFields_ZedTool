@@ -31,8 +31,6 @@
             --title-font: 'Orbitron', sans-serif;
             --body-font: 'Inter', sans-serif;
             --text-highlight-bg: var(--bg-color); /* Use main bg for TH text highlight */
-        }
-
         body {
             font-family: var(--body-font);
             background-color: var(--bg-color);
@@ -63,7 +61,7 @@
             margin-top: 1em; 
             border-bottom: none; /* Explicitly no border */
         }
-        
+
         .swatch {
             display: inline-block;
             width: 18px;
@@ -2567,7 +2565,7 @@ const ZED_API = {
                         'Authorization': `Bearer ${this.authToken}`,
                         'Content-Type': 'application/json'
                     }
-                });T
+                });
                 
                 if (response.ok) {
                     return { success: true, message: "Connection successful!" };
