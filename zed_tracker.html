@@ -38,7 +38,6 @@
             margin: 0;
             padding: 20px;
             line-height: 1.6;
-        }
         h1, h2, h3 {
             color: var(--accent-color);
             padding-bottom: 0.3em;
@@ -2627,67 +2626,64 @@ const ZED_API = {
         }
     }
 };
- 
-// Replace your existing setupZedApiUI function
-
-        // Replace this function (around line 2995)
+         // Replace this function (around line 2995)
        function setupZedApiUI() {
-    const settingsTab = document.getElementById('tab-content-settings');
-    if (!settingsTab) return;
-    
-    const apiSection = document.createElement('div');
-    apiSection.className = 'section';
-    apiSection.innerHTML = `
-        <h2>ZedChampions API Integration</h2>
-        
-        <div class="token-notice">
-            <p><strong>Note:</strong> ZedChampions API tokens expire after 24 hours. You'll need to get a new token daily.</p>
-            <p>To get a new token: Open ZedChampions in your browser, open Developer Tools (F12), 
-            go to Network tab, reload the page, find any API request, and copy the "Authorization" header value.</p>
-        </div>
-        
-        <div style="margin-top: 15px;">
-            <label for="zed-api-token" style="display: block; margin-bottom: 5px;">API Token:</label>
-            <input type="password" id="zed-api-token" style="width: 400px; padding: 10px;" placeholder="Enter your ZedChampions API token">
-        </div>
-        
-        <div style="margin-top: 15px; display: flex; gap: 10px;">
-            <button id="save-api-token-btn" class="button">Save Token</button>
-            <button id="test-api-connection-btn" class="button">Test Connection</button>
-        </div>
-        
-        <div id="api-connection-status" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;"></div>
-    `;
-    
-    // Add to beginning of settings tab
-    settingsTab.insertBefore(apiSection, settingsTab.firstChild);
-    
-    // Add event handlers
-    const saveTokenBtn = document.getElementById('save-api-token-btn');
-    const testConnectionBtn = document.getElementById('test-api-connection-btn');
-    
-    if (saveTokenBtn) {
-        saveTokenBtn.addEventListener('click', function() {
-            const tokenInput = document.getElementById('zed-api-token');
-            if (tokenInput && tokenInput.value) {
-                try {
-                    if (ZED_API.setAuthToken(tokenInput.value)) {
-                        showConnectionStatus('Token saved successfully. Testing connection...', null);
-                        
-                        ZED_API.testConnection().then(result => {
-                            showConnectionStatus(result.message, result.success);
-                        });
+            const settingsTab = document.getElementById('tab-content-settings');
+            if (!settingsTab) return;
+            
+            const apiSection = document.createElement('div');
+            apiSection.className = 'section';
+            apiSection.innerHTML = `
+                <h2>ZedChampions API Integration</h2>
+                
+                <div class="token-notice">
+                    <p><strong>Note:</strong> ZedChampions API tokens expire after 24 hours. You'll need to get a new token daily.</p>
+                    <p>To get a new token: Open ZedChampions in your browser, open Developer Tools (F12), 
+                    go to Network tab, reload the page, find any API request, and copy the "Authorization" header value.</p>
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label for="zed-api-token" style="display: block; margin-bottom: 5px;">API Token:</label>
+                    <input type="password" id="zed-api-token" style="width: 400px; padding: 10px;" placeholder="Enter your ZedChampions API token">
+                </div>
+                
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button id="save-api-token-btn" class="button">Save Token</button>
+                    <button id="test-api-connection-btn" class="button">Test Connection</button>
+                </div>
+                
+                <div id="api-connection-status" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;"></div>
+            `;
+            
+            // Add to beginning of settings tab
+            settingsTab.insertBefore(apiSection, settingsTab.firstChild);
+            
+            // Add event handlers
+            const saveTokenBtn = document.getElementById('save-api-token-btn');
+            const testConnectionBtn = document.getElementById('test-api-connection-btn');
+            
+            if (saveTokenBtn) {
+                saveTokenBtn.addEventListener('click', function() {
+                    const tokenInput = document.getElementById('zed-api-token');
+                    if (tokenInput && tokenInput.value) {
+                        try {
+                            if (ZED_API.setAuthToken(tokenInput.value)) {
+                                showConnectionStatus('Token saved successfully. Testing connection...', null);
+                                
+                                ZED_API.testConnection().then(result => {
+                                    showConnectionStatus(result.message, result.success);
+                                });
+                            } else {
+                                showConnectionStatus('Invalid token format. Token should be a JWT.', false);
+                            }
+                        } catch (e) {
+                            showConnectionStatus('An error occurred while saving the token.', false);
+                        }
                     } else {
-                        showConnectionStatus('Invalid token format. Token should be a JWT.', false);
+                        showConnectionStatus('Please enter a valid token.', false);
                     }
-                } catch (e) {
-                    showConnectionStatus('An error occurred while saving the token.', false);
-                }
-            } else {
-                showConnectionStatus('Please enter a valid token.', false);
+                });
             }
-        });
-    }
     
     if (testConnectionBtn) {
         testConnectionBtn.addEventListener('click', async function() {
@@ -2756,162 +2752,126 @@ const ZED_API = {
         }
 
 // Function to import horse data from ZedChampions
-function importHorseFromZed(horseId) {
-    ZED_API.fetchHorse(horseId).then(result => {
-        if (!result.success) {
-            alert(`Error importing horse: ${result.message}`);
-            return;
+        function importHorseFromZed(horseId) {
+            ZED_API.fetchHorse(horseId).then(result => {
+                if (!result.success) {
+                    alert(`Error importing horse: ${result.message}`);
+                    return;
+                }
+                
+                const horseData = result.data;
+                
+                // Convert ZedChampions data format to our app's format
+                const newHorse = {
+                    id: `horse-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                    name: horseData.name,
+                    bloodline: horseData.bloodline,
+                    color: horseData.color || '#CCCCCC', // Default if color missing
+                    gender: horseData.gender,
+                    stars: horseData.overall_rating || null,
+                    speedStars: horseData.speed_rating || null,
+                    sprintStars: horseData.sprint_rating || null,
+                    enduranceStars: horseData.endurance_rating || null,
+                    initialZedBalance: 0, // Default values
+                    initialMmRating: 1000,
+                    status: 'racing', // Default to racing
+                    generation: horseData.genotype || 0,
+                    importedFromZed: true,
+                    zedId: horseData.id
+                };
+                
+                // Ask user if they want to import as racing or breeding
+                const status = confirm("Import this horse as a racing horse?\n\nClick OK for racing, Cancel for breeding.");
+                newHorse.status = status ? 'racing' : 'breeding';
+                
+                // Add the horse to our collection
+                horses.push(newHorse);
+                saveData();
+                
+                // Update UI based on status
+                if (newHorse.status === 'racing') {
+                    renderHorsesTable();
+                    updateHorseDropdown();
+                } else {
+                    renderBreedingHorsesTable();
+                }
+                
+                updateParentDropdowns();
+                populateAugmentAnalysisHorseFilter();
+                updateStudAuctionSelect();
+                updateFoalPredictorDropdowns();
+                
+                alert(`Successfully imported ${horseData.name} as a ${newHorse.status} horse.`);
+                
+                // Switch to appropriate tab
+                activateTab(newHorse.status === 'racing' ? 'racing' : 'breeding');
+            });
         }
+            
+    // Add to setupEventListeners function
+    const originalSetupEventListeners = setupEventListeners;
+    setupEventListeners = function() {
+        originalSetupEventListeners();
+        setupZedApiUI();
+        addZedChampionsImportUI();
+        ZED_API.loadAuthToken(); // Load token on startup
+    };
+    // Enhanced event listener for predict button - replaces the existing one
+    document.addEventListener('DOMContentLoaded', function() {
+        // Keep existing event listeners for initialization
         
-        const horseData = result.data;
-        
-        // Convert ZedChampions data format to our app's format
-        const newHorse = {
-            id: `horse-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-            name: horseData.name,
-            bloodline: horseData.bloodline,
-            color: horseData.color || '#CCCCCC', // Default if color missing
-            gender: horseData.gender,
-            stars: horseData.overall_rating || null,
-            speedStars: horseData.speed_rating || null,
-            sprintStars: horseData.sprint_rating || null,
-            enduranceStars: horseData.endurance_rating || null,
-            initialZedBalance: 0, // Default values
-            initialMmRating: 1000,
-            status: 'racing', // Default to racing
-            generation: horseData.genotype || 0,
-            importedFromZed: true,
-            zedId: horseData.id
-        };
-        
-        // Ask user if they want to import as racing or breeding
-        const status = confirm("Import this horse as a racing horse?\n\nClick OK for racing, Cancel for breeding.");
-        newHorse.status = status ? 'racing' : 'breeding';
-        
-        // Add the horse to our collection
-        horses.push(newHorse);
-        saveData();
-        
-        // Update UI based on status
-        if (newHorse.status === 'racing') {
-            renderHorsesTable();
-            updateHorseDropdown();
-        } else {
-            renderBreedingHorsesTable();
+        // Find and enhance the predict button if it exists
+        const predictButton = document.getElementById('predict-foal-btn');
+        if (predictButton) {
+            predictButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                
+                const sireSelect = document.getElementById('predict-sire');
+                const damSelect = document.getElementById('predict-dam');
+                const resultDiv = document.getElementById('foal-prediction-result');
+                
+                if (!sireSelect || !damSelect || !resultDiv) return;
+                
+                const sireName = sireSelect.value;
+                const damName = damSelect.value;
+                
+                if (!sireName || !damName) {
+                    resultDiv.innerHTML = '<p style="color:var(--error-color)">Please select both sire and dam</p>';
+                    return;
+                }
+                
+                // Find the horses by name in the horses array
+                const sire = horses.find(h => h.name === sireName && h.gender === 'Male');
+                const dam = horses.find(h => h.name === damName && h.gender === 'Female');
+                
+                if (!sire || !dam) {
+                    resultDiv.innerHTML = '<p style="color:var(--error-color)">Selected horses not found</p>';
+                    return;
+                }
+                
+                // Get the prediction
+                const prediction = predictFoal(sire, dam);
+                
+                // Display detailed results with styling
+                resultDiv.innerHTML = `
+                    <div style="padding: 15px; background-color: var(--section-bg); border-radius: 8px; margin-top: 10px;">
+                        <h4 style="margin-top: 0; color: var(--accent-color);">Predicted Foal Attributes</h4>
+                        <p><strong>Bloodline:</strong> ${prediction.bloodline}</p>
+                        <p><strong>Gender:</strong> ${prediction.gender}</p>
+                        <p><strong>Color:</strong> <span class="swatch" style="background:${prediction.color};"></span> ${getColorLabel(prediction.bloodline, prediction.color)}</p>
+                        <p><strong>Overall Stars:</strong> ${prediction.overallStars}</p>
+                        <p><strong>Speed Stars:</strong> ${prediction.speedStars || 'Unknown'}</p>
+                        <p><strong>Sprint Stars:</strong> ${prediction.sprintStars || 'Unknown'}</p>
+                        <p><strong>Endurance Stars:</strong> ${prediction.enduranceStars || 'Unknown'}</p>
+                        <p style="font-size: 0.9em; color: var(--text-muted-color);">Note: Results are estimates and may vary.</p>
+                    </div>
+                `;
+                
+                // Add animation effect
+                resultDiv.style.animation = "fadeIn 0.5s ease-in-out";
+            });
         }
-        
-        updateParentDropdowns();
-        populateAugmentAnalysisHorseFilter();
-        updateStudAuctionSelect();
-        updateFoalPredictorDropdowns();
-        
-        alert(`Successfully imported ${horseData.name} as a ${newHorse.status} horse.`);
-        
-        // Switch to appropriate tab
-        activateTab(newHorse.status === 'racing' ? 'racing' : 'breeding');
     });
-}
-            // Load token from storage and check status
-        if (ZED_API.loadAuthToken()) {
-            const tokenInput = document.getElementById('zed-api-token');
-            if (tokenInput) {
-                tokenInput.value = "••••••••••••••••••••••"; // Mask the actual token
-            }
-            
-            if (ZED_API.isTokenExpired()) {
-                showConnectionStatus("Your API token has expired. Please get a new token.", false);
-            } else {
-                ZED_API.testConnection().then(result => {
-                    if (result.success) {
-                        const expiryMsg = ZED_API.tokenExpiry ? 
-                            ` Token valid until ${ZED_API.tokenExpiry.toLocaleString()}.` : '';
-                        showConnectionStatus(result.message + expiryMsg, true);
-                    } else {
-                        showConnectionStatus(result.message, false);
-                    }
-                });
-            }
-        }
-    
-    // Add CSS for token notice
-    const style = document.createElement('style');
-    style.textContent = `
-        .token-notice {
-            background-color: rgba(255, 193, 7, 0.1);
-            border-left: 4px solid #ffc107;
-            padding: 10px 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            font-size: 0.9em;
-            line-height: 1.4;
-        }
-    `;
-    document.head.appendChild(style);
-}
-// Add to setupEventListeners function
-const originalSetupEventListeners = setupEventListeners;
-setupEventListeners = function() {
-    originalSetupEventListeners();
-    setupZedApiUI();
-    addZedChampionsImportUI();
-    ZED_API.loadAuthToken(); // Load token on startup
-};
-// Enhanced event listener for predict button - replaces the existing one
-document.addEventListener('DOMContentLoaded', function() {
-    // Keep existing event listeners for initialization
-    
-    // Find and enhance the predict button if it exists
-    const predictButton = document.getElementById('predict-foal-btn');
-    if (predictButton) {
-        predictButton.addEventListener('click', function(event) {
-            event.preventDefault();
-            
-            const sireSelect = document.getElementById('predict-sire');
-            const damSelect = document.getElementById('predict-dam');
-            const resultDiv = document.getElementById('foal-prediction-result');
-            
-            if (!sireSelect || !damSelect || !resultDiv) return;
-            
-            const sireName = sireSelect.value;
-            const damName = damSelect.value;
-            
-            if (!sireName || !damName) {
-                resultDiv.innerHTML = '<p style="color:var(--error-color)">Please select both sire and dam</p>';
-                return;
-            }
-            
-            // Find the horses by name in the horses array
-            const sire = horses.find(h => h.name === sireName && h.gender === 'Male');
-            const dam = horses.find(h => h.name === damName && h.gender === 'Female');
-            
-            if (!sire || !dam) {
-                resultDiv.innerHTML = '<p style="color:var(--error-color)">Selected horses not found</p>';
-                return;
-            }
-            
-            // Get the prediction
-            const prediction = predictFoal(sire, dam);
-            
-            // Display detailed results with styling
-            resultDiv.innerHTML = `
-                <div style="padding: 15px; background-color: var(--section-bg); border-radius: 8px; margin-top: 10px;">
-                    <h4 style="margin-top: 0; color: var(--accent-color);">Predicted Foal Attributes</h4>
-                    <p><strong>Bloodline:</strong> ${prediction.bloodline}</p>
-                    <p><strong>Gender:</strong> ${prediction.gender}</p>
-                    <p><strong>Color:</strong> <span class="swatch" style="background:${prediction.color};"></span> ${getColorLabel(prediction.bloodline, prediction.color)}</p>
-                    <p><strong>Overall Stars:</strong> ${prediction.overallStars}</p>
-                    <p><strong>Speed Stars:</strong> ${prediction.speedStars || 'Unknown'}</p>
-                    <p><strong>Sprint Stars:</strong> ${prediction.sprintStars || 'Unknown'}</p>
-                    <p><strong>Endurance Stars:</strong> ${prediction.enduranceStars || 'Unknown'}</p>
-                    <p style="font-size: 0.9em; color: var(--text-muted-color);">Note: Results are estimates and may vary.</p>
-                </div>
-            `;
-            
-            // Add animation effect
-            resultDiv.style.animation = "fadeIn 0.5s ease-in-out";
-        });
-    }
-});
         function onBloodlineChange(bloodId, colorId, traitsId, attrsId) {
         const bloodEl = document.getElementById(bloodId);
         const colorEl = document.getElementById(colorId);
