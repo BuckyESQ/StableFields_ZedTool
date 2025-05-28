@@ -3151,35 +3151,6 @@ async function fetchAllHorses(type = 'racing') {
         return { success: false, message: `Connection error: ${error.message}` };
     }
 }
-
-        // Add this to the setupEventListeners function
-        const originalSetupEventListeners = setupEventListeners;
-        setupEventListeners = function() {
-            originalSetupEventListeners();
-            setupZedApiUI();
-            addZedChampionsImportUI(); // This ensures the UI is created
-            ZED_API.loadAuthToken(); // Load token on startup
-            
-            // Add explicit listeners for the import buttons
-            setTimeout(() => {
-                const importRacingButton = document.getElementById('import-racing-stable-btn');
-                const importBreedingButton = document.getElementById('import-breeding-stable-btn');
-                const importSingleButton = document.getElementById('import-single-horse-btn');
-                
-                if (importRacingButton) {
-                    importRacingButton.addEventListener('click', importRacingStable);
-                    console.log("Racing import button listener added");
-                }
-                if (importBreedingButton) {
-                    importBreedingButton.addEventListener('click', importBreedingStable);
-                    console.log("Breeding import button listener added");
-                }
-                if (importSingleButton) {
-                    importSingleButton.addEventListener('click', importSingleHorse);
-                    console.log("Single horse import button listener added");
-                }
-            }, 500); // Small delay to ensure DOM elements exist
-        };
             // Add CSS for token notice
             const style = document.createElement('style');
             style.textContent = `
@@ -3213,16 +3184,7 @@ async function fetchAllHorses(type = 'racing') {
                 statusEl.style.backgroundColor = 'rgba(33, 150, 243, 0.2)';
                 statusEl.style.color = '#2196F3';
             }
-        }
-
-// Function to import horse data from ZedChampions
-        function importHorseFromZed(horseId) {
-            ZED_API.fetchHorse(horseId).then(result => {
-                if (!result.success) {
-                    alert(`Error importing horse: ${result.message}`);
-                    return;
-                }
-                
+        }              
                 const horseData = result.data;
                 
                 // Convert ZedChampions data format to our app's format
@@ -3272,18 +3234,6 @@ async function fetchAllHorses(type = 'racing') {
             });
         }
             
-    // Add to setupEventListeners function
-    const originalSetupEventListeners = setupEventListeners;
-    setupEventListeners = function() {
-        originalSetupEventListeners();
-        setupZedApiUI();
-        addZedChampionsImportUI();
-        ZED_API.loadAuthToken(); // Load token on startup
-    };
-    // Enhanced event listener for predict button - replaces the existing one
-    document.addEventListener('DOMContentLoaded', function() {
-        // Keep existing event listeners for initialization
-        
         // Find and enhance the predict button if it exists
         const predictButton = document.getElementById('predict-foal-btn');
         if (predictButton) {
@@ -3388,31 +3338,7 @@ async function fetchAllHorses(type = 'racing') {
             });
         }
         }
-        document.addEventListener('DOMContentLoaded', () => {
-        forms.forEach(f => {
-            const el = document.getElementById(`${f.prefix}-bloodline`);
-            if (el) {
-            el.addEventListener('change', () => onBloodlineChange(
-                `${f.prefix}-bloodline`,
-                f.color, f.traits, f.attrs
-            ));
-            }
-        });
-                
-        // REMOVE THE NESTED DOMContentLoaded here and just include its contents:
-        updateHorseDropdown(); // For race form (only racing horses)
-        updateParentDropdowns(); // For bred form (all horses)
-        updateFoalPredictorDropdowns(); // For foal predictor
-        updateStudAuctionSelect(); // For stud auction form (male breeding horses)
-        updateOverallStats();
-        setupEventListeners();
-        console.log("Tracker Initialized.");
-
-        forms.forEach(f => onBloodlineChange(
-            `${f.prefix}-bloodline`,
-            f.color, f.traits, f.attrs
-        ));
-        });
+        
         // 3️⃣ UI update functions // populate `select` with id=colorSelectId based on bloodline in bloodSelectId
         function populateColorOptions(bloodline) {
         const color = document.getElementById('horse-color').value;
@@ -3644,56 +3570,59 @@ async function fetchAllHorses(type = 'racing') {
         document.addEventListener('DOMContentLoaded', () => {
             console.log("Tracker Initializing...");
 
-            // Move DOM Element selections inside DOMContentLoaded to ensure elements exist
-            // Assign elements to the globally declared variables
+            // Assign modal variables after DOM is loaded
             modal = document.getElementById('horse-details-modal');
             modalCloseBtn = document.getElementById('modal-close-button');
             modalTitle = document.getElementById('modal-horse-name');
             modalStatsContent = document.getElementById('modal-stats-content');
             modalAnalysisContent = document.getElementById('modal-analysis-content');
 
-        document.getElementById('predict-foal-btn').addEventListener('click', (event)=>{
-            event.preventDefault();
-            const sireName = document.getElementById('predict-sire').value;
-            const damName  = document.getElementById('predict-dam').value;
-            if(!sireName||!damName) return;
-            const sire = horses.find(h=>h.name===sireName && h.status === 'breeding' && h.gender === 'Male');
-            const dam  = horses.find(h=>h.name===damName && h.status === 'breeding' && h.gender === 'Female');
-            const stars = predictFoalStars(sire, dam);
-            const predictedBloodline = predictFoalBloodline(sire, dam);
-            document.getElementById('foal-prediction-result').textContent =
-                `🎯 Predicted Foal Overall Stars: ${stars}\n🧬 Predicted Bloodline: ${predictedBloodline}`;
-        });
-                    // Event listeners for modal (now safe to add)
-            if (modalCloseBtn) {
-                modalCloseBtn.onclick = hideHorseDetailsModal;
-            }
-            window.onclick = function(event) {
-                if (event.target == modal) {
-                    hideHorseDetailsModal();
+            // Add event listeners for bloodline changes on all forms
+            forms.forEach(f => {
+                const el = document.getElementById(`${f.prefix}-bloodline`);
+                if (el) {
+                    el.addEventListener('change', () => onBloodlineChange(
+                        `${f.prefix}-bloodline`,
+                        f.color, f.traits, f.attrs
+                    ));
                 }
-            }
+            });
 
+            // Initialize color/traits/attributes for all forms
+            forms.forEach(f => onBloodlineChange(
+                `${f.prefix}-bloodline`,
+                f.color, f.traits, f.attrs
+            ));
+
+            // Main initialization
             loadData(); // Load data FIRST
             populateAugmentDropdowns();
-            populateAugmentAnalysisHorseFilter(); // Populate the augment analysis horse filter
+            populateAugmentAnalysisHorseFilter();
             initializeTabs();
-            renderHorsesTable(); // Renders active racing horses
-            renderBreedingHorsesTable(); // Renamed function call
+            renderHorsesTable();
+            renderBreedingHorsesTable();
             renderRacesTable();
             renderBredHorsesTable();
-            renderStudAuctionTable(); // Render stud auction table
-            renderTransactionsTable(); // Render transactions table
+            renderStudAuctionTable();
+            renderTransactionsTable();
             renderAugmentAnalysis();
-            updateHorseDropdown(); // For race form (only racing horses)
+            updateHorseDropdown();
             updateParentDropdowns();
-            updateFoalPredictorDropdowns(); // For bred form (all horses)
-            updateStudAuctionSelect(); // For stud auction form (male breeding horses)
+            updateFoalPredictorDropdowns();
+            updateStudAuctionSelect();
             updateOverallStats();
+
             setupEventListeners();
+
+            // --- ZedChampions API UI and Import UI ---
+            setupZedApiUI();
+            addZedChampionsImportUI();
+            ZED_API.loadAuthToken();
+
             console.log("Tracker Initialized.");
         });
-
+        // --- End Initialization ---
+        
         // --- Data Storage (localStorage) ---
         function loadData() {
             // Load main horses list first
