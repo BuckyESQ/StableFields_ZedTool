@@ -3460,6 +3460,13 @@ function importSingleHorse() {
         document.addEventListener('DOMContentLoaded', () => {
             console.log("Tracker Initializing...");
 
+            // --- Tab Button/Content Fix ---
+            window.tabButtons = Array.from(document.querySelectorAll('.tab-button'));
+            window.tabContents = Array.from(document.querySelectorAll('.tab-content'));
+
+            // Assign modal variables after DOM is loaded
+            modal = document.getElementById('horse-details-modal');
+
             // Assign modal variables after DOM is loaded
             modal = document.getElementById('horse-details-modal');
             modalCloseBtn = document.getElementById('modal-close-button');
