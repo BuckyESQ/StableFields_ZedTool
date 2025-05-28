@@ -2436,116 +2436,144 @@
         ];
         
         // Foal Prediction Algorithm - Insert after forms array, before onBloodlineChange function
-function predictFoalStars(sire, dam) {
-    if (!sire || !dam) return "N/A";
-    
-    // Base calculation: average of parents' stars with randomness
-    const sireStars = parseFloat(sire.stars) || 0;
-    const damStars = parseFloat(dam.stars) || 0;
-    
-    // Basic average
-    let baseStars = (sireStars + damStars) / 2;
-    
-    // Add some randomness (-0.4 to +0.6)
-    const randomFactor = (Math.random() * 1.0) - 0.4;
-    
-    // Final prediction (with some limits)
-    let predictedStars = baseStars + randomFactor;
-    
-    // Ensure it's within reasonable bounds
-    predictedStars = Math.max(Math.min(predictedStars, Math.max(sireStars, damStars) + 0.5), Math.min(sireStars, damStars) - 0.3);
-    
-    return predictedStars.toFixed(1);
-}
-
-function predictFoalBloodline(sire, dam) {
-    if (!sire || !dam) return "Unknown";
-    
-    // 75% chance to inherit from sire, 25% from dam
-    return Math.random() < 0.75 ? sire.bloodline : dam.bloodline;
-}
-
-    // Color inheritance (80% from parents, 20% new from bloodline)
-    const predictColor = () => {
-        if (Math.random() < 0.8) {
-            // Inherit from parent (60% sire, 40% dam)
-            return Math.random() < 0.6 ? sire.color : dam.color;
-        } else {
-            // New color from bloodline
-            const rarityRoll = Math.random();
-            let colorPool;
+            function calculateStars(sireStars, damStars) {
+            // Get values as numbers, defaulting to 0 if not provided
+            const sireVal = parseFloat(sireStars) || 0;
+            const damVal = parseFloat(damStars) || 0;
             
-            if (rarityRoll < 0.05) {
-                colorPool = breedColorOptions[bloodline]["super rare"].map(c => c.hex);
-            } else if (rarityRoll < 0.2) {
-                colorPool = breedColorOptions[bloodline].rare.map(c => c.hex);
-            } else {
-                colorPool = breedColorOptions[bloodline].normal.map(c => c.hex);
+            // Basic average
+            let baseStars = (sireVal + damVal) / 2;
+            
+            // Add some randomness (-0.4 to +0.6)
+            const randomFactor = (Math.random() * 1.0) - 0.4;
+            
+            // Final prediction (with some limits)
+            let predictedStars = baseStars + randomFactor;
+            
+            // Ensure it's within reasonable bounds
+            predictedStars = Math.max(Math.min(predictedStars, Math.max(sireVal, damVal) + 0.5), Math.min(sireVal, damVal) - 0.3);
+            
+            return predictedStars.toFixed(1);
+        }
+
+        function predictFoal(sire, dam) {
+            if (!sire || !dam) return null;
+            const bloodline = predictFoalBloodline(sire, dam);
+            
+            // Color inheritance (80% from parents, 20% new from bloodline)
+            // ... rest of your predictFoal function ...
+        }
+            
+                function predictFoalStars(sire, dam) {
+                if (!sire || !dam) return "N/A";
+                
+                // Base calculation: average of parents' stars with randomness
+                const sireStars = parseFloat(sire.stars) || 0;
+                const damStars = parseFloat(dam.stars) || 0;
+                
+                // Basic average
+                let baseStars = (sireStars + damStars) / 2;
+                
+                // Add some randomness (-0.4 to +0.6)
+                const randomFactor = (Math.random() * 1.0) - 0.4;
+                
+                // Final prediction (with some limits)
+                let predictedStars = baseStars + randomFactor;
+                
+                // Ensure it's within reasonable bounds
+                predictedStars = Math.max(Math.min(predictedStars, Math.max(sireStars, damStars) + 0.5), Math.min(sireStars, damStars) - 0.3);
+                
+                return predictedStars.toFixed(1);
             }
-            
-            return colorPool[Math.floor(Math.random() * colorPool.length)];
-        }
-    };
-    
-    // Return prediction result
-    return {
-        bloodline,
-        gender: Math.random() < 0.5 ? 'Male' : 'Female',
-        color: predictColor(),
-        overallStars: calculateStars(sire.stars, dam.stars),
-        speedStars: calculateStars(sire.speedStars, dam.speedStars),
-        sprintStars: calculateStars(sire.sprintStars, dam.sprintStars),
-        enduranceStars: calculateStars(sire.enduranceStars, dam.enduranceStars)
-    };
-}
-// Add after the predictFoal function
 
-// ZedChampions API integration
-
-const ZED_API = {
-    // Store the auth token
-    authToken: null,
-    tokenExpiry: null,
-    
-    // Set the auth token
-    setAuthToken(token) {
-        this.authToken = token;
-        localStorage.setItem('zedTrackerAuthToken', token);
-        console.log("ZedChampions API token set successfully");
-        // Check expiration when setting token
-        this.isTokenExpired();
-        return true;
-    },
-    
-    // Load the stored auth token
-    loadAuthToken() {
-        const token = localStorage.getItem('zedTrackerAuthToken');
-        if (token) {
-            this.authToken = token;
-            return true;
-        }
-        return false;
-    },
-    
-    // Check if token is expired
-    isTokenExpired() {
-      if (!this.authToken) return true;
-      
-      try {
-        // Parse JWT (split by dots and decode middle part)
-        const base64Url = this.authToken.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const payload = JSON.parse(window.atob(base64));
+    function predictFoalBloodline(sire, dam) {
+        if (!sire || !dam) return "Unknown";
         
-        // Get expiration timestamp and compare with current time
-        const expiryTime = payload.exp * 1000; // Convert to milliseconds
-        this.tokenExpiry = new Date(expiryTime);
-        return Date.now() >= expiryTime;
-      } catch (e) {
-        console.error("Error checking token expiration:", e);
-        return true; // Assume expired if can't parse
-      }
-    },
+        // 75% chance to inherit from sire, 25% from dam
+        return Math.random() < 0.75 ? sire.bloodline : dam.bloodline;
+    }
+        function predictFoal(sire, dam) {
+            // Color inheritance (80% from parents, 20% new from bloodline)
+            const predictColor = () => {
+                if (Math.random() < 0.8) {
+                    // Inherit from parent (60% sire, 40% dam)
+                    return Math.random() < 0.6 ? sire.color : dam.color;
+                } else {
+                    // New color from bloodline
+                    const rarityRoll = Math.random();
+                    let colorPool;
+                    
+                    if (rarityRoll < 0.05) {
+                        colorPool = breedColorOptions[bloodline]["super rare"].map(c => c.hex);
+                    } else if (rarityRoll < 0.2) {
+                        colorPool = breedColorOptions[bloodline].rare.map(c => c.hex);
+                    } else {
+                        colorPool = breedColorOptions[bloodline].normal.map(c => c.hex);
+                    }
+                    
+                    return colorPool[Math.floor(Math.random() * colorPool.length)];
+                }
+            };
+            
+            // Return prediction result
+            return {
+                bloodline,
+                gender: Math.random() < 0.5 ? 'Male' : 'Female',
+                color: predictColor(),
+                overallStars: calculateStars(sire.stars, dam.stars),
+                speedStars: calculateStars(sire.speedStars, dam.speedStars),
+                sprintStars: calculateStars(sire.sprintStars, dam.sprintStars),
+                enduranceStars: calculateStars(sire.enduranceStars, dam.enduranceStars)
+            };
+        }
+        // Add after the predictFoal function
+
+        // ZedChampions API integration
+
+        const ZED_API = {
+            // Store the auth token
+            authToken: null,
+            tokenExpiry: null,
+            
+            // Set the auth token
+            setAuthToken(token) {
+                this.authToken = token;
+                localStorage.setItem('zedTrackerAuthToken', token);
+                console.log("ZedChampions API token set successfully");
+                // Check expiration when setting token
+                this.isTokenExpired();
+                return true;
+            },
+            
+            // Load the stored auth token
+            loadAuthToken() {
+                const token = localStorage.getItem('zedTrackerAuthToken');
+                if (token) {
+                    this.authToken = token;
+                    return true;
+                }
+                return false;
+            },
+            
+            // Check if token is expired
+            isTokenExpired() {
+            if (!this.authToken) return true;
+            
+            try {
+                // Parse JWT (split by dots and decode middle part)
+                const base64Url = this.authToken.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const payload = JSON.parse(window.atob(base64));
+                
+                // Get expiration timestamp and compare with current time
+                const expiryTime = payload.exp * 1000; // Convert to milliseconds
+                this.tokenExpiry = new Date(expiryTime);
+                return Date.now() >= expiryTime;
+            } catch (e) {
+                console.error("Error checking token expiration:", e);
+                return true; // Assume expired if can't parse
+            }
+            },
     // Add this method to the ZED_API object
         testConnection: async function() {
             if (!this.authToken) {
@@ -6874,20 +6902,20 @@ function handleAddRace(event) {
             console.log(`Editing horse: ${horse.name} (${horse.status})`);
         }
     </script>
-</body>
-<!-- Horse Details Modal Structure -->
-<div id="horse-details-modal" class="modal">
-    <div class="modal-content">
-        <span class="modal-close" id="modal-close-button">&times;</span>
-        <h3 id="modal-horse-name">Horse Details</h3>
-        <div id="modal-stats-content" class="modal-stats">
-            <!-- Basic stats loaded here -->
-        </div>
-        <h4>Augment Performance</h4>
-        <div id="modal-analysis-content">
-            <!-- Augment analysis table loaded here -->
-        </div>
-    </div>
-</div>
-
-</html>
+        
+        <!-- Horse Details Modal Structure -->
+        <div id="horse-details-modal" class="modal">
+                <div class="modal-content">
+                    <span class="modal-close" id="modal-close-button">&times;</span>
+                    <h3 id="modal-horse-name">Horse Details</h3>
+                    <div id="modal-stats-content" class="modal-stats">
+                        <!-- Basic stats loaded here -->
+                    </div>
+                    <h4>Augment Performance</h4>
+                    <div id="modal-analysis-content">
+                        <!-- Augment analysis table loaded here -->
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
