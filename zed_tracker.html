@@ -2955,7 +2955,6 @@ function importSingleHorse() {
             showImportStatus(statusElement, `Error importing horse: ${error.message}`, false);
         });
 }
-        }
         // Helper function to display API connection status
         function showConnectionStatus(message, isSuccess) {
             const statusEl = document.getElementById('api-connection-status');
@@ -3472,11 +3471,11 @@ function importSingleHorse() {
                 }
             }); // <-- This closes the forEach!
 
-// Initialize color/traits/attributes for all forms
-forms.forEach(f => onBloodlineChange(
-    `${f.prefix}-bloodline`,
-    f.color, f.traits, f.attrs
-));
+            // Initialize color/traits/attributes for all forms
+            forms.forEach(f => onBloodlineChange(
+                `${f.prefix}-bloodline`,
+                f.color, f.traits, f.attrs
+            ));
 
             // Initialize color/traits/attributes for all forms
             forms.forEach(f => onBloodlineChange(
