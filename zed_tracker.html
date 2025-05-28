@@ -2636,7 +2636,8 @@ const ZED_API = {
                 saveTokenBtn.addEventListener('click', function() {
                     const tokenInput = document.getElementById('zed-api-token');
                     if (tokenInput && tokenInput.value) {
-                        if (ZED_API.setAuthToken(tokenInput.value)) {
+                        try {
+                            if (ZED_API.setAuthToken(tokenInput.value)) {
                             showConnectionStatus('Token saved successfully. Testing connection...', null);
                             
                             ZED_API.testConnection().then(result => {
@@ -2648,7 +2649,9 @@ const ZED_API = {
                     } else {
                         showConnectionStatus('Please enter a valid token.', false);
                     }
-                });
+                } catch (e) {
+                    showConnectionStatus('An error occurred while saving the token.', false);
+                }
             }
             
             if (testConnectionBtn) {
@@ -2682,73 +2685,42 @@ const ZED_API = {
                 }
             }
         }
-    
-    if (testConnectionBtn) {
-        testConnectionBtn.addEventListener('click', async function() {
-            showConnectionStatus('Testing connection...', null);
             
-            const result = await ZED_API.testConnection();
-            showConnectionStatus(result.message, result.success);
-        });
-    }
-    
-    // Load token from storage and check status
-    if (ZED_API.loadAuthToken()) {
-        const tokenInput = document.getElementById('zed-api-token');
-        if (tokenInput) {
-            tokenInput.value = "••••••••••••••••••••••"; // Mask the actual token
-        }
-        
-        if (ZED_API.isTokenExpired()) {
-            showConnectionStatus("Your API token has expired. Please get a new token.", false);
-        } else {
-            ZED_API.testConnection().then(result => {
-                if (result.success) {
-                    const expiryMsg = ZED_API.tokenExpiry ? 
-                        ` Token valid until ${ZED_API.tokenExpiry.toLocaleString()}.` : '';
-                    showConnectionStatus(result.message + expiryMsg, true);
-                } else {
-                    showConnectionStatus(result.message, false);
+            // Add CSS for token notice
+            const style = document.createElement('style');
+            style.textContent = `
+                .token-notice {
+                    background-color: rgba(255, 193, 7, 0.1);
+                    border-left: 4px solid #ffc107;
+                    padding: 10px 15px;
+                    margin-bottom: 20px;
+                    border-radius: 4px;
+                    font-size: 0.9em;
+                    line-height: 1.4;
                 }
-            });
+            `;
+            document.head.appendChild(style);
         }
-    }
-    
-    // Add CSS for token notice
-    const style = document.createElement('style');
-    style.textContent = `
-        .token-notice {
-            background-color: rgba(255, 193, 7, 0.1);
-            border-left: 4px solid #ffc107;
-            padding: 10px 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            font-size: 0.9em;
-            line-height: 1.4;
-        }
-    `;
-    document.head.appendChild(style);
-}
 
-// Helper function to display API connection status
-function showConnectionStatus(message, isSuccess) {
-    const statusEl = document.getElementById('api-connection-status');
-    if (!statusEl) return;
-    
-    statusEl.style.display = 'block';
-    statusEl.textContent = message;
-    
-    if (isSuccess === true) {
-        statusEl.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
-        statusEl.style.color = '#4CAF50';
-    } else if (isSuccess === false) {
-        statusEl.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
-        statusEl.style.color = '#F44336';
-    } else {
-        statusEl.style.backgroundColor = 'rgba(33, 150, 243, 0.2)';
-        statusEl.style.color = '#2196F3';
-    }
-}
+        // Helper function to display API connection status
+        function showConnectionStatus(message, isSuccess) {
+            const statusEl = document.getElementById('api-connection-status');
+            if (!statusEl) return;
+            
+            statusEl.style.display = 'block';
+            statusEl.textContent = message;
+            
+            if (isSuccess === true) {
+                statusEl.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                statusEl.style.color = '#4CAF50';
+            } else if (isSuccess === false) {
+                statusEl.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
+                statusEl.style.color = '#F44336';
+            } else {
+                statusEl.style.backgroundColor = 'rgba(33, 150, 243, 0.2)';
+                statusEl.style.color = '#2196F3';
+            }
+        }
 
 // Function to import horse data from ZedChampions
 function importHorseFromZed(horseId) {
