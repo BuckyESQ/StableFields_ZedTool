@@ -2686,7 +2686,7 @@
         function setupZedApiUI(tabId = 'tab-content-settings') {
             const tab = document.getElementById(tabId);
             if (!tab) return;
-            
+
             const apiSection = document.createElement('div');
             apiSection.className = 'section';
             apiSection.innerHTML = `
@@ -2712,7 +2712,7 @@
             `;
             
             // Add to beginning of settings tab
-            settingsTab.insertBefore(apiSection, settingsTab.firstChild);
+            tab.insertBefore(apiSection, tab.firstChild);
             
             // Add event handlers
             const saveTokenBtn = document.getElementById('save-api-token-btn');
@@ -2815,11 +2815,11 @@
             `;
     
     // Add this section after the API section
-    const apiSection = settingsTab.querySelector('.section');
+    const apiSection = tab.querySelector('.section');
     if (apiSection) {
         apiSection.parentNode.insertBefore(importSection, apiSection.nextSibling);
     } else {
-        settingsTab.appendChild(importSection);
+        tab.appendChild(importSection);
     }
     
     // Add event listeners for buttons
