@@ -2308,7 +2308,6 @@
                 document
                     .getElementById('tab-content-' + btn.dataset.tab)
                     .classList.add('active');
-            });
         });
     </script>
      </div> <!-- End #tab-content -->
@@ -3092,39 +3091,39 @@ function importSingleHorse() {
             showImportStatus(statusElement, `Error importing horse: ${error.message}`, false);
         });
 }
-// Function to fetch all horses (either racing or breeding)
-async function fetchAllHorses(type = 'racing') {
-    try {
-        if (!ZED_API.authToken) {
-            return { success: false, message: "No authentication token set" };
-        }
-        
-        // API endpoint differs by type
-        const endpoint = type === 'racing' ? 
-            'https://api.zedchampions.com/v1/stable/racing' : 
-            'https://api.zedchampions.com/v1/stable/breeding';
-        
-        const response = await fetch(endpoint, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${ZED_API.authToken}`,
-                'Content-Type': 'application/json'
+        // Function to fetch all horses (either racing or breeding)
+        async function fetchAllHorses(type = 'racing') {
+            try {
+                if (!ZED_API.authToken) {
+                    return { success: false, message: "No authentication token set" };
+                }
+                
+                // API endpoint differs by type
+                const endpoint = type === 'racing' ? 
+                    'https://api.zedchampions.com/v1/stable/racing' : 
+                    'https://api.zedchampions.com/v1/stable/breeding';
+                
+                const response = await fetch(endpoint, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${ZED_API.authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    return { 
+                        success: false, 
+                        message: `API Error: ${response.status} ${response.statusText}` 
+                    };
+                }
+                
+                const data = await response.json();
+                return { success: true, data: data.horses || [] };
+            } catch (error) {
+                return { success: false, message: `Connection error: ${error.message}` };
             }
-        });
-        
-        if (!response.ok) {
-            return { 
-                success: false, 
-                message: `API Error: ${response.status} ${response.statusText}` 
-            };
         }
-        
-        const data = await response.json();
-        return { success: true, data: data.horses || [] };
-    } catch (error) {
-        return { success: false, message: `Connection error: ${error.message}` };
-    }
-}
         }
         // Helper function to display API connection status
         function showConnectionStatus(message, isSuccess) {
