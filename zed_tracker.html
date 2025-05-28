@@ -2810,22 +2810,425 @@
             });
         }
     }
-
-    // Add CSS for token notice
-    const style = document.createElement('style');
-    style.textContent = `
-        .token-notice {
-            background-color: rgba(255, 193, 7, 0.1);
-            border-left: 4px solid #ffc107;
-            padding: 10px 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            font-size: 0.9em;
-            line-height: 1.4;
-        }
+        // Add this function after setupZedApiUI() in your code
+function addZedChampionsImportUI() {
+    const settingsTab = document.getElementById('tab-content-settings');
+    if (!settingsTab) return;
+    
+    // Create a new section for imports
+    const importSection = document.createElement('div');
+    importSection.className = 'section';
+    importSection.style.marginTop = '20px';
+    importSection.innerHTML = `
+        <h2>Import Horses from ZedChampions</h2>
+        <p>Import your horses directly from your ZedChampions account.</p>
+        
+        <div class="token-notice">
+            <p><strong>Note:</strong> You must set your API token in the section above before you can import horses.</p>
+        </div>
+        
+        <h3>Import Racing Stable</h3>
+        <div style="margin: 15px 0;">
+            <button id="import-racing-stable-btn" class="button">Import All Racing Horses</button>
+            <span id="racing-import-status" style="margin-left: 10px;"></span>
+        </div>
+        
+        <h3>Import Breeding Stable</h3>
+        <div style="margin: 15px 0;">
+            <button id="import-breeding-stable-btn" class="button">Import All Breeding Horses</button>
+            <span id="breeding-import-status" style="margin-left: 10px;"></span>
+        </div>
+        
+        <h3>Import Single Horse</h3>
+        <div style="margin-top: 15px; display: flex; gap: 10px; align-items: flex-end;">
+            <div>
+                <label for="zed-horse-id" style="display: block; margin-bottom: 5px;">Horse ID:</label>
+                <input type="text" id="zed-horse-id" style="width: 250px; padding: 10px; height: 42px;" placeholder="Enter ZedChampions horse ID">
+            </div>
+            <div>
+                <label for="import-horse-type" style="display: block; margin-bottom: 5px;">Import As:</label>
+                <select id="import-horse-type" style="width: 150px; padding: 10px; height: 42px;">
+                    <option value="racing">Racing Horse</option>
+                    <option value="breeding">Breeding Horse</option>
+                </select>
+            </div>
+            <button id="import-single-horse-btn" class="button" style="height: 42px;">Import Horse</button>
+        </div>
+        <div id="single-import-status" style="margin-top: 10px;"></div>
     `;
-    document.head.appendChild(style);
+    
+    // Add this section after the API section
+    const apiSection = settingsTab.querySelector('.section');
+    if (apiSection) {
+        apiSection.parentNode.insertBefore(importSection, apiSection.nextSibling);
+    } else {
+        settingsTab.appendChild(importSection);
+    }
+    
+    // Add event listeners for buttons
+    document.getElementById('import-racing-stable-btn')?.addEventListener('click', importRacingStable);
+    document.getElementById('import-breeding-stable-btn')?.addEventListener('click', importBreedingStable);
+    document.getElementById('import-single-horse-btn')?.addEventListener('click', importSingleHorse);
 }
+
+// Add these functions for importing horses
+function importRacingStable() {
+    const statusElement = document.getElementById('racing-import-status');
+    
+    // Check API token
+    if (!ZED_API.authToken) {
+        showImportStatus(statusElement, 'No API token set. Please set your ZedChampions API token first.', false);
+        return;
+    }
+    
+    if (ZED_API.isTokenExpired()) {
+        showImportStatus(statusElement, 'Your API token has expired. Please get a new token.', false);
+        return;
+    }
+    
+    // Show loading status
+    showImportStatus(statusElement, 'Loading your racing stable... This may take some time.', null);
+    
+    // Call ZED API to get racing stable
+    fetchAllHorses('racing')
+        .then(result => {
+            if (!result.success) {
+                showImportStatus(statusElement, `Error: ${result.message}`, false);
+                return;
+            }
+            
+            const importedHorses = result.data;
+            const importCount = importedHorses.length;
+            
+            if (importCount === 0) {
+                showImportStatus(statusElement, 'No racing horses found to import.', false);
+                return;
+            }
+            
+            // Process each horse
+            let newHorsesCount = 0;
+            let updatedHorsesCount = 0;
+            
+            importedHorses.forEach(horseData => {
+                const existingHorse = horses.find(h => h.zedId === horseData.id);
+                
+                const processedHorse = {
+                    id: existingHorse?.id || `horse-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                    name: horseData.name,
+                    bloodline: horseData.bloodline,
+                    color: horseData.color || '#CCCCCC', // Default if color missing
+                    gender: horseData.gender,
+                    stars: horseData.overall_rating || null,
+                    speedStars: horseData.speed_rating || null,
+                    sprintStars: horseData.sprint_rating || null,
+                    enduranceStars: horseData.endurance_rating || null,
+                    initialZedBalance: existingHorse?.initialZedBalance || 0, // Keep existing or default
+                    initialMmRating: existingHorse?.initialMmRating || 1000, // Keep existing or default
+                    status: 'racing',
+                    generation: horseData.genotype || 0,
+                    importedFromZed: true,
+                    zedId: horseData.id,
+                    lastUpdated: new Date().toISOString()
+                };
+                
+                if (existingHorse) {
+                    // Update existing horse
+                    Object.assign(existingHorse, processedHorse);
+                    updatedHorsesCount++;
+                } else {
+                    // Add new horse
+                    horses.push(processedHorse);
+                    newHorsesCount++;
+                }
+            });
+            
+            // Save and update UI
+            saveData();
+            renderHorsesTable();
+            updateHorseDropdown();
+            updateParentDropdowns();
+            populateAugmentAnalysisHorseFilter();
+            
+            showImportStatus(
+                statusElement, 
+                `Successfully imported ${importCount} horses (${newHorsesCount} new, ${updatedHorsesCount} updated).`,
+                true
+            );
+            
+            // Switch to Racing tab to see results
+            activateTab('racing');
+        })
+        .catch(error => {
+            console.error("Import error:", error);
+            showImportStatus(statusElement, `Error importing horses: ${error.message}`, false);
+        });
+}
+
+function importBreedingStable() {
+    const statusElement = document.getElementById('breeding-import-status');
+    
+    // Check API token
+    if (!ZED_API.authToken) {
+        showImportStatus(statusElement, 'No API token set. Please set your ZedChampions API token first.', false);
+        return;
+    }
+    
+    if (ZED_API.isTokenExpired()) {
+        showImportStatus(statusElement, 'Your API token has expired. Please get a new token.', false);
+        return;
+    }
+    
+    // Show loading status
+    showImportStatus(statusElement, 'Loading your breeding stable... This may take some time.', null);
+    
+    // Call ZED API to get breeding stable
+    fetchAllHorses('breeding')
+        .then(result => {
+            if (!result.success) {
+                showImportStatus(statusElement, `Error: ${result.message}`, false);
+                return;
+            }
+            
+            const importedHorses = result.data;
+            const importCount = importedHorses.length;
+            
+            if (importCount === 0) {
+                showImportStatus(statusElement, 'No breeding horses found to import.', false);
+                return;
+            }
+            
+            // Process each horse
+            let newHorsesCount = 0;
+            let updatedHorsesCount = 0;
+            
+            importedHorses.forEach(horseData => {
+                const existingHorse = horses.find(h => h.zedId === horseData.id);
+                
+                const processedHorse = {
+                    id: existingHorse?.id || `horse-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                    name: horseData.name,
+                    bloodline: horseData.bloodline,
+                    color: horseData.color || '#CCCCCC', // Default if color missing
+                    gender: horseData.gender,
+                    stars: horseData.overall_rating || null,
+                    speedStars: horseData.speed_rating || null,
+                    sprintStars: horseData.sprint_rating || null,
+                    enduranceStars: horseData.endurance_rating || null,
+                    status: 'breeding',
+                    generation: horseData.genotype || 0,
+                    importedFromZed: true,
+                    zedId: horseData.id,
+                    lastUpdated: new Date().toISOString()
+                };
+                
+                if (existingHorse) {
+                    // Update existing horse
+                    Object.assign(existingHorse, processedHorse);
+                    updatedHorsesCount++;
+                } else {
+                    // Add new horse
+                    horses.push(processedHorse);
+                    newHorsesCount++;
+                }
+            });
+            
+            // Save and update UI
+            saveData();
+            renderBreedingHorsesTable();
+            updateParentDropdowns();
+            updateFoalPredictorDropdowns();
+            updateStudAuctionSelect();
+            
+            showImportStatus(
+                statusElement, 
+                `Successfully imported ${importCount} horses (${newHorsesCount} new, ${updatedHorsesCount} updated).`,
+                true
+            );
+            
+            // Switch to Breeding tab to see results
+            activateTab('breeding');
+        })
+        .catch(error => {
+            console.error("Import error:", error);
+            showImportStatus(statusElement, `Error importing horses: ${error.message}`, false);
+        });
+}
+
+function importSingleHorse() {
+    const statusElement = document.getElementById('single-import-status');
+    const horseId = document.getElementById('zed-horse-id').value.trim();
+    const importType = document.getElementById('import-horse-type').value;
+    
+    // Validate inputs
+    if (!horseId) {
+        showImportStatus(statusElement, 'Please enter a horse ID.', false);
+        return;
+    }
+    
+    // Check API token
+    if (!ZED_API.authToken) {
+        showImportStatus(statusElement, 'No API token set. Please set your ZedChampions API token first.', false);
+        return;
+    }
+    
+    if (ZED_API.isTokenExpired()) {
+        showImportStatus(statusElement, 'Your API token has expired. Please get a new token.', false);
+        return;
+    }
+    
+    // Show loading status
+    showImportStatus(statusElement, `Importing horse ${horseId}...`, null);
+    
+    // Fetch the horse data
+    ZED_API.fetchHorse(horseId)
+        .then(result => {
+            if (!result.success) {
+                showImportStatus(statusElement, `Error: ${result.message}`, false);
+                return;
+            }
+            
+            const horseData = result.data;
+            const existingHorse = horses.find(h => h.zedId === horseData.id);
+            
+            const processedHorse = {
+                id: existingHorse?.id || `horse-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                name: horseData.name,
+                bloodline: horseData.bloodline,
+                color: horseData.color || '#CCCCCC', // Default if color missing
+                gender: horseData.gender,
+                stars: horseData.overall_rating || null,
+                speedStars: horseData.speed_rating || null,
+                sprintStars: horseData.sprint_rating || null,
+                enduranceStars: horseData.endurance_rating || null,
+                initialZedBalance: existingHorse?.initialZedBalance || 0, // Keep existing or default to 0
+                initialMmRating: existingHorse?.initialMmRating || 1000, // Keep existing or default to 1000
+                status: importType, // Use selected type
+                generation: horseData.genotype || 0,
+                importedFromZed: true,
+                zedId: horseData.id,
+                lastUpdated: new Date().toISOString()
+            };
+            
+            if (existingHorse) {
+                // Update existing horse
+                Object.assign(existingHorse, processedHorse);
+                showImportStatus(statusElement, `Updated horse: ${horseData.name}`, true);
+            } else {
+                // Add new horse
+                horses.push(processedHorse);
+                showImportStatus(statusElement, `Imported new horse: ${horseData.name}`, true);
+            }
+            
+            // Save and update UI
+            saveData();
+            
+            if (importType === 'racing') {
+                renderHorsesTable();
+                updateHorseDropdown();
+                // Switch to Racing tab
+                activateTab('racing');
+            } else {
+                renderBreedingHorsesTable();
+                updateFoalPredictorDropdowns();
+                updateStudAuctionSelect();
+                // Switch to Breeding tab
+                activateTab('breeding');
+            }
+            
+            updateParentDropdowns();
+            populateAugmentAnalysisHorseFilter();
+            
+            // Clear input field
+            document.getElementById('zed-horse-id').value = '';
+        })
+        .catch(error => {
+            console.error("Import error:", error);
+            showImportStatus(statusElement, `Error importing horse: ${error.message}`, false);
+        });
+}
+
+// Helper function to show import status
+function showImportStatus(element, message, isSuccess) {
+    if (!element) return;
+    
+    element.style.display = 'inline-block';
+    element.textContent = message;
+    
+    if (isSuccess === true) {
+        element.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+        element.style.color = '#4CAF50';
+        element.style.padding = '8px 12px';
+        element.style.borderRadius = '4px';
+    } else if (isSuccess === false) {
+        element.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
+        element.style.color = '#F44336';
+        element.style.padding = '8px 12px';
+        element.style.borderRadius = '4px';
+    } else {
+        element.style.backgroundColor = 'rgba(33, 150, 243, 0.2)';
+        element.style.color = '#2196F3';
+        element.style.padding = '8px 12px';
+        element.style.borderRadius = '4px';
+    }
+}
+
+// Function to fetch all horses (either racing or breeding)
+async function fetchAllHorses(type = 'racing') {
+    try {
+        if (!ZED_API.authToken) {
+            return { success: false, message: "No authentication token set" };
+        }
+        
+        // API endpoint differs by type
+        const endpoint = type === 'racing' ? 
+            'https://api.zedchampions.com/v1/stable/racing' : 
+            'https://api.zedchampions.com/v1/stable/breeding';
+        
+        const response = await fetch(endpoint, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${ZED_API.authToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            return { 
+                success: false, 
+                message: `API Error: ${response.status} ${response.statusText}` 
+            };
+        }
+        
+        const data = await response.json();
+        return { success: true, data: data.horses || [] };
+    } catch (error) {
+        return { success: false, message: `Connection error: ${error.message}` };
+    }
+}
+
+        // Add this to the setupEventListeners function
+        const originalSetupEventListeners = setupEventListeners;
+        setupEventListeners = function() {
+            originalSetupEventListeners();
+            setupZedApiUI();
+            addZedChampionsImportUI(); // Add the new import UI
+            ZED_API.loadAuthToken();
+        };
+            // Add CSS for token notice
+            const style = document.createElement('style');
+            style.textContent = `
+                .token-notice {
+                    background-color: rgba(255, 193, 7, 0.1);
+                    border-left: 4px solid #ffc107;
+                    padding: 10px 15px;
+                    margin-bottom: 20px;
+                    border-radius: 4px;
+                    font-size: 0.9em;
+                    line-height: 1.4;
+                }
+            `;
+            document.head.appendChild(style);
+        }
         // Helper function to display API connection status
         function showConnectionStatus(message, isSuccess) {
             const statusEl = document.getElementById('api-connection-status');
