@@ -1,11 +1,143 @@
-/**
- * ZED Champions Auth Token UI Components
- */
-class ZedAuthUI {
-    constructor() {
-        this.statusContainerId = 'auth-token-status';
+// ZED Champions API Service and UI Components   
+    /**
+     * ZED Champions API Service
+     */
+    class ZedApiService {
+        constructor() {
+            this.apiBase = 'https://api.zedchampions.com';
+            this.authManager = window.zedAuth;
+        }
+        /**
+         * Test connection to the ZED Champions API
+         */
+        async testConnection() {
+            try {
+            if (!this.authManager.getToken()) {
+                return { 
+                    success: false, 
+                    message: "No API token set. Please enter your ZED Champions API token." 
+                };
+            }
+            
+            if (this.authManager.isTokenExpired()) {
+                return { 
+                    success: false, 
+                    message: "Your API token has expired. Please obtain a new token." 
+                };
+            }
+            
+            const response = await this.fetchFromApi('/v1/user/me');
+            if (response.ok) {
+                const data = await response.json();
+                return { 
+                    success: true, 
+                    message: `Connection successful! Welcome, ${data.name || 'Challenger'}` 
+                };
+            } else {
+                const errorText = await response.text();
+                return { 
+                    success: false, 
+                    message: `Connection failed: ${response.status} ${response.statusText}` 
+                };
+            }
+        } catch (error) {
+            console.error("Error testing connection:", error);
+            return { 
+                success: false, 
+                message: `Connection error: ${error.message}` 
+            };
+        }
     }
-    
+        /**
+         * Fetch data from the ZED Champions API
+         */
+        async fetchFromApi(endpoint, options = {}) {
+            const token = this.authManager.getToken();
+            if (!token) throw new Error("No API token set.");
+            
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+            
+            const response = await fetch(`${this.apiBase}${endpoint}`, {
+                ...options,
+                headers
+            });
+            
+            return response;
+        }
+        
+        /**
+        * Fetch a single horse by ID
+        */
+        async fetchHorse(horseId) {
+            try {
+                const response = await this.fetchFromApi(`/v1/horses/${horseId}`);
+                if (!response.ok) {
+                    return { success: false, message: `Error ${response.status}: ${response.statusText}` };
+                }
+                
+                const data = await response.json();
+                return { success: true, data: data };
+            } catch (error) {
+                return { success: false, message: `Error: ${error.message}` };
+            }
+        }
+        
+        /**
+         * Fetch all horses (racing or breeding)
+         */
+        async fetchAllHorses(type = 'racing') {
+            try {
+                // Different endpoint based on horse type
+                const endpoint = type === 'racing' ? '/v1/stables/racing' : '/v1/stables/breeding';
+                
+                const response = await this.fetchFromApi(endpoint);
+                if (!response.ok) {
+                    return { success: false, message: `Error ${response.status}: ${response.statusText}` };
+                }
+                
+                const data = await response.json();
+                return { success: true, data: data.horses || [] };
+            } catch (error) {
+                return { success: false, message: `Error: ${error.message}` };
+            }
+        }
+        
+        /**
+         * Fetch from the ZED Champions API with authorization
+         */
+        async fetchFromApi(endpoint, options = {}) {
+            const token = this.authManager.getToken();
+            if (!token) {
+                throw new Error("No API token available");
+            }
+            
+            const url = `${this.apiBase}${endpoint}`;
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+            
+            return fetch(url, {
+                ...options,
+                headers
+            });
+        }
+    }
+
+    /**
+     * ZED Champions Auth Token UI Components
+     */
+    class ZedAuthUI {
+        constructor() {
+            this.apiService = window.zedApi;
+            this.statusContainerId = 'api-connection-status'; // Add this line
+        }
+
     /**
      * Initialize the auth UI
      */
@@ -466,6 +598,9 @@ class ZedAuthUI {
         }
     }
 }
+
+// Initialize the API service globally
+window.zedApi = new ZedApiService();
 
 // Initialize the UI when the DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
