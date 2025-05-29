@@ -3915,7 +3915,7 @@
                 const horse = horseData; // Original horse data
                 const stats = horseData.calculatedStats; // Pre-calculated stats
 
-                console.log("Rendering horse:", horseData.name, horseData);
+                console.log("Rendering horse:", horse.name, horse);
                 
                 const row = horsesTableBody.insertRow();
                 const formatStars = (stars) => (stars !== null && stars !== undefined && stars !== '') ? Number(stars).toFixed(1) : '-';
