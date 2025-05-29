@@ -4,10 +4,18 @@
  */
 class ZedApiService {
     constructor() {
+        // Detect if we're on the production domain
+        this.isProduction = window.location.hostname.includes('stablefields.com');
+        
+        // Configure API settings based on environment
         this.apiBase = 'https://api.zedchampions.com';
         this.authManager = window.zedAuth;
-        this.useProxy = false; // Disable proxy temporarily
+        
+        // Only use proxy in development environments
+        this.useProxy = !this.isProduction;
         this.proxyUrl = 'https://corsproxy.io/?';
+        
+        console.log(`Running in ${this.isProduction ? 'production' : 'development'} mode`);
     }
     /**
      * Test connection to the ZED Champions API
