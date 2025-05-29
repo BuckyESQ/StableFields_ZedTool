@@ -128,15 +128,16 @@
                 throw new Error("Network request failed. Please check your internet connection.");
             }
         }
+    } // <-- Close ZedApiService class here
 
     /**
      * ZED Champions Auth Token UI Components
      */
-        class ZedAuthUI {
-            constructor() {
-                this.apiService = window.zedApi;
-                this.statusContainerId = 'api-connection-status'; // Add this line
-            }
+    class ZedAuthUI {
+        constructor() {
+            this.apiService = window.zedApi;
+            this.statusContainerId = 'api-connection-status'; // Add this line
+        }
 
         /**
          * Initialize the auth UI
