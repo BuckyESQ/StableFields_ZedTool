@@ -6,13 +6,8 @@ class ZedApiService {
     constructor() {
         this.apiBase = 'https://api.zedchampions.com';
         this.authManager = window.zedAuth;
-        
-        // Try different CORS proxies
-        this.useProxy = true;
-        this.proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-        // Alternative options:
-        // this.proxyUrl = 'https://api.allorigins.win/raw?url=';
-        // this.proxyUrl = 'https://crossorigin.me/';
+        this.useProxy = false; // Disable proxy temporarily
+        this.proxyUrl = 'https://corsproxy.io/?';
     }
     /**
      * Test connection to the ZED Champions API
