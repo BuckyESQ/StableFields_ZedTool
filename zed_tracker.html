@@ -2097,14 +2097,113 @@
                     </div>
                 </div>
             </div>
+            
             <!-- Analysis Tab Content -->
             <div id="tab-content-analysis" class="tab-content">
-                <!-- Place ALL Analysis tab content here (tables, filters, etc.) -->
+                <div class="section" id="performance-by-bloodline-section">
+                    <h2>Performance by Bloodline</h2>
+                    <p>Average performance metrics broken down by bloodline.</p>
+                    
+                    <table id="bloodline-analysis-table">
+                        <thead>
+                            <tr>
+                                <th>Bloodline</th>
+                                <th>Color</th>
+                                <th>Races</th>
+                                <th>Win %</th>
+                                <th>Avg Place</th>
+                                <th>Avg Odds</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bloodline-analysis-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="section" id="augment-analysis-section">
+                    <h2>Augment Performance Analysis</h2>
+                    
+                    <!-- Filters for augment analysis -->
+                    <div class="analysis-filter-row">
+                        <div class="analysis-filter-item">
+                            <label for="augment-analysis-bloodline-filter">Bloodline:</label>
+                            <select id="augment-analysis-bloodline-filter" class="pagination-select" style="width: 150px;">
+                                <option value="">All Bloodlines</option>
+                                <option value="Nakamoto">Nakamoto</option>
+                                <option value="Szabo">Szabo</option>
+                                <option value="Finney">Finney</option>
+                                <option value="Buterin">Buterin</option>
+                            </select>
+                        </div>
+                        <div class="analysis-filter-item">
+                            <label for="augment-analysis-min-races">Min Races:</label>
+                            <input type="number" id="augment-analysis-min-races" class="filter-item" style="width: 80px;" value="5">
+                        </div>
+                        <div class="analysis-filter-item">
+                            <button id="augment-analysis-refresh" class="button">Refresh Analysis</button>
+                        </div>
+                    </div>
+                    
+                    <h3>Individual Augment Performance</h3>
+                    <div style="overflow-x: auto; margin-bottom: 30px;">
+                        <table id="individual-augment-table">
+                            <thead>
+                                <tr>
+                                    <th>Augment</th>
+                                    <th>Type</th>
+                                    <th>Races</th>
+                                    <th>Win %</th>
+                                    <th>Avg Place</th>
+                                    <th>Avg Odds</th>
+                                </tr>
+                            </thead>
+                            <tbody id="individual-augment-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <h3>Augment Pair Performance</h3>
+                    <div style="overflow-x: auto; margin-bottom: 30px;">
+                        <table id="augment-pair-table">
+                            <thead>
+                                <tr>
+                                    <th>Augment Pair</th>
+                                    <th>Races</th>
+                                    <th>Win %</th>
+                                    <th>Avg Place</th>
+                                    <th>Avg Odds</th>
+                                </tr>
+                            </thead>
+                            <tbody id="augment-pair-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <h3>Triple Augment Performance</h3>
+                    <div style="overflow-x: auto;">
+                        <table id="augment-triple-table">
+                            <thead>
+                                <tr>
+                                    <th>Augment Combination</th>
+                                    <th>Races</th>
+                                    <th>Win %</th>
+                                    <th>Avg Place</th>
+                                    <th>Avg Odds</th>
+                                </tr>
+                            </thead>
+                            <tbody id="augment-triple-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
-            <!-- Stats Tab Content -->
+           <!-- Stats Tab Content -->
             <div id="tab-content-stats" class="tab-content">
-                <!-- Place ALL Overall Stats tab content here -->
                 <div class="section" id="stats-section">
                     <h2>Overall Statistics</h2>
                     <div id="stats-content">
@@ -2125,52 +2224,52 @@
 
             <!-- Import Tab Content -->
             <div id="tab-content-import" class="tab-content">
-
-     <h2>Data Management</h2>
-            <div style="margin-top: 15px;">
-                <button id="export-data-button" class="button">Export All Data</button>
-                <p style="font-size: 0.9em; color: var(--text-muted-color); margin-top: 8px;">
-                    Saves all horses, races, bred records, and augments to a JSON file as a backup.
-                </p>
-            </div>
-            <hr style="margin: 2em 0; border-color: var(--border-color);">
-            <div style="margin-top: 15px;">
-                <button id="import-data-button" class="button">Import Data from Backup</button>
-                <input type="file" id="import-file-input" accept=".json" style="display: none;">
-                <p style="font-size: 0.9em; color: var(--text-muted-color); margin-top: 8px;">
-                    Loads data from a previously exported JSON backup file.
-                    <strong style="color: var(--error-color);">Warning: This will overwrite all current data in the tracker.</strong>
-                </p>
-            </div>
-            
-            <hr style="margin: 2em 0; border-color: var(--border-color);">
-
-         <!-- Add Stud Fee Section -->
-        <h2>Manually Add Stud Fee</h2>
-            <p>Use this if a stud fee wasn't properly recorded in the stats.</p>
-            <div style="margin-top: 15px; display: flex; gap: 10px; align-items: flex-end;">
-                <div>
-                    <label for="manual-stud-fee-bred-horse" style="display: block; margin-bottom: 5px;">Select Bred Horse:</label>
-                    <select id="manual-stud-fee-bred-horse" style="width: 250px; padding: 10px; height: 42px; box-sizing: border-box;">
-                        <option value="">--Select Bred Horse--</option>
-                        <!-- Options populated by JS -->
-                    </select>
+                <h2>Data Management</h2>
+                <div style="margin-top: 15px;">
+                    <button id="export-data-button" class="button">Export All Data</button>
+                    <p style="font-size: 0.9em; color: var(--text-muted-color); margin-top: 8px;">
+                        Saves all horses, races, bred records, and augments to a JSON file as a backup.
+                    </p>
                 </div>
-                <div>
-                    <label for="manual-stud-fee-amount" style="display: block; margin-bottom: 5px;">Stud Fee Amount:</label>
-                    <input type="number" id="manual-stud-fee-amount" step="any" style="width: 120px; padding: 10px; height: 42px; box-sizing: border-box;">
+                
+                <hr style="margin: 2em 0; border-color: var(--border-color);">
+                
+                <div style="margin-top: 15px;">
+                    <button id="import-data-button" class="button">Import Data from Backup</button>
+                    <input type="file" id="import-file-input" accept=".json" style="display: none;">
+                    <p style="font-size: 0.9em; color: var(--text-muted-color); margin-top: 8px;">
+                        Loads data from a previously exported JSON backup file.
+                        <strong style="color: var(--error-color);">Warning: This will overwrite all current data in the tracker.</strong>
+                    </p>
                 </div>
-                <button id="update-stud-fee-button" class="button" style="height: 42px; margin-bottom: 0; align-self: flex-end; box-sizing: border-box;">Update Stud Fee</button>
-            </div>
-                <!-- The ZedChampions API integration and import UI will be injected here by JS -->
+                
+                <hr style="margin: 2em 0; border-color: var(--border-color);">
+
+                <!-- Add Stud Fee Section -->
+                <h2>Manually Add Stud Fee</h2>
+                <p>Use this if a stud fee wasn't properly recorded in the stats.</p>
+                <div style="margin-top: 15px; display: flex; gap: 10px; align-items: flex-end;">
+                    <div>
+                        <label for="manual-stud-fee-bred-horse" style="display: block; margin-bottom: 5px;">Select Bred Horse:</label>
+                        <select id="manual-stud-fee-bred-horse" style="width: 250px; padding: 10px; height: 42px; box-sizing: border-box;">
+                            <option value="">--Select Bred Horse--</option>
+                            <!-- Options populated by JS -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="manual-stud-fee-amount" style="display: block; margin-bottom: 5px;">Stud Fee Amount:</label>
+                        <input type="number" id="manual-stud-fee-amount" step="any" style="width: 120px; padding: 10px; height: 42px; box-sizing: border-box;">
+                    </div>
+                    <button id="update-stud-fee-button" class="button" style="height: 42px; margin-bottom: 0; align-self: flex-end; box-sizing: border-box;">Update Stud Fee</button>
+                </div>
+                
+                <!-- ZedChampions API integration and import UI will be injected here by JS -->
             </div>
 
             <!-- Settings Tab Content -->
             <div id="tab-content-settings" class="tab-content">
-                <!-- Place ALL Settings tab content here -->
-                <!-- The ZedChampions API integration and import UI will be injected here by JS if needed -->
+                <!-- ZedChampions API integration and import UI will be injected here by JS if needed -->
             </div>
-        </div>
 
         <script>
         // 1️⃣ Define your color palettes per bloodline.
