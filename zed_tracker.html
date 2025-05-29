@@ -3763,6 +3763,7 @@
         // --- Rendering ---
         function renderHorsesTable() {
             horsesTableBody.innerHTML = '';
+            console.log("Rendering horse:", horse.name, horse);
 
             // 1. Get the correctly filtered list of horses WITH their stats
             const filteredHorsesWithStats = getFilteredRacingHorses();
@@ -3837,7 +3838,7 @@
 
                 // --- UPDATED INNER HTML with Avg Odds column ---
                row.innerHTML = `
-                    <td>${horse.name}</td>
+                    <td style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 12px;">${horse.name || 'Unknown'}</td>
                     <td>${horse.bloodline}</td>
                     <td>
                         <span class="swatch" style="background:
