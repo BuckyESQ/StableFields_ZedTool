@@ -143,7 +143,7 @@
             this.apiService = window.zedApi;
             this.statusContainerId = 'api-connection-status'; // Add this line
         }
-
+            
         /**
          * Initialize the auth UI
          */
@@ -176,9 +176,11 @@
                 <div style="margin-top: 20px;">
                     <div class="form-grid" style="grid-template-columns: 1fr auto;">
                         <div>
+                            <!-- Hidden username field to satisfy browser autofill -->
+                            <input type="text" name="fakeusernameremembered" style="display:none;">
                             <label for="zed-api-token">API Token:</label>
                             <input type="password" id="zed-api-token" placeholder="Paste Bearer token here..." 
-                                autocomplete="off" 
+                                autocomplete="new-password" 
                                 style="width: 100%; font-family: monospace;">
                         </div>
                         <div style="display: flex; align-items: flex-end;">
