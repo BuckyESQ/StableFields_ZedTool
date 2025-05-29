@@ -178,6 +178,7 @@
                         <div>
                             <label for="zed-api-token">API Token:</label>
                             <input type="password" id="zed-api-token" placeholder="Paste Bearer token here..." 
+                                autocomplete="off" 
                                 style="width: 100%; font-family: monospace;">
                         </div>
                         <div style="display: flex; align-items: flex-end;">
