@@ -2415,19 +2415,20 @@
 
         // Add event listeners for bloodline changes on all forms
        forms.forEach(f => {
-            const el = document.getElementById(`${f.prefix}-bloodline`);
-            if (el) {
-                el.addEventListener('change', () => onBloodlineChange(
-                    `${f.prefix}-bloodline`,
-                    f.color, f.traits, f.attrs
-                ));
-            }
-
-        // Initialize color/traits/attributes for all forms
-        forms.forEach(f => onBloodlineChange(
+    const el = document.getElementById(`${f.prefix}-bloodline`);
+    if (el) {
+        el.addEventListener('change', () => onBloodlineChange(
             `${f.prefix}-bloodline`,
             f.color, f.traits, f.attrs
         ));
+    }
+}); // <-- CLOSE the forEach HERE
+
+// Initialize color/traits/attributes for all forms
+forms.forEach(f => onBloodlineChange(
+    `${f.prefix}-bloodline`,
+    f.color, f.traits, f.attrs
+));
         
         // Foal Prediction Algorithm - Insert after forms array, before onBloodlineChange function
 
