@@ -63,27 +63,7 @@
                 };
             }
         }
-        /**
-         * Fetch data from the ZED Champions API
-         */
-        async fetchFromApi(endpoint, options = {}) {
-            const token = this.authManager.getToken();
-            if (!token) throw new Error("No API token set.");
-            
-            const headers = {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-                ...options.headers
-            };
-            
-            const response = await fetch(`${this.apiBase}${endpoint}`, {
-                ...options,
-                headers
-            });
-            
-            return response;
-        }
-        
+       
         /**
         * Fetch a single horse by ID
         */
