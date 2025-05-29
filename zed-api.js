@@ -10,44 +10,59 @@
         /**
          * Test connection to the ZED Champions API
          */
-        async testConnection() {
+       async testConnection() {
             try {
-            if (!this.authManager.getToken()) {
+                if (!this.authManager.getToken()) {
+                    return { 
+                        success: false, 
+                        message: "No API token set. Please enter your ZED Champions API token." 
+                    };
+                }
+                
+                if (this.authManager.isTokenExpired()) {
+                    return { 
+                        success: false, 
+                        message: "Your API token has expired. Please obtain a new token." 
+                    };
+                }
+                
+                // Try a simpler endpoint for testing
+                try {
+                    const response = await this.fetchFromApi('/v1/user/me');
+                    if (response.ok) {
+                        const data = await response.json();
+                        return { 
+                            success: true, 
+                            message: `Connection successful! Welcome, ${data.name || 'Challenger'}` 
+                        };
+                    } else {
+                        return { 
+                            success: false, 
+                            message: `Connection failed: ${response.status} ${response.statusText}` 
+                        };
+                    }
+                } catch (networkError) {
+                    // Special case for CORS errors
+                    if (networkError.message.includes("CORS") || networkError.message.includes("Failed to fetch")) {
+                        return { 
+                            success: false, 
+                            message: "Connection blocked by CORS policy. Try using this app from a different environment." 
+                        };
+                    }
+                    
+                    return { 
+                        success: false, 
+                        message: `Connection error: ${networkError.message}` 
+                    };
+                }
+            } catch (error) {
+                console.error("Error testing connection:", error);
                 return { 
                     success: false, 
-                    message: "No API token set. Please enter your ZED Champions API token." 
+                    message: `Connection error: ${error.message}` 
                 };
             }
-            
-            if (this.authManager.isTokenExpired()) {
-                return { 
-                    success: false, 
-                    message: "Your API token has expired. Please obtain a new token." 
-                };
-            }
-            
-            const response = await this.fetchFromApi('/v1/user/me');
-            if (response.ok) {
-                const data = await response.json();
-                return { 
-                    success: true, 
-                    message: `Connection successful! Welcome, ${data.name || 'Challenger'}` 
-                };
-            } else {
-                const errorText = await response.text();
-                return { 
-                    success: false, 
-                    message: `Connection failed: ${response.status} ${response.statusText}` 
-                };
-            }
-        } catch (error) {
-            console.error("Error testing connection:", error);
-            return { 
-                success: false, 
-                message: `Connection error: ${error.message}` 
-            };
         }
-    }
         /**
          * Fetch data from the ZED Champions API
          */
@@ -110,24 +125,29 @@
          * Fetch from the ZED Champions API with authorization
          */
         async fetchFromApi(endpoint, options = {}) {
-            const token = this.authManager.getToken();
-            if (!token) {
-                throw new Error("No API token available");
+            try {
+                const token = this.authManager.getToken();
+                if (!token) {
+                    throw new Error("No API token available");
+                }
+                
+                const url = `${this.apiBase}${endpoint}`;
+                const headers = {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                };
+                
+                return await fetch(url, {
+                    ...options,
+                    headers
+                });
+            } catch (error) {
+                console.error(`Network request failed: ${endpoint}`, error);
+                // Rethrow with a more user-friendly message
+                throw new Error("Network request failed. Please check your internet connection.");
             }
-            
-            const url = `${this.apiBase}${endpoint}`;
-            const headers = {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-                ...options.headers
-            };
-            
-            return fetch(url, {
-                ...options,
-                headers
-            });
         }
-    }
 
     /**
      * ZED Champions Auth Token UI Components
