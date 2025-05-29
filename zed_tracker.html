@@ -2419,7 +2419,7 @@
         ];
 
         // Add event listeners for bloodline changes on all forms
-        forms.forEach(f => {
+       forms.forEach(f => {
             const el = document.getElementById(`${f.prefix}-bloodline`);
             if (el) {
                 el.addEventListener('change', () => onBloodlineChange(
@@ -2427,6 +2427,7 @@
                     f.color, f.traits, f.attrs
                 ));
             }
+        });
 
         // Initialize color/traits/attributes for all forms
         forms.forEach(f => onBloodlineChange(
@@ -2952,27 +2953,7 @@ function importSingleHorse() {
         .catch(error => {
             console.error("Import error:", error);
             showImportStatus(statusElement, `Error importing horse: ${error.message}`, false);
-        });
-}
-        // Helper function to display API connection status
-        function showConnectionStatus(message, isSuccess) {
-            const statusEl = document.getElementById('api-connection-status');
-            if (!statusEl) return;
-            
-            statusEl.style.display = 'block';
-            statusEl.textContent = message;
-            
-            if (isSuccess === true) {
-                statusEl.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
-                statusEl.style.color = '#4CAF50';
-            } else if (isSuccess === false) {
-                statusEl.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
-                statusEl.style.color = '#F44336';
-            } else {
-                statusEl.style.backgroundColor = 'rgba(33, 150, 243, 0.2)';
-                statusEl.style.color = '#2196F3';
-            }
-        }              
+        });              
                
         // Find and enhance the predict button if it exists
         const predictButton = document.getElementById('predict-foal-btn');
@@ -3305,7 +3286,26 @@ function importSingleHorse() {
         const transactionsPageInfoSpan = document.getElementById('transactions-page-info');
 
         // ...existing code...
-
+        // Helper function to display API connection status
+       function showConnectionStatus (message, isSuccess) {
+            const statusEl = document.getElementById('api-connection-status');
+            if (!statusEl) return;
+            
+            statusEl.style.display = 'block';
+            statusEl.textContent = message;
+            
+            if (isSuccess === true) {
+                statusEl.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                statusEl.style.color = '#4CAF50';
+            } else if (isSuccess === false) {
+                statusEl.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
+                statusEl.style.color = '#F44336';
+            } else {
+                statusEl.style.backgroundColor = 'rgba(33, 150, 243, 0.2)';
+                statusEl.style.color = '#2196F3';
+            }
+        }
+        // Now this function can safely use showConnectionStatus:
         function setupZedApiUI(tabId = 'tab-content-settings') {
             const tab = document.getElementById(tabId);
             if (!tab) return;
