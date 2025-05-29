@@ -3614,6 +3614,26 @@
             console.log(`Loaded ${cpuAugments.length} CPU, ${ramAugments.length} RAM, ${hydraulicAugments.length} Hydraulic augments.`);
         }
 
+        function ensureDataIntegrity() {
+            // Ensure all horses have a valid status
+            horses = horses.map(h => {
+                if (!h.status) h.status = 'racing'; // Default to racing if missing
+                if (!h.id) h.id = `horse-${Date.now()}-${Math.random().toString(16).slice(2)}`; // Add ID if missing
+                return h;
+            });
+            
+            // Ensure races have valid horseId references
+            races = races.filter(r => {
+                const hasValidHorse = horses.some(h => h.id === r.horseId);
+                if (!hasValidHorse) {
+                    console.warn("Removing race with invalid horseId:", r);
+                }
+                return hasValidHorse;
+            });
+            
+            saveData(); // Save the corrected data
+            console.log("Data integrity check completed");
+        }
         function saveData() {
             localStorage.setItem('zedTrackerHorses', JSON.stringify(horses)); // Unified list
             localStorage.setItem('zedTrackerRaces', JSON.stringify(races));
@@ -3768,7 +3788,62 @@
                 damSelect.appendChild(option);
             });        
         }
-
+            // Add this function after your data storage definitions
+            function debugRacesAndHorses() {
+                console.group("🔍 DEBUG INFORMATION");
+                
+                // Debug races data
+                console.log("📊 Total races:", races.length);
+                const racesWithNoHorseId = races.filter(r => !r.horseId);
+                console.log("⚠️ Races with missing horseId:", racesWithNoHorseId.length);
+                if (racesWithNoHorseId.length > 0) {
+                    console.log("First 5 problematic races:", racesWithNoHorseId.slice(0, 5));
+                }
+                
+                // Debug horses data
+                console.log("🐎 Total horses:", horses.length);
+                console.log("🏇 Racing horses:", horses.filter(h => h.status === 'racing').length);
+                console.log("🐴 Breeding horses:", horses.filter(h => h.status === 'breeding').length);
+                
+                // Debug race horse dropdown
+                console.log("📋 Race horse select element exists:", !!raceHorseSelect);
+                if (raceHorseSelect) {
+                    console.log("📋 Options in race horse dropdown:", raceHorseSelect.options.length);
+                }
+                
+                // Debug race table
+                console.log("📋 Races table body exists:", !!racesTableBody);
+                if (racesTableBody) {
+                    console.log("📋 Current rows in races table:", racesTableBody.children.length);
+                }
+                
+                // Check for table header with Horse column
+                const racesTable = document.getElementById('races-table');
+                if (racesTable) {
+                    const headers = Array.from(racesTable.querySelectorAll('thead th')).map(th => th.textContent.trim());
+                    console.log("📋 Race table headers:", headers);
+                    console.log("📋 Contains 'Horse' column:", headers.includes('Horse'));
+                } else {
+                    console.log("⚠️ Races table not found");
+                }
+                
+                // Examine any recent race rendering issues
+                const lastRace = races[races.length - 1];
+                if (lastRace) {
+                    const horse = horses.find(h => h.id === lastRace.horseId);
+                    console.log("🏇 Last race details:", {
+                        raceId: lastRace.id,
+                        horseId: lastRace.horseId,
+                        horseName: horse ? horse.name : 'NOT FOUND',
+                        date: lastRace.date
+                    });
+                }
+                
+                console.groupEnd();
+                
+                return "Debug information logged to console. Check the browser console (F12) for details.";
+            }
+            
         // --- Rendering ---
         function renderHorsesTable() {
             horsesTableBody.innerHTML = '';
@@ -3844,62 +3919,7 @@
                 const row = horsesTableBody.insertRow();
                 const formatStars = (stars) => (stars !== null && stars !== undefined && stars !== '') ? Number(stars).toFixed(1) : '-';
                 const formatAvgOdds = (avgOdds) => (avgOdds !== null && avgOdds !== undefined) ? avgOdds.toFixed(1) : 'N/A';
-            
-            // Add this function after your data storage definitions (around line 3810-3850)
-            function debugRacesAndHorses() {
-                console.group("🔍 DEBUG INFORMATION");
-                
-                // Debug races data
-                console.log("📊 Total races:", races.length);
-                const racesWithNoHorseId = races.filter(r => !r.horseId);
-                console.log("⚠️ Races with missing horseId:", racesWithNoHorseId.length);
-                if (racesWithNoHorseId.length > 0) {
-                    console.log("First 5 problematic races:", racesWithNoHorseId.slice(0, 5));
-                }
-                
-                // Debug horses data
-                console.log("🐎 Total horses:", horses.length);
-                console.log("🏇 Racing horses:", horses.filter(h => h.status === 'racing').length);
-                console.log("🐴 Breeding horses:", horses.filter(h => h.status === 'breeding').length);
-                
-                // Debug race horse dropdown
-                console.log("📋 Race horse select element exists:", !!raceHorseSelect);
-                if (raceHorseSelect) {
-                    console.log("📋 Options in race horse dropdown:", raceHorseSelect.options.length);
-                }
-                
-                // Debug race table
-                console.log("📋 Races table body exists:", !!racesTableBody);
-                if (racesTableBody) {
-                    console.log("📋 Current rows in races table:", racesTableBody.children.length);
-                }
-                
-                // Check for table header with Horse column
-                const racesTable = document.getElementById('races-table');
-                if (racesTable) {
-                    const headers = Array.from(racesTable.querySelectorAll('thead th')).map(th => th.textContent.trim());
-                    console.log("📋 Race table headers:", headers);
-                    console.log("📋 Contains 'Horse' column:", headers.includes('Horse'));
-                } else {
-                    console.log("⚠️ Races table not found");
-                }
-                
-                // Examine any recent race rendering issues
-                const lastRace = races[races.length - 1];
-                if (lastRace) {
-                    const horse = horses.find(h => h.id === lastRace.horseId);
-                    console.log("🏇 Last race details:", {
-                        raceId: lastRace.id,
-                        horseId: lastRace.horseId,
-                        horseName: horse ? horse.name : 'NOT FOUND',
-                        date: lastRace.date
-                    });
-                }
-                
-                console.groupEnd();
-                
-                return "Debug information logged to console. Check the browser console (F12) for details.";
-            }
+        
                 // --- UPDATED INNER HTML with Avg Odds column ---
                row.innerHTML = `
                     <td style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 12px;">${horse.name || 'Unknown'}</td>
@@ -4624,95 +4644,87 @@
             }
         }
 
-        function handleAddHorse(event) {
-            event.preventDefault();
-            console.log('[handleAddHorse] Started. currentlyEditingHorse:', currentlyEditingHorse); // Log at start of handleAddHorse
-            // Get elements correctly
-            const horseNameInput = document.getElementById('horse-name');
-            const bloodlineSelect = document.getElementById('horse-bloodline');
-            const colorSelect = document.getElementById('horse-color');
-            const genderSelect = document.getElementById('horse-gender');
-            const starsInput = document.getElementById('horse-stars');
-            const zedBalanceInput = document.getElementById('horse-zed-balance');
-            const mmRatingInput = document.getElementById('horse-mm-rating');
-            const speedStarsInput = document.getElementById('horse-speed-stars');
-            const sprintStarsInput = document.getElementById('horse-sprint-stars');
-            const enduranceStarsInput = document.getElementById('horse-endurance-stars');
+            function handleAddHorse(event) {
+                event.preventDefault();
+                console.log('[handleAddHorse] Started. currentlyEditingHorse:', currentlyEditingHorse);
+                
+                // Get form values
+                const horseNameInput = document.getElementById('horse-name');
+                const bloodlineSelect = document.getElementById('horse-bloodline');
+                const colorSelect = document.getElementById('horse-color');
+                const genderSelect = document.getElementById('horse-gender');
+                const starsInput = document.getElementById('horse-stars');
+                const zedBalanceInput = document.getElementById('horse-zed-balance');
+                const mmRatingInput = document.getElementById('horse-mm-rating');
+                const speedStarsInput = document.getElementById('horse-speed-stars');
+                const sprintStarsInput = document.getElementById('horse-sprint-stars');
+                const enduranceStarsInput = document.getElementById('horse-endurance-stars');
 
-            const parseFloatOptional = (value) => value ? parseFloat(value) : null;
+                const parseFloatOptional = (value) => value ? parseFloat(value) : null;
 
-            // Prepare data object - initially assume adding
-            const horseData = {
-                id: currentlyEditingHorse ? currentlyEditingHorse.id : null, // Use existing ID if editing
-                name: horseNameInput.value.trim(),
-                bloodline: bloodlineSelect.value,
-                color: colorSelect.value,
-                gender: genderSelect.value,
-                stars: parseFloat(starsInput.value) || 0,
-                initialZedBalance: parseFloat(zedBalanceInput.value) || 0,
-                initialMmRating: parseInt(mmRatingInput.value) || 1000,
-                speedStars: parseFloatOptional(speedStarsInput.value),
-                sprintStars: parseFloatOptional(sprintStarsInput.value),
-                enduranceStars: parseFloatOptional(enduranceStarsInput.value),
-                status: 'racing' // This form always deals with racing horses
-             };
+                // Prepare data object
+                const horseData = {
+                    name: horseNameInput.value.trim(),
+                    bloodline: bloodlineSelect.value,
+                    color: colorSelect.value,
+                    gender: genderSelect.value,
+                    stars: parseFloat(starsInput.value) || 0,
+                    initialZedBalance: parseFloat(zedBalanceInput.value) || 0,
+                    initialMmRating: parseInt(mmRatingInput.value) || 1000,
+                    speedStars: parseFloatOptional(speedStarsInput.value),
+                    sprintStars: parseFloatOptional(sprintStarsInput.value),
+                    enduranceStars: parseFloatOptional(enduranceStarsInput.value),
+                    status: 'racing' // Always racing in this form
+                };
 
-            // --- Validation ---
-            if (!horseData.name) { alert("Horse Name is required."); return; }
-            if (!horseData.bloodline) { alert("Please select a Bloodline."); return; }
-            if (!horseData.gender) { alert("Please select a Gender."); return; }
-            if (isNaN(horseData.stars) || horseData.stars <= 0) { alert("Please enter a valid positive number for Overall Stars."); return; }
-            if (isNaN(horseData.initialZedBalance)) { alert("Please enter a valid number for Initial $ZED Balance."); return; }
-            if (isNaN(horseData.initialMmRating)) { alert("Please enter a valid number for Initial Matchmaking Rating."); return; }
-            // Optional star validation
-            if ((speedStarsInput.value && isNaN(horseData.speedStars)) ||
-                (sprintStarsInput.value && isNaN(horseData.sprintStars)) ||
-                (enduranceStarsInput.value && isNaN(horseData.enduranceStars))) {
-                alert("Please enter valid numbers for Speed/Sprint/Endurance Stars, or leave them empty.");
-                 return;
-            }
+                // Validation
+                if (!horseData.name) { alert("Horse Name is required."); return; }
+                if (!horseData.bloodline) { alert("Please select a Bloodline."); return; }
+                if (!horseData.gender) { alert("Please select a Gender."); return; }
+                if (isNaN(horseData.stars) || horseData.stars <= 0) { alert("Please enter a valid number for Overall Stars."); return; }
 
-            // --- Check if Updating or Adding --- //
-            if (currentlyEditingHorse && currentlyEditingHorse.status === 'racing') {
-                // --- UPDATE --- //
-                const index = horses.findIndex(h => h.id === currentlyEditingHorse.id);
-                if (index !== -1) {
-                    // Merge updates, keeping original ID and ensuring status remains 'racing'
-                    horses[index] = { ...horses[index], ...horseData, status: 'racing' };
-                    console.log("Racing horse updated:", horses[index]);
+                // Check if updating or adding
+                if (currentlyEditingHorse && currentlyEditingHorse.id) {
+                    // UPDATE - edit existing horse
+                    const index = horses.findIndex(h => h.id === currentlyEditingHorse.id);
+                    if (index !== -1) {
+                        // Keep the ID and status, update other fields
+                        horseData.id = currentlyEditingHorse.id;
+                        horses[index] = { ...horses[index], ...horseData };
+                        console.log("Racing horse updated:", horses[index]);
+                    } else {
+                        console.error("Horse not found for update:", currentlyEditingHorse.id);
+                    }
                 } else {
-                    console.error("Could not find racing horse to update:", currentlyEditingHorse.id);
-                    // Reset state even if update failed
-                    currentlyEditingHorse = null;
-                    addHorseForm.querySelector('button[type="submit"]').textContent = 'Add Racing Horse';
-                    addHorseForm.reset();
-                    return; // Stop execution
+                    // ADD - create new horse
+                    // Check for duplicates
+                    if (horses.some(h => h.name.toLowerCase() === horseData.name.toLowerCase())) {
+                        alert(`A horse named "${horseData.name}" already exists.`);
+                        return;
+                    }
+                    
+                    // Add ID and timestamp
+                    horseData.id = `horse-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+                    horses.push(horseData);
+                    console.log("Racing horse added:", horseData);
                 }
-            } else {
-                 // --- ADD --- //
-                // Check for duplicate names only when adding
-                if (horses.some(h => h.name.toLowerCase() === horseData.name.toLowerCase())) {
-                     alert(`A horse named "${horseData.name}" already exists.`);
-                 return;
-                }
-                horseData.id = `horse-${Date.now()}-${Math.random().toString(16).slice(2)}`; // Generate new ID
-                horses.push(horseData);
-                 console.log("Racing horse added:", horseData);
-             }
 
-             // --- Post Add/Update Actions --- //
-            saveData();
-            renderHorsesTable();
-            updateHorseDropdown();
-            updateParentDropdowns();
-            populateAugmentAnalysisHorseFilter(); // Refresh the horse filter dropdown
-            addHorseForm.reset();
-            addHorseForm.querySelector('button[type="submit"]').textContent = 'Add Racing Horse';
-            currentlyEditingHorse = null;
-             // ...inside handleAddBreedingHorse, after currentlyEditingHorse = null;
-            updateStudAuctionSelect();
-            updateFoalPredictorDropdowns();
-        }
+                // Save, update UI
+                saveData();
+                renderHorsesTable();
+                updateHorseDropdown(); // Make sure dropdown updates
+                updateParentDropdowns();
+                populateAugmentAnalysisHorseFilter();
+
+                // Reset form and editing state
+                addHorseForm.reset();
+                addHorseForm.querySelector('button[type="submit"]').textContent = 'Add Racing Horse';
+                currentlyEditingHorse = null;
+                
+                // Update additional dropdowns
+                updateStudAuctionSelect();
+                updateFoalPredictorDropdowns();
+            }
 
         // --- Add Breeding Horse Handler (Needs similar refactor) --- //
         function handleAddBreedingHorse(event) {
