@@ -1333,22 +1333,23 @@
     </select>
 </div>
 
-<!-- TRAITS / ATTRIBUTE DISPLAY (add after Color, can style as needed) -->
-<div style="margin-top:8px;">
-  <label style="color:#77ffe7;font-weight:600;">Traits:</label>
-  <ul id="horse-traits" style="display:none;"></ul>
-  <label style="color:#f6b600;font-weight:600;">Attribute:</label>
-  <ul id="horse-attributes" style="display:none;"></ul>
-</div>
-      <!-- Gender -->
-      <div>
-        <label for="horse-gender">Gender:</label>
-        <select id="horse-gender" required>
-          <option value="">--Select--</option>
-          <option value="Female">Female</option>
-          <option value="Male">Male</option>
-        </select>
-      </div>
+    <!-- TRAITS / ATTRIBUTE DISPLAY (add after Color, can style as needed) -->
+    <div style="margin-top:8px;">
+        <label style="color:#77ffe7;font-weight:600;">Traits:</label>
+        <ul id="horse-traits" style="display:none;"></ul>
+        <label style="color:#f6b600;font-weight:600;">Attribute:</label>
+        <ul id="horse-attributes" style="display:none;"></ul>
+    </div>
+        </div>
+        </div>
+        <div>
+            <label for="horse-gender">Gender:</label>
+            <select id="horse-gender" required>
+            <option value="">--Select--</option>
+            <option value="Female">Female</option>
+            <option value="Male">Male</option>
+            </select>
+        </div>
 
       <!-- Overall Stars -->
       <div>
@@ -1392,13 +1393,7 @@
       </div>
 
     </div> <!-- /.form-grid -->
-  </form>
-</div> <!-- /.content-wrapper -->
-
-
-                <h3>Registered Racing Horses</h3>
-                <!-- Simplified Filter Controls -->
-                <div class="filter-controls">
+                </form>
                     <select id="horse-filter-bloodline" class="filter-item">
                         <option value="">All Bloodlines</option>
                         <option value="Nakamoto">Nakamoto</option>
@@ -2427,7 +2422,6 @@
                     f.color, f.traits, f.attrs
                 ));
             }
-        });
 
         // Initialize color/traits/attributes for all forms
         forms.forEach(f => onBloodlineChange(
@@ -2438,23 +2432,23 @@
         // Foal Prediction Algorithm - Insert after forms array, before onBloodlineChange function
 
           function calculateStars(sireStars, damStars) {
-    // Get values as numbers, defaulting to 0 if not provided
-    const sireVal = parseFloat(sireStars) || 0;
-    const damVal = parseFloat(damStars) || 0;
-    
-    // Basic average
-    let baseStars = (sireVal + damVal) / 2;
-    
-    // Add some randomness (-0.4 to +0.6)
-    const randomFactor = (Math.random() * 1.0) - 0.4;
-    
-    // Final prediction (with some limits)
-    let predictedStars = baseStars + randomFactor;
-    
-    // Ensure it's within reasonable bounds
-    predictedStars = Math.max(Math.min(predictedStars, Math.max(sireVal, damVal) + 0.5), Math.min(sireVal, damVal) - 0.3);
-    
-    return predictedStars.toFixed(1);
+        // Get values as numbers, defaulting to 0 if not provided
+        const sireVal = parseFloat(sireStars) || 0;
+        const damVal = parseFloat(damStars) || 0;
+        
+        // Basic average
+        let baseStars = (sireVal + damVal) / 2;
+        
+        // Add some randomness (-0.4 to +0.6)
+        const randomFactor = (Math.random() * 1.0) - 0.4;
+        
+        // Final prediction (with some limits)
+        let predictedStars = baseStars + randomFactor;
+        
+        // Ensure it's within reasonable bounds
+        predictedStars = Math.max(Math.min(predictedStars, Math.max(sireVal, damVal) + 0.5), Math.min(sireVal, damVal) - 0.3);
+        
+        return predictedStars.toFixed(1);
 }
 
         function predictFoalBloodline(sire, dam) {
@@ -3006,7 +3000,7 @@ function importSingleHorse() {
                 resultDiv.style.animation = "fadeIn 0.5s ease-in-out";
             });
         }
-    });
+    };
         function onBloodlineChange(bloodId, colorId, traitsId, attrsId) {
         const bloodEl = document.getElementById(bloodId);
         const colorEl = document.getElementById(colorId);
