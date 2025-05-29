@@ -1296,28 +1296,807 @@
 
         <!-- Tab Content -->
         <div id="tab-content">
-            <!-- Racing Tab Content -->
-            <div id="tab-content-racing" class="tab-content active">
-                <!-- Place ALL Racing tab content here (forms, tables, etc.) -->
-                <!-- ...Racing Horses section, Add Race, Race History, etc... -->
+           <!-- Racing Tab Content -->
+<div id="tab-content-racing" class="tab-content active">
+        <!-- Racing Horses section -->
+        <div class="section" id="horses-section">
+            <h2>Racing Horses</h2>
+            <div class="content-wrapper">
+                <h3>Add New Racing Horse</h3>
+                <form id="add-horse-form">
+                    <div class="form-grid">
+                        <!-- Horse name -->
+                        <div>
+                            <label for="horse-name">Name:</label>
+                            <input type="text" id="horse-name" required>
+                        </div>
+                        <!-- Bloodline -->
+                        <div>
+                            <label for="horse-bloodline">Bloodline:</label>
+                            <select id="horse-bloodline" required>
+                                <option value="">--Select--</option>
+                                <option value="Nakamoto">Nakamoto</option>
+                                <option value="Szabo">Szabo</option>
+                                <option value="Finney">Finney</option>
+                                <option value="Buterin">Buterin</option>
+                            </select>
+                        </div>
+                        <!-- Color -->
+                        <div>
+                            <label for="horse-color">Color:</label>
+                            <select id="horse-color" required>
+                                <option value="">--Select Color--</option>
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <!-- TRAITS / ATTRIBUTE DISPLAY -->
+                        <div style="margin-top:8px;">
+                            <label style="color:#77ffe7;font-weight:600;">Traits:</label>
+                            <ul id="horse-traits" style="display:none;"></ul>
+                            <label style="color:#f6b600;font-weight:600;">Attribute:</label>
+                            <ul id="horse-attributes" style="display:none;"></ul>
+                        </div>
+                        <!-- Gender -->
+                        <div>
+                            <label for="horse-gender">Gender:</label>
+                            <select id="horse-gender" required>
+                                <option value="">--Select--</option>
+                                <option value="Female">Female</option>
+                                <option value="Male">Male</option>
+                            </select>
+                        </div>
+                        <!-- Overall Stars -->
+                        <div>
+                            <label for="horse-stars">Overall Stars:</label>
+                            <input type="number" id="horse-stars" step="0.1" min="1" required>
+                        </div>
+                        <!-- Initial $ZED Balance -->
+                        <div>
+                            <label for="horse-zed-balance">Initial $ZED Balance:</label>
+                            <input type="number" id="horse-zed-balance" step="any" value="0" required>
+                        </div>
+                        <!-- Initial Matchmaking Rating -->
+                        <div>
+                            <label for="horse-mm-rating">Initial Matchmaking Rating:</label>
+                            <input type="number" id="horse-mm-rating" step="1" value="1000" required>
+                        </div>
+                        <!-- Speed Stars -->
+                        <div>
+                            <label for="horse-speed-stars">Speed Stars:</label>
+                            <input type="number" id="horse-speed-stars" step="0.1" min="0" placeholder="Optional">
+                        </div>
+                        <!-- Sprint Stars -->
+                        <div>
+                            <label for="horse-sprint-stars">Sprint Stars:</label>
+                            <input type="number" id="horse-sprint-stars" step="0.1" min="0" placeholder="Optional">
+                        </div>
+                        <!-- Endurance Stars -->
+                        <div>
+                            <label for="horse-endurance-stars">Endurance Stars:</label>
+                            <input type="number" id="horse-endurance-stars" step="0.1" min="0" placeholder="Optional">
+                        </div>
+                        <!-- Submit -->
+                        <div>
+                            <button type="submit">Add Racing Horse</button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Filter controls -->
+                <div class="filter-controls">
+                    <select id="horse-filter-bloodline" class="filter-item">
+                        <option value="">All Bloodlines</option>
+                        <option value="Nakamoto">Nakamoto</option>
+                        <option value="Szabo">Szabo</option>
+                        <option value="Finney">Finney</option>
+                        <option value="Buterin">Buterin</option>
+                    </select>
+                    <select id="horse-filter-gender" class="filter-item">
+                        <option value="">All Genders</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                    <input type="number" step="0.1" id="horse-filter-min-stars" placeholder="Min Overall" class="filter-item">
+                    <input type="number" step="0.1" id="horse-filter-max-stars" placeholder="Max Overall" class="filter-item">
+                    <input type="number" step="0.1" id="horse-filter-min-speed" placeholder="Min Speed" class="filter-item">
+                    <input type="number" step="0.1" id="horse-filter-max-speed" placeholder="Max Speed" class="filter-item">
+                    <input type="number" step="0.1" id="horse-filter-min-sprint" placeholder="Min Sprint" class="filter-item">
+                    <input type="number" step="0.1" id="horse-filter-max-sprint" placeholder="Max Sprint" class="filter-item">
+                    <input type="number" step="0.1" id="horse-filter-min-endurance" placeholder="Min Endur" class="filter-item">
+                    <input type="number" step="0.1" id="horse-filter-max-endurance" placeholder="Max Endur" class="filter-item">
+                </div>
+
+                <!-- Horses table -->
+                <div style="overflow-x:auto;">
+                    <table id="horses-table">
+                        <thead>
+                            <tr>
+                                <th data-sort-key="name">Name</th>
+                                <th data-sort-key="bloodline">Bloodline</th>
+                                <th data-sort-key="color">Color</th>
+                                <th data-sort-key="gender">Gender</th>
+                                <th data-sort-key="stars">Stars (O/Sp/Sr/E)</th>
+                                <th data-sort-key="mmr">MMR</th>
+                                <th data-sort-key="zed">$ZED Bal</th>
+                                <th data-sort-key="wins">W-P-S</th>
+                                <th data-sort-key="avgOdds">Avg Odds</th>
+                                <th data-sort-key="netProfit">Net / ROI</th>
+                                <th data-sort-key="winRate">Win %</th>
+                                <th data-sort-key="races">Races</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="horses-table-body">
+                            <!-- Horse data populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination Controls for Horses Table -->
+                <div id="horses-pagination-controls" class="pagination-controls">
+                    <div style="display: inline-flex; align-items: center; gap: 5px;">
+                        <label for="horses-items-per-page" style="margin-right: 5px;">Show:</label>
+                        <select id="horses-items-per-page" class="pagination-select">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                    <button id="horses-prev-page" class="button pagination-button">&lt; Previous</button>
+                    <span id="horses-page-info">Page 1 of 1</span>
+                    <button id="horses-next-page" class="button pagination-button">Next &gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section for Adding Race Results -->
+        <div class="section" id="races-section">
+            <h2>Record Race Result</h2>
+            <div class="content-wrapper">
+                <h3>Record New Race</h3>
+                <form id="add-race-form">
+                    <div class="form-grid">
+                        <!-- Form fields for races -->
+                        <div>
+                            <label for="race-horse">Select Horse:</label>
+                            <select id="race-horse" required>
+                                <option value="">--Select Racing Horse--</option>
+                                <!-- Options populated by JS -->
+                            </select>
+                        </div>
+                        <div>
+                            <label for="race-name">Race Name:</label>
+                            <input type="text" id="race-name" placeholder="Optional">
+                        </div>
+                        <div>
+                            <label for="race-date">Race Date:</label>
+                            <input type="date" id="race-date">
+                        </div>
+                        <div>
+                            <label for="race-split-1">Split 1 (0-250m):</label>
+                            <input type="number" id="race-split-1" step="any" min="0" placeholder="Seconds">
+                        </div>
+                        <div>
+                            <label for="race-split-2">Split 2 (250-500m):</label>
+                            <input type="number" id="race-split-2" step="any" min="0" placeholder="Seconds">
+                        </div>
+                        <div>
+                            <label for="race-split-3">Split 3 (500-750m):</label>
+                            <input type="number" id="race-split-3" step="any" min="0" placeholder="Seconds">
+                        </div>
+                        <div>
+                            <label for="race-split-4">Split 4 (750-1000m):</label>
+                            <input type="number" id="race-split-4" step="any" min="0" placeholder="Seconds">
+                        </div>
+                        <div>
+                            <label for="race-position">Place:</label>
+                            <input type="number" id="race-position" min="1" step="1" required>
+                        </div>
+                        <div>
+                            <label for="race-odds">Odds:</label>
+                            <input type="number" id="race-odds" min="1" step="any" required>
+                        </div>
+                        <div>
+                            <label for="race-finish-time">Time:</label>
+                            <input type="number" id="race-finish-time" step="any" min="0" placeholder="Seconds">
+                        </div>
+                        <div>
+                            <label for="race-zed-change">$ZED Won/Lost:</label>
+                            <input type="number" id="race-zed-change" step="any" required placeholder="e.g., 1200, -350">
+                        </div>
+                        <div>
+                            <label for="race-rating-change">MM Change:</label>
+                            <input type="number" id="race-rating-change" step="1" placeholder="Matchmaking Change (e.g., 15, -8)">
+                        </div>
+                        <div>
+                            <label for="race-cpu-augment">CPU Augment Used:</label>
+                            <select id="race-cpu-augment" required>
+                                <option value="None">None</option>
+                                <!-- Options populated by JS -->
+                            </select>
+                        </div>
+                        <div>
+                            <label for="race-ram-augment">RAM Augment Used:</label>
+                            <select id="race-ram-augment" required>
+                                <option value="None">None</option>
+                                <!-- Options populated by JS -->
+                            </select>
+                        </div>
+                        <div>
+                            <label for="race-hydraulic-augment">Hydraulic Augment Used:</label>
+                            <select id="race-hydraulic-augment" required>
+                                <option value="None">None</option>
+                                <!-- Options populated by JS -->
+                            </select>
+                        </div>
+                        <div>
+                            <button type="submit">Record Race</button>
+                        </div>
+                    </div>
+                </form>
             </div>
 
+            <h3>Race History</h3>
+            <div style="overflow-x:auto;">
+                <table id="races-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Race Name</th>
+                            <th>Horse</th>
+                            <th>Pos</th>
+                            <th>Odds</th>
+                            <th>Time</th>
+                            <th>Split 1</th>
+                            <th>Split 2</th>
+                            <th>Split 3</th>
+                            <th>Split 4</th>
+                            <th>ZED +/-</th>
+                            <th>MM +/-</th>
+                            <th>Augs (C/R/H)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="races-table-body">
+                        <!-- Race results populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+            <!-- Pagination Controls for Races Table -->
+            <div id="races-pagination-controls" class="pagination-controls">
+                <div style="display: inline-flex; align-items: center; gap: 5px;">
+                    <label for="races-items-per-page" style="margin-right: 5px;">Show:</label>
+                    <select id="races-items-per-page" class="pagination-select">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+                <button id="races-prev-page" class="button pagination-button">&lt; Previous</button>
+                <span id="races-page-info">Page 1 of 1</span>
+                <button id="races-next-page" class="button pagination-button">Next &gt;</button>
+            </div>
+        </div>
+
+        <!-- Section for Augment Performance Analysis -->
+        <div class="section" id="augment-analysis-section">
+            <h2>Augment Performance Analysis</h2>
+            <p>Shows performance statistics grouped by unique augment combinations for each racing horse.</p>
+            
+            <!-- Horse Filter for Augment Analysis -->
+            <div style="margin-bottom: 15px; display: flex; align-items: center;">
+                <label for="augment-analysis-horse-filter" style="margin-right: 10px;">Filter by Horse:</label>
+                <select id="augment-analysis-horse-filter" style="width: 180px; max-width: 250px; padding: 8px;" class="pagination-select">
+                    <option value="">All Horses</option>
+                    <!-- Options populated by JS -->
+                </select>
+            </div>
+            
+            <!-- Augment Analysis for Lineage and Colors -->
+            <label for="augment-trait-filter">Trait:</label>
+            <select id="augment-trait-filter">
+                <option value="">All</option>
+            </select>
+            
+            <div id="augment-analysis-content">
+                <!-- Analysis tables will be generated here by JS -->
+            </div>
+        </div>
+    </div>
             <!-- Breeding Tab Content -->
             <div id="tab-content-breeding" class="tab-content">
-                <!-- Place ALL Breeding tab content here (forms, tables, etc.) -->
-                <!-- ...Breeding Horses, Stud Auction, Bred Horses, etc... -->
+    <!-- Section for Breeding Horses -->
+    <div class="section" id="breeding-horses-section">
+        <div class="content-wrapper">
+            <h2>Breeding Horses</h2>
+            <form id="add-breeding-horse-form">
+                <h3>Add New Breeding Horse</h3>
+                <div class="form-grid">
+                    <div>
+                        <label for="breeding-horse-name">Name:</label>
+                        <input type="text" id="breeding-horse-name" required>
+                    </div>
+                    <div>
+                        <label for="breeding-horse-bloodline">Bloodline:</label>
+                        <select id="breeding-horse-bloodline" required>
+                            <option value="">--Select--</option>
+                            <option value="Nakamoto">Nakamoto</option>
+                            <option value="Szabo">Szabo</option>
+                            <option value="Finney">Finney</option>
+                            <option value="Buterin">Buterin</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="breeding-horse-color">Color:</label>
+                        <select id="breeding-horse-color" required>
+                            <option value="">--Select--</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="breeding-horse-gender">Gender:</label>
+                        <select id="breeding-horse-gender" required>
+                            <option value="">--Select--</option>
+                            <option value="Female">Female</option>
+                            <option value="Male">Male</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="breeding-horse-stars">Overall Stars:</label>
+                        <input type="number" id="breeding-horse-stars" step="0.1" min="1" placeholder="Optional">
+                    </div>
+                    <div>
+                        <label for="breeding-horse-speed-stars">Speed Stars:</label>
+                        <input type="number" id="breeding-horse-speed-stars" step="0.1" min="0" placeholder="Optional">
+                    </div>
+                    <div>
+                        <label for="breeding-horse-sprint-stars">Sprint Stars:</label>
+                        <input type="number" id="breeding-horse-sprint-stars" step="0.1" min="0" placeholder="Optional">
+                    </div>
+                    <div>
+                        <label for="breeding-horse-endurance-stars">Endurance Stars:</label>
+                        <input type="number" id="breeding-horse-endurance-stars" step="0.1" min="0" placeholder="Optional">
+                    </div>
+                    <div>
+                        <button type="submit">Add Breeding Horse</button>
+                    </div>
+                </div>
+            </form>
+
+            <h3>Predict Foal Quality</h3>
+            <div class="form-grid" id="foal-predictor">
+                <div>
+                    <label for="predict-sire">Sire:</label>
+                    <select id="predict-sire"><option>--Select--</option></select>
+                </div>
+                <div>
+                    <label for="predict-dam">Dam:</label>
+                    <select id="predict-dam"><option>--Select--</option></select>
+                </div>
+                <div>
+                    <button id="predict-foal-btn" class="button">Predict</button>
+                </div>
+                <div id="foal-prediction-result" style="grid-column:1/-1; margin-top:1em;"></div>
             </div>
+
+            <hr style="margin: 2em 0; border-color: var(--border-color);">
+
+            <h3>Registered Breeding Horses</h3>
+            <div style="overflow-x:auto;">
+                <table id="breeding-horses-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Bloodline</th>
+                            <th>Color</th>
+                            <th>Gender</th>
+                            <th>Stars (O/Sp/Sr/E)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="breeding-horses-table-body">
+                        <!-- Breeding horse data populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+            <!-- Pagination Controls for Breeding Horses Table -->
+            <div id="breeding-horses-pagination-controls" class="pagination-controls">
+                <div style="display: inline-flex; align-items: center; gap: 5px;">
+                    <label for="breeding-horses-items-per-page" style="margin-right: 5px;">Show:</label>
+                    <select id="breeding-horses-items-per-page" class="pagination-select">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+                <button id="breeding-horses-prev-page" class="button pagination-button">&lt; Previous</button>
+                <span id="breeding-horses-page-info">Page 1 of 1</span>
+                <button id="breeding-horses-next-page" class="button pagination-button">Next &gt;</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Section for Recording Stud Auction Income -->
+    <div class="section" id="stud-auction-section">
+        <div class="content-wrapper">
+            <h2>Stud Auction Income</h2>
+            <p>Record 5% commission income from stud auctions.</p>
+            
+            <form id="add-stud-auction-form">
+                <h3>Record Stud Auction Income</h3>
+                <div class="form-grid">
+                    <div>
+                        <label for="stud-auction-horse">Select Stud:</label>
+                        <select id="stud-auction-horse" required>
+                            <option value="">--Select Male Breeding Horse--</option>
+                            <!-- Male breeding horses populated by JS -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="stud-auction-price">Auction Sale Price:</label>
+                        <input type="number" id="stud-auction-price" step="0.01" min="0" required>
+                    </div>
+                    <div>
+                        <label for="stud-auction-date">Auction Date:</label>
+                        <input type="date" id="stud-auction-date">
+                    </div>
+                    <div>
+                        <label for="stud-auction-commission">Commission (5%):</label>
+                        <input type="number" id="stud-auction-commission" step="0.01" min="0" required>
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <button type="submit" style="height: 42px; margin-top: auto;">Record Income</button>
+                    </div>
+                </div>
+            </form>
+            
+            <hr style="margin: 2em 0; border-color: var(--border-color);">
+            
+            <h3>Auction Income History</h3>
+            <div style="overflow-x:auto;">
+                <table id="stud-auction-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Stud Name</th>
+                            <th>Auction Price</th>
+                            <th>Commission (5%)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stud-auction-table-body">
+                        <!-- Stud auction history populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+            <!-- Pagination controls for stud auction table -->
+            <div id="stud-auction-pagination-controls" class="pagination-controls">
+                <div style="display: inline-flex; align-items: center; gap: 5px;">
+                    <label for="stud-auction-items-per-page" style="margin-right: 5px;">Show:</label>
+                    <select id="stud-auction-items-per-page" class="pagination-select">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+                <button id="stud-auction-prev-page" class="button pagination-button">&lt; Previous</button>
+                <span id="stud-auction-page-info">Page 1 of 1</span>
+                <button id="stud-auction-next-page" class="button pagination-button">Next &gt;</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section for Recording Bred Horses -->
+    <div class="section" id="bred-horses-section">
+        <div class="content-wrapper">
+            <h2>Bred Horses</h2>
+            <form id="add-bred-horse-form">
+                <h3>Record New Bred Horse</h3>
+                <div class="form-grid">
+                    <div>
+                        <label for="bred-name">New Horse Name:</label>
+                        <input type="text" id="bred-name" required>
+                    </div>
+                    <div>
+                        <label for="bred-bloodline">Bloodline:</label>
+                        <select id="bred-bloodline" required>
+                            <option value="">--Select--</option>
+                            <option value="Nakamoto">Nakamoto</option>
+                            <option value="Szabo">Szabo</option>
+                            <option value="Finney">Finney</option>
+                            <option value="Buterin">Buterin</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="bred-gender">Gender:</label>
+                        <select id="bred-gender" required>
+                            <option value="">--Select--</option>
+                            <option value="Female">Female</option>
+                            <option value="Male">Male</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="bred-color">Color:</label>
+                        <select id="bred-color" required>
+                            <option value="">--Select--</option>
+                        </select>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px;">
+                            <label for="bred-sire" style="margin-bottom: 0;">Sire (Father):</label>
+                            <label style="display: inline-flex; align-items: center; cursor: pointer; font-size: 0.9em;">
+                                <input type="checkbox" id="use-external-sire" style="margin-right: 5px;">
+                                External Sire
+                            </label>
+                        </div>
+                        <select id="bred-sire" required>
+                            <option value="">--Select Male Parent--</option>
+                            <!-- Male horses populated by JS -->
+                        </select>
+                        <div id="sire-stats" class="parent-stats"></div>
+                    </div>
+                    <div class="external-sire-fields" style="display: none;">
+                        <label for="external-sire-name">External Sire Name:</label>
+                        <input type="text" id="external-sire-name">
+                    </div>
+                    <div class="external-sire-fields" style="display: none;">
+                        <label for="external-sire-bloodline">External Sire Bloodline:</label>
+                        <select id="external-sire-bloodline">
+                            <option value="">--Select--</option>
+                            <option value="Nakamoto">Nakamoto</option>
+                            <option value="Szabo">Szabo</option>
+                            <option value="Finney">Finney</option>
+                            <option value="Buterin">Buterin</option>
+                            <option value="Unknown">Unknown</option>
+                        </select>
+                    </div>
+                    <div class="external-sire-fields" style="display: none;">
+                        <label for="external-sire-color">External Sire Color:</label>
+                        <select id="external-sire-color">
+                            <option value="">--Select--</option>
+                            <!-- Populated dynamically by JS -->
+                        </select>
+                    </div>
+                    <div class="external-sire-fields" style="display: none;">
+                        <label for="external-sire-overall-stars">Ext. Sire Overall Stars:</label>
+                        <input type="number" id="external-sire-overall-stars" step="0.1" min="1" placeholder="Optional">
+                    </div>
+                    <div class="external-sire-fields" style="display: none;">
+                        <label for="external-sire-speed-stars">Ext. Sire Speed Stars:</label>
+                        <input type="number" id="external-sire-speed-stars" step="0.1" min="0" placeholder="Optional">
+                    </div>
+                    <div class="external-sire-fields" style="display: none;">
+                        <label for="external-sire-sprint-stars">Ext. Sire Sprint Stars:</label>
+                        <input type="number" id="external-sire-sprint-stars" step="0.1" min="0" placeholder="Optional">
+                    </div>
+                    <div class="external-sire-fields" style="display: none;">
+                        <label for="external-sire-endurance-stars">Ext. Sire Endurance Stars:</label>
+                        <input type="number" id="external-sire-endurance-stars" step="0.1" min="0" placeholder="Optional">
+                    </div>
+                    <div>
+                        <label for="bred-dam" style="margin-bottom: 0;">Dam (Mother):</label>
+                        <label style="display: inline-flex; align-items: center; cursor: pointer; font-size: 0.9em;">
+                            <input type="checkbox" id="use-external-dam" style="margin-right: 5px;">
+                            External Dam
+                        </label>
+                    </div>
+                    <div>
+                        <label for="bred-dam">Dam (Mother):</label>
+                        <select id="bred-dam" required>
+                            <option value="">--Select Female Parent--</option>
+                            <!-- Female horses populated by JS -->
+                        </select>
+                        <div id="dam-stats" class="parent-stats"></div>
+                    </div>
+                    <div>
+                        <label for="bred-date">Date Bred:</label>
+                        <input type="date" id="bred-date">
+                    </div>
+                    <div>
+                        <label for="bred-stud-fee">Stud Fee Paid:</label>
+                        <input type="number" id="bred-stud-fee" step="any" value="0" required>
+                    </div>
+                    <div>
+                        <label for="bred-overall-stars">Overall Stars:</label>
+                        <input type="number" id="bred-overall-stars" step="0.1" min="1" placeholder="Optional">
+                    </div>
+                    <div>
+                        <label for="bred-speed-stars">Speed Stars:</label>
+                        <input type="number" id="bred-speed-stars" step="0.1" min="0" placeholder="Optional">
+                    </div>
+                    <div>
+                        <label for="bred-sprint-stars">Sprint Stars:</label>
+                        <input type="number" id="bred-sprint-stars" step="0.1" min="0" placeholder="Optional">
+                    </div>
+                    <div>
+                        <label for="bred-endurance-stars">Endurance Stars:</label>
+                        <input type="number" id="bred-endurance-stars" step="0.1" min="0" placeholder="Optional">
+                    </div>
+                    <div>
+                        <button type="submit">Record Bred Horse</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <h3>Bred Horse History</h3>
+        <div style="overflow-x:auto;">
+            <table id="bred-horses-table">
+                <thead>
+                    <tr>
+                        <th>Bred Date</th>
+                        <th>Name</th>
+                        <th>Bloodline</th>
+                        <th>Color</th>
+                        <th>Gender</th>
+                        <th>Sire</th>
+                        <th>Dam</th>
+                        <th>Overall</th>
+                        <th>Speed</th>
+                        <th>Sprint</th>
+                        <th>Endurance</th>
+                        <th>Stud Fee</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="bred-horses-table-body">
+                    <!-- Bred horse history populated by JS -->
+                </tbody>
+            </table>
+        </div>
+        <!-- Pagination Controls for Bred History Table -->
+        <div id="bred-history-pagination-controls" class="pagination-controls">
+            <div style="display: inline-flex; align-items: center; gap: 5px;">
+                <label for="bred-history-items-per-page" style="margin-right: 5px;">Show:</label>
+                <select id="bred-history-items-per-page" class="pagination-select">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+            <button id="bred-history-prev-page" class="button pagination-button">&lt; Previous</button>
+            <span id="bred-history-page-info">Page 1 of 1</span>
+            <button id="bred-history-next-page" class="button pagination-button">Next &gt;</button>
+        </div>
+    </div>
+</div>
 
             <!-- Transactions Tab Content -->
             <div id="tab-content-transactions" class="tab-content">
-                <!-- Place ALL Transactions tab content here (forms, tables, etc.) -->
+                <div class="section" id="transactions-section">
+                    <h2>Horse Transactions</h2>
+                    <div class="content-wrapper">
+                        <h3>Record Sale or Purchase</h3>
+                        <form id="add-transaction-form">
+                            <div class="form-grid">
+                                <div>
+                                    <label for="transaction-type">Transaction Type:</label>
+                                    <select id="transaction-type" required>
+                                        <option value="">--Select--</option>
+                                        <option value="sale">Sale</option>
+                                        <option value="purchase">Purchase</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="transaction-horse-name">Horse Name:</label>
+                                    <input type="text" id="transaction-horse-name" required>
+                                </div>
+                                <div>
+                                    <label for="transaction-date">Date:</label>
+                                    <input type="date" id="transaction-date">
+                                </div>
+                                <div>
+                                    <label for="transaction-amount">Amount:</label>
+                                    <input type="number" id="transaction-amount" step="0.01" min="0" required>
+                                </div>
+                                <div>
+                                    <label for="transaction-notes">Notes:</label>
+                                    <input type="text" id="transaction-notes" placeholder="Optional details">
+                                </div>
+                                <div style="grid-column: 1 / -1;">
+                                    <button type="submit">Record Transaction</button>
+                                </div>                          
+                            </div>
+                        </form>
+                    </div>
+
+                    <h3>Transaction History</h3>
+                    <div style="overflow-x:auto;">
+                        <table id="transactions-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Horse Name</th>
+                                    <th>Amount</th>
+                                    <th>Notes</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions-table-body">
+                                <!-- Transaction data populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Pagination Controls for Transactions Table -->
+                    <div id="transactions-pagination-controls" class="pagination-controls">
+                        <div style="display: inline-flex; align-items: center; gap: 5px;">
+                            <label for="transactions-items-per-page" style="margin-right: 5px;">Show:</label>
+                            <select id="transactions-items-per-page" class="pagination-select">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        <button id="transactions-prev-page" class="button pagination-button">&lt; Previous</button>
+                        <span id="transactions-page-info">Page 1 of 1</span>
+                        <button id="transactions-next-page" class="button pagination-button">Next &gt;</button>
+                    </div>
+                </div>
             </div>
 
-            <!-- Augments Tab Content -->
+           <!-- Augments Tab Content -->
             <div id="tab-content-augments" class="tab-content">
-                <!-- Place ALL Augments List tab content here (forms, lists, etc.) -->
-            </div>
+                <div class="content-wrapper">
+                    <!-- Section for Augments -->
+                    <div class="section" id="augments-section">
+                        <h2>Manage Augments</h2>
+                        <p>Add or remove augments available in dropdowns.</p>
 
+                        <!-- Add Augment Form -->
+                        <form id="add-augment-form">
+                            <h3>Add New Augment</h3>
+                            <div class="form-grid">
+                                <div>
+                                    <label for="augment-name" class="label-required">Augment Name:</label>
+                                    <input type="text" id="augment-name" required placeholder="e.g., Void C100">
+                                </div>
+                                <div>
+                                    <label for="augment-type" class="label-required">Type:</label>
+                                    <select id="augment-type" required>
+                                        <option value="">--Select Type--</option>
+                                        <option value="CPU">CPU</option>
+                                        <option value="RAM">RAM</option>
+                                        <option value="Hydraulic">Hydraulic</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <button type="submit">Add Augment</button>
+                                </div>
+                            </div>
+                        </form>
+                        
+                        <hr style="margin: 2em 0; border-color: var(--border-color);">
+
+                        <h3>Current Augments</h3>
+                        <div class="form-grid">
+                            <div>
+                                <h3>CPU</h3>
+                                <ul id="cpu-augment-list" class="augment-manage-list">
+                                    <!-- Populated by JS -->
+                                </ul>
+                            </div>
+                            <div>
+                                <h3>RAM</h3>
+                                <ul id="ram-augment-list" class="augment-manage-list">
+                                    <!-- Populated by JS -->
+                                </ul>
+                            </div>
+                            <div>
+                                <h3>Hydraulic</h3>
+                                <ul id="hydraulic-augment-list" class="augment-manage-list">
+                                    <!-- Populated by JS -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!-- Analysis Tab Content -->
             <div id="tab-content-analysis" class="tab-content">
                 <!-- Place ALL Analysis tab content here (tables, filters, etc.) -->
@@ -1392,998 +2171,9 @@
                 <!-- The ZedChampions API integration and import UI will be injected here by JS if needed -->
             </div>
         </div>
-<!-- ...existing code below... -->
-    <h3>Add New Racing Horse</h3>
-        <form id="add-horse-form">
-            <div class="form-grid">
 
-            <!-- Name -->
-            <div>
-                <label for="horse-name">Name:</label>
-                <input type="text" id="horse-name" required>
-            </div>
-
-            <!-- Bloodline -->
-            <div>
-        <label for="horse-bloodline">Bloodline:</label>
-            <select id="horse-bloodline" required>
-                <option value="">--Select--</option>
-                <option value="Nakamoto">Nakamoto</option>
-                <option value="Szabo">Szabo</option>
-                <option value="Finney">Finney</option>
-                <option value="Buterin">Buterin</option>
-            </select>
-        </div>
-
-        <!-- Color -->
-        <div>
-        <label for="horse-color">Color:</label>
-            <select id="horse-color" required>
-                <option value="">--Select Color--</option>
-            <!-- Populated dynamically -->
-            </select>
-        </div>
-
-            <!-- TRAITS / ATTRIBUTE DISPLAY (add after Color, can style as needed) -->
-            <div style="margin-top:8px;">
-                <label style="color:#77ffe7;font-weight:600;">Traits:</label>
-                <ul id="horse-traits" style="display:none;"></ul>
-                <label style="color:#f6b600;font-weight:600;">Attribute:</label>
-                <ul id="horse-attributes" style="display:none;"></ul>
-            </div>
-                </div>
-                </div>
-                <div>
-                    <label for="horse-gender">Gender:</label>
-                    <select id="horse-gender" required>
-                    <option value="">--Select--</option>
-                    <option value="Female">Female</option>
-                    <option value="Male">Male</option>
-                    </select>
-                </div>
-
-            <!-- Overall Stars -->
-            <div>
-                <label for="horse-stars">Overall Stars:</label>
-                <input type="number" id="horse-stars" step="0.1" min="1" required>
-            </div>
-
-            <!-- Initial $ZED Balance -->
-            <div>
-                <label for="horse-zed-balance">Initial $ZED Balance:</label>
-                <input type="number" id="horse-zed-balance" step="any" value="0" required>
-            </div>
-
-            <!-- Initial Matchmaking Rating -->
-            <div>
-                <label for="horse-mm-rating">Initial Matchmaking Rating:</label>
-                <input type="number" id="horse-mm-rating" step="1" value="1000" required>
-            </div>
-
-            <!-- Speed Stars -->
-            <div>
-                <label for="horse-speed-stars">Speed Stars:</label>
-                <input type="number" id="horse-speed-stars" step="0.1" min="0" placeholder="Optional">
-            </div>
-
-            <!-- Sprint Stars -->
-            <div>
-                <label for="horse-sprint-stars">Sprint Stars:</label>
-                <input type="number" id="horse-sprint-stars" step="0.1" min="0" placeholder="Optional">
-            </div>
-
-            <!-- Endurance Stars -->
-            <div>
-                <label for="horse-endurance-stars">Endurance Stars:</label>
-                <input type="number" id="horse-endurance-stars" step="0.1" min="0" placeholder="Optional">
-            </div>
-
-            <!-- Submit -->
-            <div>
-                <button type="submit">Add Racing Horse</button>
-            </div>
-
-        </div> <!-- /.form-grid -->
-                </form>
-                    <select id="horse-filter-bloodline" class="filter-item">
-                        <option value="">All Bloodlines</option>
-                        <option value="Nakamoto">Nakamoto</option>
-                        <option value="Szabo">Szabo</option>
-                        <option value="Finney">Finney</option>
-                        <option value="Buterin">Buterin</option>
-                    </select>
-                    <select id="horse-filter-gender" class="filter-item">
-                        <option value="">All Genders</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                    </select>
-                    <input type="number" step="0.1" id="horse-filter-min-stars" placeholder="Min Overall" class="filter-item">
-                    <input type="number" step="0.1" id="horse-filter-max-stars" placeholder="Max Overall" class="filter-item">
-                    <input type="number" step="0.1" id="horse-filter-min-speed" placeholder="Min Speed" class="filter-item">
-                    <input type="number" step="0.1" id="horse-filter-max-speed" placeholder="Max Speed" class="filter-item">
-                    <input type="number" step="0.1" id="horse-filter-min-sprint" placeholder="Min Sprint" class="filter-item">
-                    <input type="number" step="0.1" id="horse-filter-max-sprint" placeholder="Max Sprint" class="filter-item">
-                    <input type="number" step="0.1" id="horse-filter-min-endurance" placeholder="Min Endur" class="filter-item">
-                    <input type="number" step="0.1" id="horse-filter-max-endurance" placeholder="Max Endur" class="filter-item">
-                </div>
-
-                <div style="overflow-x:auto;">
-            <table id="horses-table">
-                <thead>
-                    <tr>
-                        <th data-sort-key="name">Name</th>
-                        <th data-sort-key="bloodline">Bloodline</th>
-                        <th data-sort-key="color">Color</th> <!-- Swapped position with Gender -->
-                        <th data-sort-key="gender">Gender</th> <!-- Swapped position with Color -->
-                        <th data-sort-key="stars">Stars (O/Sp/Sr/E)</th>
-                        <th data-sort-key="mmr">MMR</th>
-                        <th data-sort-key="zed">$ZED Bal</th>
-                        <th data-sort-key="wins">W-P-S</th> <!-- Sorting by Wins -->
-                        <th data-sort-key="avgOdds">Avg Odds</th> <!-- New Column -->
-                        <th data-sort-key="netProfit">Net / ROI</th> <!-- Shifted -->
-                        <th data-sort-key="winRate">Win %</th> <!-- Shifted -->
-                        <th data-sort-key="races">Races</th> <!-- Shifted -->
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="horses-table-body">
-                    <!-- Horse data populated by JS -->
-                </tbody>
-            </table>
-        </div>
-        <!-- Pagination Controls for Horses Table -->
-        <div id="horses-pagination-controls" class="pagination-controls">
-             <div style="display: inline-flex; align-items: center; gap: 5px;"> <!-- Group label/select -->
-                <label for="horses-items-per-page" style="margin-right: 5px;">Show:</label>
-                <select id="horses-items-per-page" class="pagination-select">
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select>
-    </div>
-            <!-- Nav elements are now direct children -->
-            <button id="horses-prev-page" class="button pagination-button">&lt; Previous</button>
-            <span id="horses-page-info">Page 1 of 1</span>
-            <button id="horses-next-page" class="button pagination-button">Next &gt;</button>
-            </div>
-    </div>
-
-    <!-- Section for Adding Race Results -->
-    <div class="section" id="races-section">
-        <h2>Record Race Result</h2>
-                <div class="content-wrapper">
-                    <h3>Record New Race</h3>
-        <form id="add-race-form">
-             <div class="form-grid">
-                 <div>
-                    <label for="race-horse">Select Horse:</label>
-                    <select id="race-horse" required>
-                                    <option value="">--Select Racing Horse--</option>
-                        <!-- Options populated by JS -->
-                    </select>
-                 </div>
-                 <div>
-                    <label for="race-name">Race Name:</label>
-                    <input type="text" id="race-name" placeholder="Optional">
-                </div>
-                <div>
-                    <label for="race-date">Race Date:</label>
-                    <input type="date" id="race-date">
-                </div>
-                <div>
-                    <label for="race-split-1">Split 1 (0-250m):</label>
-                    <input type="number" id="race-split-1" step="any" min="0" placeholder="Seconds">
-                </div>
-                <div>
-                    <label for="race-split-2">Split 2 (250-500m):</label>
-                    <input type="number" id="race-split-2" step="any" min="0" placeholder="Seconds">
-                </div>
-                <div>
-                    <label for="race-split-3">Split 3 (500-750m):</label>
-                    <input type="number" id="race-split-3" step="any" min="0" placeholder="Seconds">
-                </div>
-                <div>
-                    <label for="race-split-4">Split 4 (750-1000m):</label>
-                    <input type="number" id="race-split-4" step="any" min="0" placeholder="Seconds">
-                </div>
-                 <div>
-                                <label for="race-position">Place:</label>
-                    <input type="number" id="race-position" min="1" step="1" required>
-                </div>
-                 <div>
-                                <label for="race-odds">Odds:</label>
-                    <input type="number" id="race-odds" min="1" step="any" required>
-                 </div>
-                 <div>
-                                <label for="race-finish-time">Time:</label>
-                                <input type="number" id="race-finish-time" step="any" min="0" placeholder="Seconds">
-                 </div>
-                 <div>
-                    <label for="race-zed-change">$ZED Won/Lost:</label>
-                                <input type="number" id="race-zed-change" step="any" required placeholder="e.g., 1200, -350">
-                 </div>
-                 <div>
-                                <label for="race-rating-change">MM Change:</label>
-                                <input type="number" id="race-rating-change" step="1" placeholder="Matchmaking Change (e.g., 15, -8)"> <!-- Updated placeholder -->
-                 </div>
-                 <div>
-                     <label for="race-cpu-augment">CPU Augment Used:</label>
-                     <select id="race-cpu-augment" required>
-                         <option value="None">None</option>
-                         <!-- Options populated by JS from known list -->
-                     </select>
-                 </div>
-                  <div>
-                     <label for="race-ram-augment">RAM Augment Used:</label>
-                     <select id="race-ram-augment" required>
-                          <option value="None">None</option>
-                          <!-- Options populated by JS from known list -->
-                     </select>
-                 </div>
-                  <div>
-                     <label for="race-hydraulic-augment">Hydraulic Augment Used:</label>
-                     <select id="race-hydraulic-augment" required>
-                          <option value="None">None</option>
-                          <!-- Options populated by JS from known list -->
-                     </select>
-                 </div>
-                            <div> <!-- Move button into the grid -->
-            <button type="submit">Record Race</button>
-                            </div>
-                        </div>
-        </form>
-                </div>
-
-         <h3>Race History</h3>
-          <div style="overflow-x:auto;">
-             <table id="races-table">
-                 <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Race Name</th>
-                        <th>Horse</th>
-                        <th>Pos</th>
-                        <th>Odds</th>
-                        <th>Time</th>
-                        <th>Split 1</th>
-                        <th>Split 2</th>
-                        <th>Split 3</th>
-                        <th>Split 4</th>
-                        <th>ZED +/-</th>
-                        <th>MM +/-</th>
-                        <th>Augs (C/R/H)</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-
-                 <tbody id="races-table-body">
-                     <!-- Race results populated by JS -->
-                 </tbody>
-             </table>
-         </div>
-         <!-- Pagination Controls for Races Table -->
-        <div id="races-pagination-controls" class="pagination-controls">
-            <div style="display: inline-flex; align-items: center; gap: 5px;">
-                <label for="races-items-per-page" style="margin-right: 5px;">Show:</label>
-                <select id="races-items-per-page" class="pagination-select">
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select>
-            </div>
-            <button id="races-prev-page" class="button pagination-button">&lt; Previous</button>
-            <span id="races-page-info">Page 1 of 1</span>
-            <button id="races-next-page" class="button pagination-button">Next &gt;</button>
-         </div>
-    </div>
-
-            <!-- Section for Augment Performance Analysis -->
-            <div class="section" id="augment-analysis-section">
-                <h2>Augment Performance Analysis</h2>
-                <p>Shows performance statistics grouped by unique augment combinations for each racing horse.</p>
-                
-                <!-- Horse Filter for Augment Analysis -->
-                <div style="margin-bottom: 15px; display: flex; align-items: center;">
-                    <label for="augment-analysis-horse-filter" style="margin-right: 10px;">Filter by Horse:</label>
-                    <select id="augment-analysis-horse-filter" style="width: 180px; max-width: 250px; padding: 8px;" class="pagination-select">
-                        <option value="">All Horses</option>
-                        <!-- Options populated by JS -->
-                    </select>
-                </div>
-                <!-- Augment Analysis for Lineage and Colors -->
-                <label for="augment-trait-filter">Trait:</label>
-                <select id="augment-trait-filter">
-                    <option value="">All</option>
-                </select>
-                <!-- JS will inject the selected horse’s traits here -->
-                </select>
-                <div id="augment-analysis-content">
-                    <!-- Analysis tables will be generated here by JS -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Breeding Tab Content -->
-        <div id="tab-content-breeding" class="tab-content">
-            <!-- Section for Retired Horses -->
-            <div class="section" id="breeding-horses-section"> <!-- Renamed ID -->
-                <div class="content-wrapper"> <!-- Wrapper Start -->
-                    <h2>Breeding Horses</h2> <!-- Renamed Title -->
- 
-                    <form id="add-breeding-horse-form">
-                        <h3>Add New Breeding Horse</h3>
-                        <div class="form-grid">
-                            <div>
-                                <label for="breeding-horse-name">Name:</label>
-                                <input type="text" id="breeding-horse-name" required>
-                            </div>
-                             <div>
-                                <label for="breeding-horse-bloodline">Bloodline:</label>
-                                <select id="breeding-horse-bloodline" required>
-                                    <option value="">--Select--</option>
-                                    <option value="Nakamoto">Nakamoto</option>
-                                    <option value="Szabo">Szabo</option>
-                                    <option value="Finney">Finney</option>
-                                    <option value="Buterin">Buterin</option>
-                                </select>
-                            </div>
-                              <!-- new: Breeding‐horse Color -->
-                            <div>
-                                <label for="breeding-horse-color">Color:</label>
-                                <select id="breeding-horse-color" required>
-                                    <option value="">--Select--</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="breeding-horse-gender">Gender:</label>
-                                <select id="breeding-horse-gender" required>
-                                     <option value="">--Select--</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Male">Male</option>
-                                </select>
-                            </div>
-                             <div>
-                                <label for="breeding-horse-stars">Overall Stars:</label>
-                                 <input type="number" id="breeding-horse-stars" step="0.1" min="1" placeholder="Optional">
-                            </div>
-                             <div>
-                                  <label for="breeding-horse-speed-stars">Speed Stars:</label>
-                                  <input type="number" id="breeding-horse-speed-stars" step="0.1" min="0" placeholder="Optional">
-                              </div>
-                              <div>
-                                  <label for="breeding-horse-sprint-stars">Sprint Stars:</label>
-                                  <input type="number" id="breeding-horse-sprint-stars" step="0.1" min="0" placeholder="Optional">
-                              </div>
-                              <div>
-                                  <label for="breeding-horse-endurance-stars">Endurance Stars:</label>
-                                  <input type="number" id="breeding-horse-endurance-stars" step="0.1" min="0" placeholder="Optional">
-                              </div>
-                              <div>
-                                <h3>Predict Foal Quality</h3>
-                                <div class="form-grid" id="foal-predictor">
-                                <div>
-                                    <label for="predict-sire">Sire:</label>
-                                    <select id="predict-sire"><option>--Select--</option>…</select>
-                                </div>
-                                <div>
-                                    <label for="predict-dam">Dam:</label>
-                                    <select id="predict-dam"><option>--Select--</option>…</select>
-                                </div>
-                                <div>
-                                    <button id="predict-foal-btn" class="button">Predict</button>
-                                </div>
-                                <div id="foal-prediction-result" style="grid-column:1/-1; margin-top:1em;"></div>
-                                </div>
-
-                                  <button type="submit">Add Breeding Horse</button>
-                              </div>
-                        </div>
-                    </form>
-
-                    <hr style="margin: 2em 0; border-color: var(--border-color);"> <!-- Separator -->
-
-                    <h3>Registered Breeding Horses</h3> <!-- Updated Title -->
-                    <div style="overflow-x:auto;">
-                        <table id="breeding-horses-table"> <!-- Renamed ID -->
-                            <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Bloodline</th>
-                                <th>Color</th>
-                                <th>Gender</th>
-                                <th>Stars (O/Sp/Sr/E)</th>
-                                <th>Actions</th>
-                            </tr>
-                            </thead>
-                            <tbody id="breeding-horses-table-body"> <!-- Renamed ID -->
-                                <!-- Retired horse data populated by JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                     <!-- Pagination Controls for Breeding Horses Table -->
-                    <div id="breeding-horses-pagination-controls" class="pagination-controls">
-                        <div style="display: inline-flex; align-items: center; gap: 5px;">
-                            <label for="breeding-horses-items-per-page" style="margin-right: 5px;">Show:</label>
-                            <select id="breeding-horses-items-per-page" class="pagination-select">
-                                <option value="10">10</option>
-                                <option value="25">25</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                            </select>
-                        </div>
-                        <button id="breeding-horses-prev-page" class="button pagination-button">&lt; Previous</button>
-                        <span id="breeding-horses-page-info">Page 1 of 1</span>
-                        <button id="breeding-horses-next-page" class="button pagination-button">Next &gt;</button>
-                    </div>
- 
-                </div> <!-- Wrapper End -->
-            </div>
-
-            <!-- New Section for Recording Stud Auction Income -->
-            <div class="section" id="stud-auction-section">
-                <div class="content-wrapper">
-                    <h2>Stud Auction Income</h2>
-                    <p>Record 5% commission income from stud auctions.</p>
-                    
-                    <form id="add-stud-auction-form">
-                        <h3>Record Stud Auction Income</h3>
-                        <div class="form-grid">
-                            <div>
-                                <label for="stud-auction-horse">Select Stud:</label>
-                                <select id="stud-auction-horse" required>
-                                    <option value="">--Select Male Breeding Horse--</option>
-                                    <!-- Male breeding horses populated by JS -->
-                                </select>
-                            </div>
-                            <div>
-                                <label for="stud-auction-price">Auction Sale Price:</label>
-                                <input type="number" id="stud-auction-price" step="0.01" min="0" required>
-                            </div>
-                            <div>
-                                <label for="stud-auction-date">Auction Date:</label>
-                                <input type="date" id="stud-auction-date">
-                            </div>
-                            <div>
-                                <label for="stud-auction-commission">Commission (5%):</label>
-                                <input type="number" id="stud-auction-commission" step="0.01" min="0" required>
-                            </div>
-                            <div style="display: flex; align-items: flex-end;">
-                                <button type="submit" style="height: 42px; margin-top: auto;">Record Income</button>
-                            </div>
-                        </div>
-                    </form>
-                    
-                    <hr style="margin: 2em 0; border-color: var(--border-color);">
-                    
-                    <h3>Auction Income History</h3>
-                    <div style="overflow-x:auto;">
-                        <table id="stud-auction-table">
-                            <thead>
-                              <tr>
-                                <th>Date</th>
-                                <th>Stud Name</th>
-                                <th>Auction Price</th>
-                                <th>Commission (5%)</th>
-                                <th>Actions</th>
-                            </tr>
-                            </thead>
-                            <tbody id="stud-auction-table-body">
-                                <!-- Stud auction history populated by JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- Pagination controls for stud auction table -->
-                    <div id="stud-auction-pagination-controls" class="pagination-controls">
-                        <div style="display: inline-flex; align-items: center; gap: 5px;">
-                            <label for="stud-auction-items-per-page" style="margin-right: 5px;">Show:</label>
-                            <select id="stud-auction-items-per-page" class="pagination-select">
-                                <option value="10">10</option>
-                                <option value="25">25</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                            </select>
-                        </div>
-                        <button id="stud-auction-prev-page" class="button pagination-button">&lt; Previous</button>
-                        <span id="stud-auction-page-info">Page 1 of 1</span>
-                        <button id="stud-auction-next-page" class="button pagination-button">Next &gt;</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Section for Recording Bred Horses (Stays the same) -->
-            <div class="section" id="bred-horses-section">
-                <div class="content-wrapper"> <!-- Wrapper Start -->
-                 <h2>Bred Horses</h2>
- 
-                 <form id="add-bred-horse-form">
-                     <h3>Record New Bred Horse</h3>
-                     <div class="form-grid">
-                         <div>
-                             <label for="bred-name">New Horse Name:</label>
-                             <input type="text" id="bred-name" required>
-                         </div>
-                         <div>
-                             <label for="bred-bloodline">Bloodline:</label>
-                             <select id="bred-bloodline" required>
-                                 <option value="">--Select--</option>
-                                 <option value="Nakamoto">Nakamoto</option>
-                                 <option value="Szabo">Szabo</option>
-                                 <option value="Finney">Finney</option>
-                                 <option value="Buterin">Buterin</option>
-                             </select>
-                         </div>
-                         <div>
-                             <label for="bred-gender">Gender:</label>
-                             <select id="bred-gender" required>
-                                 <option value="">--Select--</option>
-                                 <option value="Female">Female</option>
-                                 <option value="Male">Male</option>
-                             </select>
-                         </div>
-                           <!-- new: Bred‐horse Color -->
-                        <div>
-                            <label for="bred-color">Color:</label>
-                            <select id="bred-color" required>
-                                <option value="">--Select--</option>
-                             </select>
-                        </div>
-
-                          <div>
-                             <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px;">
-                                 <label for="bred-sire" style="margin-bottom: 0;">Sire (Father):</label>
-                                 <label style="display: inline-flex; align-items: center; cursor: pointer; font-size: 0.9em;">
-                                     <input type="checkbox" id="use-external-sire" style="margin-right: 5px;">
-                                     External Sire
-                                 </label>
-                             </div>
-                              <select id="bred-sire" required>
-                                  <option value="">--Select Male Parent--</option>
-                                  <!-- Male horses populated by JS -->
-                              </select>
-                              <div id="sire-stats" class="parent-stats"></div>
-                          </div>
-                          <div class="external-sire-fields" style="display: none;"> <!-- Initially hidden -->
-                             <label for="external-sire-name">External Sire Name:</label>
-                             <input type="text" id="external-sire-name">
-                         </div>
-                         <div class="external-sire-fields" style="display: none;"> <!-- Initially hidden -->
-                             <label for="external-sire-bloodline">External Sire Bloodline:</label>
-                             <select id="external-sire-bloodline">
-                                 <option value="">--Select--</option>
-                                 <option value="Nakamoto">Nakamoto</option>
-                                 <option value="Szabo">Szabo</option>
-                                 <option value="Finney">Finney</option>
-                                 <option value="Buterin">Buterin</option>
-                                 <option value="Unknown">Unknown</option>
-                             </select>
-                         </div>
-                         <!-- Add this after the external sire bloodline select -->
-                        <div class="external-sire-fields" style="display: none;">
-                            <label for="external-sire-color">External Sire Color:</label>
-                            <select id="external-sire-color">
-                                <option value="">--Select--</option>
-                                <!-- Populated dynamically by JS -->
-                            </select>
-                        </div>
-                         <div class="external-sire-fields" style="display: none;">
-                            <label for="external-sire-overall-stars">Ext. Sire Overall Stars:</label>
-                            <input type="number" id="external-sire-overall-stars" step="0.1" min="1" placeholder="Optional">
-                        </div>
-                        <div class="external-sire-fields" style="display: none;">
-                            <label for="external-sire-speed-stars">Ext. Sire Speed Stars:</label>
-                            <input type="number" id="external-sire-speed-stars" step="0.1" min="0" placeholder="Optional">
-                        </div>
-                        <div class="external-sire-fields" style="display: none;">
-                            <label for="external-sire-sprint-stars">Ext. Sire Sprint Stars:</label>
-                            <input type="number" id="external-sire-sprint-stars" step="0.1" min="0" placeholder="Optional">
-                        </div>
-                        <div class="external-sire-fields" style="display: none;">
-                            <label for="external-sire-endurance-stars">Ext. Sire Endurance Stars:</label>
-                            <input type="number" id="external-sire-endurance-stars" step="0.1" min="0" placeholder="Optional">
-                        </div>
-                        <div>
-                             <label for="bred-dam" style="margin-bottom: 0;">Dam (Mother):</label>
-                             <label style="display: inline-flex; align-items: center; cursor: pointer; font-size: 0.9em;">
-                                 <input type="checkbox" id="use-external-dam" style="margin-right: 5px;">
-                                 External Dam
-                             </label>
-                         </div>
-                        <div>
-                             <label for="bred-dam">Dam (Mother):</label>
-                             <select id="bred-dam" required>
-                                 <option value="">--Select Female Parent--</option>
-                                 <!-- Female horses populated by JS -->
-                             </select>
-                              <div id="dam-stats" class="parent-stats"></div>
-                         </div>
-                         <div>
-                             <label for="bred-date">Date Bred:</label>
-                             <input type="date" id="bred-date">
-                         </div>
-                          <div>
-                             <label for="bred-stud-fee">Stud Fee Paid:</label>
-                             <input type="number" id="bred-stud-fee" step="any" value="0" required>
-                          </div>
-                           <div>
-                              <label for="bred-overall-stars">Overall Stars:</label>
-                              <input type="number" id="bred-overall-stars" step="0.1" min="1" placeholder="Optional">
-                         </div>
-                          <div>
-                               <label for="bred-speed-stars">Speed Stars:</label>
-                               <input type="number" id="bred-speed-stars" step="0.1" min="0" placeholder="Optional">
-                           </div>
-                           <div>
-                               <label for="bred-sprint-stars">Sprint Stars:</label>
-                               <input type="number" id="bred-sprint-stars" step="0.1" min="0" placeholder="Optional">
-                           </div>
-                           <div>
-                               <label for="bred-endurance-stars">Endurance Stars:</label>
-                               <input type="number" id="bred-endurance-stars" step="0.1" min="0" placeholder="Optional">
-                           </div>
-                           <div>
-                               <button type="submit">Record Bred Horse</button>
-                           </div>
-                      </div>
-                 </form>
-
-                 </div> <!-- Wrapper End for Form -->
- 
-                 <!-- History Table Outside Wrapper -->
-                 <h3>Bred Horse History</h3>
-                 <div style="overflow-x:auto;">
-                     <table id="bred-horses-table">
-                         <thead>
-                            <tr>
-                                <th>Bred Date</th>
-                                <th>Name</th>
-                                <th>Bloodline</th>
-                                <th>Color</th>
-                                <th>Gender</th>
-                                <th>Sire</th>
-                                <th>Dam</th>
-                                <th>Overall</th>
-                                <th>Speed</th>
-                                <th>Sprint</th>
-                                <th>Endurance</th>
-                                <th>Stud Fee</th>
-                                <th>Actions</th>
-                            </tr>
-                            </thead>
-                         <tbody id="bred-horses-table-body">
-                             <!-- Bred horse history populated by JS -->
-                         </tbody>
-                     </table>
-                 </div>
-                 <!-- Pagination Controls for Bred History Table -->
-                 <div id="bred-history-pagination-controls" class="pagination-controls">
-                    <div style="display: inline-flex; align-items: center; gap: 5px;">
-                        <label for="bred-history-items-per-page" style="margin-right: 5px;">Show:</label>
-                        <select id="bred-history-items-per-page" class="pagination-select">
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
-                    </div>
-                    <button id="bred-history-prev-page" class="button pagination-button">&lt; Previous</button>
-                    <span id="bred-history-page-info">Page 1 of 1</span>
-                    <button id="bred-history-next-page" class="button pagination-button">Next &gt;</button>
-                </div>
- 
-             </div>
-         </div>
-
-        <!-- Transactions Tab Content -->
-        <div id="tab-content-transactions" class="tab-content">
-            <div class="section" id="transactions-section">
-                <h2>Horse Transactions</h2>
-                <div class="content-wrapper">
-                    <h3>Record Sale or Purchase</h3>
-                    <form id="add-transaction-form">
-                        <div class="form-grid">
-                            <div>
-                                <label for="transaction-type">Transaction Type:</label>
-                                <select id="transaction-type" required>
-                                    <option value="">--Select--</option>
-                                    <option value="sale">Sale</option>
-                                    <option value="purchase">Purchase</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="transaction-horse-name">Horse Name:</label>
-                                <input type="text" id="transaction-horse-name" required>
-                            </div>
-                            <div>
-                                <label for="transaction-date">Date:</label>
-                                <input type="date" id="transaction-date">
-                            </div>
-                            <div>
-                                <label for="transaction-amount">Amount:</label>
-                                <input type="number" id="transaction-amount" step="0.01" min="0" required>
-                            </div>
-                            <div style="grid-column: 1 / -1;">
-                                <button type="submit">Record Transaction</button>
-                            </div>                          
-                            <div>
-                                <label for="transaction-notes">Notes:</label>
-                                <input type="text" id="transaction-notes" placeholder="Optional details">
-                            </div>
-
-                        </div>
-                    </form>
-                </div>
-
-                <h3>Transaction History</h3>
-                <div style="overflow-x:auto;">
-                    <table id="transactions-table">
-                        <thead>
-                         <tr>
-                            <th>Date</th>
-                            <th>Type</th>
-                            <th>Horse Name</th>
-                            <th>Amount</th>
-                            <th>Notes</th>
-                            <th>Actions</th>
-                         </tr>
-                        </thead>
-                        <tbody id="transactions-table-body">
-                            <!-- Transaction data populated by JS -->
-                        </tbody>
-                    </table>
-                </div>
-                <!-- Pagination Controls for Transactions Table -->
-                <div id="transactions-pagination-controls" class="pagination-controls">
-                    <div style="display: inline-flex; align-items: center; gap: 5px;">
-                        <label for="transactions-items-per-page" style="margin-right: 5px;">Show:</label>
-                        <select id="transactions-items-per-page" class="pagination-select">
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
-                    </div>
-                    <button id="transactions-prev-page" class="button pagination-button">&lt; Previous</button>
-                    <span id="transactions-page-info">Page 1 of 1</span>
-                    <button id="transactions-next-page" class="button pagination-button">Next &gt;</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Augments Tab Content -->
-        <div id="tab-content-augments" class="tab-content">
-            <div class="content-wrapper">
-             <!-- Section for Augments -->
-             <div class="section" id="augments-section">
-                 <h2>Manage Augments</h2>
-                 <p>Add or remove augments available in dropdowns.</p>
-
-                 <!-- Add Augment Form -->
-                 <form id="add-augment-form">
-                     <h3>Add New Augment</h3>
-                     <div class="form-grid">
-                           <div>
-                             <label for="augment-name" class="label-required">Augment Name:</label>
-                             <input type="text" id="augment-name" required placeholder="e.g., Void C100">
-                           </div>
-                           <div>
-                             <label for="augment-type" class="label-required">Type:</label>
-                             <select id="augment-type" required>
-                                 <option value="">--Select Type--</option>
-                                 <option value="CPU">CPU</option>
-                                 <option value="RAM">RAM</option>
-                                 <option value="Hydraulic">Hydraulic</option>
-                               </select>
-                           </div>
-                         <!-- Removed align-items: end from grid, using align-self on button's container if needed -->
-                         <div> <!-- Removed align-self: end; -->
-                             <button type="submit">Add Augment</button>
-                     </div>
-                     </div>
-                 </form>
-                  <hr style="margin: 2em 0; border-color: var(--border-color);">
-
-                 <h3>Current Augments</h3>
-                 <div class="form-grid">
-                     <div>
-                         <h3>CPU</h3>
-                         <ul id="cpu-augment-list" class="augment-manage-list">
-                             <!-- Populated by JS -->
-                         </ul>
-                     </div>
-                     <div>
-                         <h3>RAM</h3>
-                         <ul id="ram-augment-list" class="augment-manage-list">
-                              <!-- Populated by JS -->
-                         </ul>
-                     </div>
-                      <div>
-                         <h3>Hydraulic</h3>
-                         <ul id="hydraulic-augment-list" class="augment-manage-list">
-                             <!-- Populated by JS -->
-                         </ul>
-                      </div>
-                 </div>
-             </div>
-             </div>
-         </div> <!-- Close .content-wrapper -->
-
-        <!-- Analysis Tab Content -->
-        <div id="tab-content-analysis" class="tab-content">
-            <div class="section" id="performance-by-bloodline-section">
-                <h2>Performance by Bloodline</h2>
-                <p>Average performance metrics broken down by bloodline.</p>
-                
-                <table id="bloodline-analysis-table">
-                    <thead>
-                      <tr>
-                        <th>Bloodline</th>
-                        <th>Color</th>
-                        <th>Races</th>
-                        <th>Win %</th>
-                        <th>Avg Place</th>
-                        <th>Avg Odds</th>
-                      </tr>
-                    </thead>
-                    <tbody id="bloodline-analysis-body">
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="section" id="augment-analysis-section">
-                <h2>Augment Performance Analysis</h2>
-                
-                <!-- Filters for augment analysis -->
-                <div class="analysis-filter-row">
-                    <div class="analysis-filter-item">
-                        <label for="augment-analysis-bloodline-filter">Bloodline:</label>
-                        <select id="augment-analysis-bloodline-filter" class="pagination-select" style="width: 150px;">
-                            <option value="">All Bloodlines</option>
-                            <option value="Nakamoto">Nakamoto</option>
-                            <option value="Szabo">Szabo</option>
-                            <option value="Finney">Finney</option>
-                            <option value="Buterin">Buterin</option>
-                        </select>
-                    </div>
-                    <div class="analysis-filter-item">
-                        <label for="augment-analysis-min-races">Min Races:</label>
-                        <input type="number" id="augment-analysis-min-races" class="filter-item" style="width: 80px;" value="5">
-                    </div>
-                    <div class="analysis-filter-item">
-                        <button id="augment-analysis-refresh" class="button">Refresh Analysis</button>
-                    </div>
-                </div>
-                
-                <h3>Individual Augment Performance</h3>
-                <div style="overflow-x: auto; margin-bottom: 30px;">
-                    <table id="individual-augment-table">
-                        <thead>
-                          <tr>
-                            <th>Augment</th>
-                            <th>Type</th>
-                            <th>Races</th>
-                            <th>Win %</th>
-                            <th>Avg Place</th>
-                            <th>Avg Odds</th>
-                          </tr>
-                        </thead>
-                        <tbody id="individual-augment-body">
-                            <!-- Populated by JS -->
-                        </tbody>
-                    </table>
-                </div>
-                
-                <h3>Augment Pair Performance</h3>
-                <div style="overflow-x: auto; margin-bottom: 30px;">
-                    <table id="augment-pair-table">
-                        <thead>
-                          <tr>
-                            <th>Augment Pair</th>
-                            <th>Races</th>
-                            <th>Win %</th>
-                            <th>Avg Place</th>
-                            <th>Avg Odds</th>
-                          </tr>
-                        </thead>
-                        <tbody id="augment-pair-body">
-                            <!-- Populated by JS -->
-                        </tbody>
-                    </table>
-                </div>
-                
-                <h3>Triple Augment Performance</h3>
-                <div style="overflow-x: auto;">
-                    <table id="augment-triple-table">
-                        <thead>
-                        <tr>
-                            <th>Augment Combination</th>
-                            <th>Races</th>
-                            <th>Win %</th>
-                            <th>Avg Place</th>
-                            <th>Avg Odds</th>
-                        </tr>
-                        </thead>
-                        <tbody id="augment-triple-body">
-                            <!-- Populated by JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Stats Tab Content -->
-        <div id="tab-content-stats" class="tab-content">
-
-     <!-- Section for Displaying Overall Stats -->
-     <div class="section" id="stats-section">
-        <h2>Overall Statistics</h2>
-        <div id="stats-content">
-            <p>Total Races Recorded: <span id="total-races"></span></p>
-            <p>$ZED Change for Active Racers: <span id="total-zed-change"></span></p>
-            <p>Current Balance of Active Racers: <span id="active-racers-balance"></span></p>
-            <hr style="border-color: var(--border-color); margin: 0.8em 0;">
-            <p>Total Retirement Earnings: <span id="total-retirement-earnings"></span></p>
-            <p>Total Stud Auction Income: <span id="total-stud-auction-income"></span></p>
-            <p>Total Stud Fees Paid: <span id="total-stud-fees"></span></p>
-            <p>Total Sales Income: <span id="total-sales-income"></span></p>
-            <p>Total Purchase Expenses: <span id="total-purchase-expenses"></span></p>
-            <hr style="border-color: var(--border-color); margin: 0.8em 0;">
-            <p><strong>Net Earnings (All Sources):</strong> <strong id="net-earnings" style="font-size: 1.1em;"></strong></p>
-        </div>
-    </div>
-    </div>
-        <div id="tab-content-import" class="tab-content">
-            <!-- ...Import content... -->
-        </div>
-        <div id="tab-content-settings" class="tab-content">
-            <!-- ...Settings content... -->
-        </div>
-
-            <h2>Data Management</h2>
-            <div style="margin-top: 15px;">
-                <button id="export-data-button" class="button">Export All Data</button>
-                <p style="font-size: 0.9em; color: var(--text-muted-color); margin-top: 8px;">
-                    Saves all horses, races, bred records, and augments to a JSON file as a backup.
-                </p>
-            </div>
-            <hr style="margin: 2em 0; border-color: var(--border-color);"> <!-- Separator -->
-            <div style="margin-top: 15px;">
-                <button id="import-data-button" class="button">Import Data from Backup</button>
-                <input type="file" id="import-file-input" accept=".json" style="display: none;">
-                <p style="font-size: 0.9em; color: var(--text-muted-color); margin-top: 8px;">
-                    Loads data from a previously exported JSON backup file.
-                    <strong style="color: var(--error-color);">Warning: This will overwrite all current data in the tracker.</strong>
-                </p>
-            </div>
-            
-            <hr style="margin: 2em 0; border-color: var(--border-color);"> <!-- Separator -->
-            
-            <!-- Add Stud Fee Section -->
-            <h2>Manually Add Stud Fee</h2>
-            <p>Use this if a stud fee wasn't properly recorded in the stats.</p>
-            <div style="margin-top: 15px; display: flex; gap: 10px; align-items: flex-end;">
-                <div>
-                    <label for="manual-stud-fee-bred-horse" style="display: block; margin-bottom: 5px;">Select Bred Horse:</label>
-                    <select id="manual-stud-fee-bred-horse" style="width: 250px; padding: 10px; height: 42px; box-sizing: border-box;">
-                        <option value="">--Select Bred Horse--</option>
-                        <!-- Options populated by JS -->
-                    </select>
-                </div>
-                <div>
-                    <label for="manual-stud-fee-amount" style="display: block; margin-bottom: 5px;">Stud Fee Amount:</label>
-                    <input type="number" id="manual-stud-fee-amount" step="any" style="width: 120px; padding: 10px; height: 42px; box-sizing: border-box;">
-                </div>
-                <button id="update-stud-fee-button" class="button" style="height: 42px; margin-bottom: 0; align-self: flex-end; box-sizing: border-box;">Update Stud Fee</button>
-            </div>
-            <!-- Import functionality could be added here later -->
-        </div>
-     
-        <!-- End Settings Tab Content -->
         <script>
-            // 1️⃣ Define your color palettes per bloodline.
+        // 1️⃣ Define your color palettes per bloodline.
 
         const breedColorOptions = {
         Nakamoto: {
