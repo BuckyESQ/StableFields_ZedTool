@@ -6,6 +6,9 @@
             constructor() {
             this.apiBase = 'https://api.zedchampions.com'; // Make sure https:// is included
             this.authManager = window.zedAuth;
+             // Add CORS proxy for development
+            this.useProxy = true;  // Set to false in production
+            this.proxyUrl = 'https://corsproxy.io/?';
         }
             /**
              * Test connection to the ZED Champions API
@@ -111,12 +114,17 @@
                     throw new Error("No API token available");
                 }
                 console.log("Token header:", `Bearer ${token.substring(0, 10)}...`);
+                
                 // Ensure the endpoint starts with a slash
                 if (!endpoint.startsWith('/')) {
                     endpoint = '/' + endpoint;
                 }
-                const url = `${this.apiBase}${endpoint}`;
+                
+                // Use proxy in development environments
+                const baseUrl = this.useProxy ? `${this.proxyUrl}${this.apiBase}` : this.apiBase;
+                const url = `${baseUrl}${endpoint}`;
                 console.log("Attempting API request to:", url);
+                
                 const headers = {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
@@ -129,7 +137,6 @@
                 });
             } catch (error) {
                 console.error(`Network request failed: ${endpoint}`, error);
-                // Rethrow with a more user-friendly message
                 throw new Error("Network request failed. Please check your internet connection.");
             }
         }
