@@ -3847,8 +3847,7 @@
         // --- Rendering ---
         function renderHorsesTable() {
             horsesTableBody.innerHTML = '';
-            console.log("Rendering horse:", horseData.name, horseData);
-
+            
             // 1. Get the correctly filtered list of horses WITH their stats
             const filteredHorsesWithStats = getFilteredRacingHorses();
 
@@ -3916,6 +3915,8 @@
                 const horse = horseData; // Original horse data
                 const stats = horseData.calculatedStats; // Pre-calculated stats
 
+                console.log("Rendering horse:", horseData.name, horseData);
+                
                 const row = horsesTableBody.insertRow();
                 const formatStars = (stars) => (stars !== null && stars !== undefined && stars !== '') ? Number(stars).toFixed(1) : '-';
                 const formatAvgOdds = (avgOdds) => (avgOdds !== null && avgOdds !== undefined) ? avgOdds.toFixed(1) : 'N/A';
