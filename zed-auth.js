@@ -56,16 +56,33 @@ class ZedAuthManager {
      * Checks if the token is expired
      */
     isTokenExpired() {
-        const expiryStr = localStorage.getItem(this.tokenExpiryKey);
-        if (!expiryStr) return true; // No expiry means assume expired
+        if (!this.getToken()) return true;
         
-        const expiryTime = new Date(expiryStr).getTime();
-        const now = Date.now();
-        
-        // Add 5-minute buffer to prevent edge cases
-        return now >= (expiryTime - (5 * 60 * 1000));
+        try {
+            const token = this.getToken();
+            const payload = this.parseJwt(token);
+            
+            // Get expiry from payload (exp is in seconds since epoch)
+            const expiryTime = payload.exp * 1000; // Convert to milliseconds
+            const now = Date.now();
+            
+            // Store expiry time for reference
+            localStorage.setItem(this.tokenExpiryKey, new Date(expiryTime).toISOString());
+            
+            console.log('Token expiry check:', {
+                now: new Date(now).toISOString(),
+                expiryTime: new Date(expiryTime).toISOString(),
+                timeLeft: Math.round((expiryTime - now) / (60 * 1000)) + ' minutes',
+                expired: now >= expiryTime
+            });
+            
+            // Simple check: is current time past expiration? (removed buffer)
+            return now >= expiryTime;
+        } catch (e) {
+            console.error('Error checking token expiration:', e);
+            return true; // Assume expired on error
+        }
     }
-
     /**
      * Gets token expiry details
      */
