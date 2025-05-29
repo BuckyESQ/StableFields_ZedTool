@@ -4,9 +4,9 @@
      */
         class ZedApiService {
             constructor() {
-                this.apiBase = 'https://api.zedchampions.com';
-                this.authManager = window.zedAuth;
-            }
+            this.apiBase = 'https://api.zedchampions.com'; // Make sure https:// is included
+            this.authManager = window.zedAuth;
+        }
             /**
              * Test connection to the ZED Champions API
              */
@@ -110,8 +110,13 @@
                 if (!token) {
                     throw new Error("No API token available");
                 }
-                
+                console.log("Token header:", `Bearer ${token.substring(0, 10)}...`);
+                // Ensure the endpoint starts with a slash
+                if (!endpoint.startsWith('/')) {
+                    endpoint = '/' + endpoint;
+                }
                 const url = `${this.apiBase}${endpoint}`;
+                console.log("Attempting API request to:", url);
                 const headers = {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
