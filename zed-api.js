@@ -179,9 +179,9 @@
                             <!-- Hidden username field to satisfy browser autofill -->
                             <input type="text" name="fakeusernameremembered" style="display:none;">
                             <label for="zed-api-token">API Token:</label>
-                            <input type="password" id="zed-api-token" placeholder="Paste Bearer token here..." 
-                                autocomplete="new-password" 
-                                style="width: 100%; font-family: monospace;">
+                            <textarea id="zed-api-token" placeholder="Paste Bearer token here..." 
+                                style="width: 100%; font-family: monospace; height: 38px; resize: none; padding: 8px;"
+                                autocomplete="off" data-lpignore="true"></textarea>
                         </div>
                         <div style="display: flex; align-items: flex-end;">
                             <button id="save-api-token-btn" class="button">Save Token</button>
