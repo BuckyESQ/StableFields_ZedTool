@@ -1282,155 +1282,206 @@
 
      <h1>Zed Champions Tracker</h1>
 
-    <!-- Tab Navigation -->
-    <div id="tab-buttons">
-        <button class="tab-button active" data-tab="racing">Racing</button>
-        <button class="tab-button" data-tab="breeding">Breeding</button>
-        <button class="tab-button" data-tab="transactions">Transactions</button>
-        <button class="tab-button" data-tab="augments">Augments List</button>
-        <button class="tab-button" data-tab="analysis">Analysis</button>
-        <button class="tab-button" data-tab="stats">Overall Stats</button>
-        <button class="tab-button" data-tab="import">Import</button>
-        <button class="tab-button" data-tab="settings">Settings</button>
-    </div>
-    <!-- Tab Content -->
-    <div id="tab-content">
-        <!-- Racing Tab Content -->
-        <div id="tab-content-racing" class="tab-content active">
-            <!-- ...Racing content... -->
+    <!-- ...existing code above... -->
+
+        <!-- Tab Navigation -->
+        <div id="tab-buttons">
+            <button class="tab-button active" data-tab="racing">Racing</button>
+            <button class="tab-button" data-tab="breeding">Breeding</button>
+            <button class="tab-button" data-tab="transactions">Transactions</button>
+            <button class="tab-button" data-tab="augments">Augments List</button>
+            <button class="tab-button" data-tab="analysis">Analysis</button>
+            <button class="tab-button" data-tab="stats">Overall Stats</button>
+            <button class="tab-button" data-tab="import">Import</button>
+            <button class="tab-button" data-tab="settings">Settings</button>
         </div>
 
-        <!-- Breeding Tab Content -->
-        <div id="tab-content-breeding" class="tab-content">
-            <!-- ...Breeding content... -->
+        <!-- Tab Content -->
+        <div id="tab-content">
+            <!-- Racing Tab Content -->
+            <div id="tab-content-racing" class="tab-content active">
+                <!-- Place ALL Racing tab content here (forms, tables, etc.) -->
+                <!-- ...Racing Horses section, Add Race, Race History, etc... -->
+            </div>
+
+            <!-- Breeding Tab Content -->
+            <div id="tab-content-breeding" class="tab-content">
+                <!-- Place ALL Breeding tab content here (forms, tables, etc.) -->
+                <!-- ...Breeding Horses, Stud Auction, Bred Horses, etc... -->
+            </div>
+
+            <!-- Transactions Tab Content -->
+            <div id="tab-content-transactions" class="tab-content">
+                <!-- Place ALL Transactions tab content here (forms, tables, etc.) -->
+            </div>
+
+            <!-- Augments Tab Content -->
+            <div id="tab-content-augments" class="tab-content">
+                <!-- Place ALL Augments List tab content here (forms, lists, etc.) -->
+            </div>
+
+            <!-- Analysis Tab Content -->
+            <div id="tab-content-analysis" class="tab-content">
+                <!-- Place ALL Analysis tab content here (tables, filters, etc.) -->
+            </div>
+
+            <!-- Stats Tab Content -->
+            <div id="tab-content-stats" class="tab-content">
+                <!-- Place ALL Overall Stats tab content here -->
+                <div class="section" id="stats-section">
+                    <h2>Overall Statistics</h2>
+                    <div id="stats-content">
+                        <p>Total Races Recorded: <span id="total-races"></span></p>
+                        <p>$ZED Change for Active Racers: <span id="total-zed-change"></span></p>
+                        <p>Current Balance of Active Racers: <span id="active-racers-balance"></span></p>
+                        <hr style="border-color: var(--border-color); margin: 0.8em 0;">
+                        <p>Total Retirement Earnings: <span id="total-retirement-earnings"></span></p>
+                        <p>Total Stud Auction Income: <span id="total-stud-auction-income"></span></p>
+                        <p>Total Stud Fees Paid: <span id="total-stud-fees"></span></p>
+                        <p>Total Sales Income: <span id="total-sales-income"></span></p>
+                        <p>Total Purchase Expenses: <span id="total-purchase-expenses"></span></p>
+                        <hr style="border-color: var(--border-color); margin: 0.8em 0;">
+                        <p><strong>Net Earnings (All Sources):</strong> <strong id="net-earnings" style="font-size: 1.1em;"></strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Import Tab Content -->
+            <div id="tab-content-import" class="tab-content">
+                <h2>Data Management</h2>
+                <div style="margin-top: 15px;">
+                    <button id="export-data-button" class="button">Export All Data</button>
+                    <p style="font-size: 0.9em; color: var(--text-muted-color); margin-top: 8px;">
+                        Saves all horses, races, bred records, and augments to a JSON file as a backup.
+                    </p>
+                </div>
+                <hr style="margin: 2em 0; border-color: var(--border-color);">
+                <div style="margin-top: 15px;">
+                    <button id="import-data-button" class="button">Import Data from Backup</button>
+                    <input type="file" id="import-file-input" accept=".json" style="display: none;">
+                    <p style="font-size: 0.9em; color: var(--text-muted-color); margin-top: 8px;">
+                        Loads data from a previously exported JSON backup file.
+                        <strong style="color: var(--error-color);">Warning: This will overwrite all current data in the tracker.</strong>
+                    </p>
+                </div>
+                <hr style="margin: 2em 0; border-color: var(--border-color);">
+                <h2>Manually Add Stud Fee</h2>
+                <p>Use this if a stud fee wasn't properly recorded in the stats.</p>
+                <div style="margin-top: 15px; display: flex; gap: 10px; align-items: flex-end;">
+                    <div>
+                        <label for="manual-stud-fee-bred-horse" style="display: block; margin-bottom: 5px;">Select Bred Horse:</label>
+                        <select id="manual-stud-fee-bred-horse" style="width: 250px; padding: 10px; height: 42px; box-sizing: border-box;">
+                            <option value="">--Select Bred Horse--</option>
+                            <!-- Options populated by JS -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="manual-stud-fee-amount" style="display: block; margin-bottom: 5px;">Stud Fee Amount:</label>
+                        <input type="number" id="manual-stud-fee-amount" step="any" style="width: 120px; padding: 10px; height: 42px; box-sizing: border-box;">
+                    </div>
+                    <button id="update-stud-fee-button" class="button" style="height: 42px; margin-bottom: 0; align-self: flex-end; box-sizing: border-box;">Update Stud Fee</button>
+                </div>
+                <!-- The ZedChampions API integration and import UI will be injected here by JS -->
+            </div>
+
+            <!-- Settings Tab Content -->
+            <div id="tab-content-settings" class="tab-content">
+                <!-- Place ALL Settings tab content here -->
+                <!-- The ZedChampions API integration and import UI will be injected here by JS if needed -->
+            </div>
         </div>
+<!-- ...existing code below... -->
+    <h3>Add New Racing Horse</h3>
+        <form id="add-horse-form">
+            <div class="form-grid">
 
-        <!-- Transactions Tab Content -->
-        <div id="tab-content-transactions" class="tab-content">
-            <!-- ...Transactions content... -->
-        </div>
+            <!-- Name -->
+            <div>
+                <label for="horse-name">Name:</label>
+                <input type="text" id="horse-name" required>
+            </div>
 
-        <!-- Augments Tab Content -->
-        <div id="tab-content-augments" class="tab-content">
-            <!-- ...Augments content... -->
-        </div>
-
-        <!-- Analysis Tab Content -->
-        <div id="tab-content-analysis" class="tab-content">
-            <!-- ...Analysis content... -->
-        </div>
-
-        <!-- Stats Tab Content -->
-        <div id="tab-content-stats" class="tab-content">
-            <!-- ...Stats content... -->
-        </div>
-
-        <!-- Import Tab Content -->
-        <div id="tab-content-import" class="tab-content">
-            <!-- ...Import content... -->
-        </div>
-
-        <!-- Settings Tab Content -->
-        <div id="tab-content-settings" class="tab-content">
-            <!-- ...Settings content... -->
-        </div>
-    </div>
-            <!-- Section for Managing Racing Horses -->
-    <div class="section" id="horses-section">
-                <h2>Racing Horses</h2>
-                <div class="content-wrapper">
-
-  <h3>Add New Racing Horse</h3>
-  <form id="add-horse-form">
-    <div class="form-grid">
-
-      <!-- Name -->
-      <div>
-        <label for="horse-name">Name:</label>
-        <input type="text" id="horse-name" required>
-      </div>
-
-      <!-- Bloodline -->
-      <div>
-  <label for="horse-bloodline">Bloodline:</label>
-    <select id="horse-bloodline" required>
-        <option value="">--Select--</option>
-        <option value="Nakamoto">Nakamoto</option>
-        <option value="Szabo">Szabo</option>
-        <option value="Finney">Finney</option>
-        <option value="Buterin">Buterin</option>
-    </select>
-</div>
-
- <!-- Color -->
-<div>
-  <label for="horse-color">Color:</label>
-    <select id="horse-color" required>
-        <option value="">--Select Color--</option>
-    <!-- Populated dynamically -->
-    </select>
-</div>
-
-    <!-- TRAITS / ATTRIBUTE DISPLAY (add after Color, can style as needed) -->
-    <div style="margin-top:8px;">
-        <label style="color:#77ffe7;font-weight:600;">Traits:</label>
-        <ul id="horse-traits" style="display:none;"></ul>
-        <label style="color:#f6b600;font-weight:600;">Attribute:</label>
-        <ul id="horse-attributes" style="display:none;"></ul>
-    </div>
-        </div>
-        </div>
-        <div>
-            <label for="horse-gender">Gender:</label>
-            <select id="horse-gender" required>
-            <option value="">--Select--</option>
-            <option value="Female">Female</option>
-            <option value="Male">Male</option>
+            <!-- Bloodline -->
+            <div>
+        <label for="horse-bloodline">Bloodline:</label>
+            <select id="horse-bloodline" required>
+                <option value="">--Select--</option>
+                <option value="Nakamoto">Nakamoto</option>
+                <option value="Szabo">Szabo</option>
+                <option value="Finney">Finney</option>
+                <option value="Buterin">Buterin</option>
             </select>
         </div>
 
-      <!-- Overall Stars -->
-      <div>
-        <label for="horse-stars">Overall Stars:</label>
-        <input type="number" id="horse-stars" step="0.1" min="1" required>
-      </div>
+        <!-- Color -->
+        <div>
+        <label for="horse-color">Color:</label>
+            <select id="horse-color" required>
+                <option value="">--Select Color--</option>
+            <!-- Populated dynamically -->
+            </select>
+        </div>
 
-      <!-- Initial $ZED Balance -->
-      <div>
-        <label for="horse-zed-balance">Initial $ZED Balance:</label>
-        <input type="number" id="horse-zed-balance" step="any" value="0" required>
-      </div>
+            <!-- TRAITS / ATTRIBUTE DISPLAY (add after Color, can style as needed) -->
+            <div style="margin-top:8px;">
+                <label style="color:#77ffe7;font-weight:600;">Traits:</label>
+                <ul id="horse-traits" style="display:none;"></ul>
+                <label style="color:#f6b600;font-weight:600;">Attribute:</label>
+                <ul id="horse-attributes" style="display:none;"></ul>
+            </div>
+                </div>
+                </div>
+                <div>
+                    <label for="horse-gender">Gender:</label>
+                    <select id="horse-gender" required>
+                    <option value="">--Select--</option>
+                    <option value="Female">Female</option>
+                    <option value="Male">Male</option>
+                    </select>
+                </div>
 
-      <!-- Initial Matchmaking Rating -->
-      <div>
-        <label for="horse-mm-rating">Initial Matchmaking Rating:</label>
-        <input type="number" id="horse-mm-rating" step="1" value="1000" required>
-      </div>
+            <!-- Overall Stars -->
+            <div>
+                <label for="horse-stars">Overall Stars:</label>
+                <input type="number" id="horse-stars" step="0.1" min="1" required>
+            </div>
 
-      <!-- Speed Stars -->
-      <div>
-        <label for="horse-speed-stars">Speed Stars:</label>
-        <input type="number" id="horse-speed-stars" step="0.1" min="0" placeholder="Optional">
-      </div>
+            <!-- Initial $ZED Balance -->
+            <div>
+                <label for="horse-zed-balance">Initial $ZED Balance:</label>
+                <input type="number" id="horse-zed-balance" step="any" value="0" required>
+            </div>
 
-      <!-- Sprint Stars -->
-      <div>
-        <label for="horse-sprint-stars">Sprint Stars:</label>
-        <input type="number" id="horse-sprint-stars" step="0.1" min="0" placeholder="Optional">
-      </div>
+            <!-- Initial Matchmaking Rating -->
+            <div>
+                <label for="horse-mm-rating">Initial Matchmaking Rating:</label>
+                <input type="number" id="horse-mm-rating" step="1" value="1000" required>
+            </div>
 
-      <!-- Endurance Stars -->
-      <div>
-        <label for="horse-endurance-stars">Endurance Stars:</label>
-        <input type="number" id="horse-endurance-stars" step="0.1" min="0" placeholder="Optional">
-      </div>
+            <!-- Speed Stars -->
+            <div>
+                <label for="horse-speed-stars">Speed Stars:</label>
+                <input type="number" id="horse-speed-stars" step="0.1" min="0" placeholder="Optional">
+            </div>
 
-      <!-- Submit -->
-      <div>
-        <button type="submit">Add Racing Horse</button>
-      </div>
+            <!-- Sprint Stars -->
+            <div>
+                <label for="horse-sprint-stars">Sprint Stars:</label>
+                <input type="number" id="horse-sprint-stars" step="0.1" min="0" placeholder="Optional">
+            </div>
 
-    </div> <!-- /.form-grid -->
+            <!-- Endurance Stars -->
+            <div>
+                <label for="horse-endurance-stars">Endurance Stars:</label>
+                <input type="number" id="horse-endurance-stars" step="0.1" min="0" placeholder="Optional">
+            </div>
+
+            <!-- Submit -->
+            <div>
+                <button type="submit">Add Racing Horse</button>
+            </div>
+
+        </div> <!-- /.form-grid -->
                 </form>
                     <select id="horse-filter-bloodline" class="filter-item">
                         <option value="">All Bloodlines</option>
