@@ -3682,12 +3682,25 @@
             });
          }
 
+        // 1. First, fix the updateHorseDropdown function
         function updateHorseDropdown() {
+            console.log("Updating horse dropdown with racing horses:", horses.filter(h => h.status === 'racing').length);
+            
+            if (!raceHorseSelect) {
+                console.error("Race horse select element not found!");
+                return;
+            }
+            
+            // Clear existing options
             raceHorseSelect.innerHTML = '<option value="">--Select Racing Horse--</option>';
+            
             // Only use active racing horses for the race form dropdown
             const racingHorses = horses.filter(h => h.status === 'racing');
+            
             // Sort the racing horses alphabetically by name
             racingHorses.sort((a, b) => a.name.localeCompare(b.name));
+            
+            console.log("Found racing horses to add to dropdown:", racingHorses.length);
             
             racingHorses.forEach(horse => {
                 const option = document.createElement('option');
@@ -3695,10 +3708,6 @@
                 option.textContent = horse.name;
                 raceHorseSelect.appendChild(option);
             });
-             // Try to restore previous selection
-             if (horses.some(h => h.id === raceHorseSelect.value && h.status === 'racing')) {
-                raceHorseSelect.value = raceHorseSelect.value;
-             }
         }
 
         function updateParentDropdowns() {
@@ -3835,7 +3844,62 @@
                 const row = horsesTableBody.insertRow();
                 const formatStars = (stars) => (stars !== null && stars !== undefined && stars !== '') ? Number(stars).toFixed(1) : '-';
                 const formatAvgOdds = (avgOdds) => (avgOdds !== null && avgOdds !== undefined) ? avgOdds.toFixed(1) : 'N/A';
-
+            
+            // Add this function after your data storage definitions (around line 3810-3850)
+            function debugRacesAndHorses() {
+                console.group("🔍 DEBUG INFORMATION");
+                
+                // Debug races data
+                console.log("📊 Total races:", races.length);
+                const racesWithNoHorseId = races.filter(r => !r.horseId);
+                console.log("⚠️ Races with missing horseId:", racesWithNoHorseId.length);
+                if (racesWithNoHorseId.length > 0) {
+                    console.log("First 5 problematic races:", racesWithNoHorseId.slice(0, 5));
+                }
+                
+                // Debug horses data
+                console.log("🐎 Total horses:", horses.length);
+                console.log("🏇 Racing horses:", horses.filter(h => h.status === 'racing').length);
+                console.log("🐴 Breeding horses:", horses.filter(h => h.status === 'breeding').length);
+                
+                // Debug race horse dropdown
+                console.log("📋 Race horse select element exists:", !!raceHorseSelect);
+                if (raceHorseSelect) {
+                    console.log("📋 Options in race horse dropdown:", raceHorseSelect.options.length);
+                }
+                
+                // Debug race table
+                console.log("📋 Races table body exists:", !!racesTableBody);
+                if (racesTableBody) {
+                    console.log("📋 Current rows in races table:", racesTableBody.children.length);
+                }
+                
+                // Check for table header with Horse column
+                const racesTable = document.getElementById('races-table');
+                if (racesTable) {
+                    const headers = Array.from(racesTable.querySelectorAll('thead th')).map(th => th.textContent.trim());
+                    console.log("📋 Race table headers:", headers);
+                    console.log("📋 Contains 'Horse' column:", headers.includes('Horse'));
+                } else {
+                    console.log("⚠️ Races table not found");
+                }
+                
+                // Examine any recent race rendering issues
+                const lastRace = races[races.length - 1];
+                if (lastRace) {
+                    const horse = horses.find(h => h.id === lastRace.horseId);
+                    console.log("🏇 Last race details:", {
+                        raceId: lastRace.id,
+                        horseId: lastRace.horseId,
+                        horseName: horse ? horse.name : 'NOT FOUND',
+                        date: lastRace.date
+                    });
+                }
+                
+                console.groupEnd();
+                
+                return "Debug information logged to console. Check the browser console (F12) for details.";
+            }
                 // --- UPDATED INNER HTML with Avg Odds column ---
                row.innerHTML = `
                     <td style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 12px;">${horse.name || 'Unknown'}</td>
@@ -3931,7 +3995,15 @@
             }
         }
 
+        // 3. Fix the renderRacesTable function to properly display horses
         function renderRacesTable() {
+            console.log("Rendering races table with", races.length, "races");
+            
+            if (!racesTableBody) {
+                console.error("Races table body element not found!");
+                return;
+            }
+            
             racesTableBody.innerHTML = '';
             const sortedRaces = [...races].sort((a, b) => new Date(b.date) - new Date(a.date));
 
@@ -3948,14 +4020,19 @@
             // Render the sliced rows
             racesToShow.forEach(race => {
                 const horse = horses.find(h => h.id === race.horseId);
+                const horseName = horse ? horse.name : 'Unknown Horse';
+                
+                console.log("Rendering race for horse:", horseName, "with ID:", race.horseId);
+                
                 const row = racesTableBody.insertRow();
+                
                 // Updated row structure to include horse name column
                 row.innerHTML = `
                     <td>${race.raceDate ? new Date(race.raceDate).toLocaleDateString() : (race.date ? new Date(race.date).toLocaleDateString() : '-')}</td>
                     <td>${race.raceName || '-'}</td>
-                    <td>${horse ? horse.name : 'N/A'}</td>
-                    <td>${race.position}</td>
-                    <td>${race.odds}</td>
+                    <td>${horseName}</td>
+                    <td>${race.position || '-'}</td>
+                    <td>${race.odds || '-'}</td>
                     <td>${race.finishTime ? race.finishTime.toFixed(3) : '-'}</td>
                     <td>${race.split1 !== null && race.split1 !== undefined ? race.split1 : '-'}</td>
                     <td>${race.split2 !== null && race.split2 !== undefined ? race.split2 : '-'}</td>
