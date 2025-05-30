@@ -12,8 +12,8 @@ class ZedApiService {
         this.apiBase = 'https://api.zedchampions.com';
         this.authManager = window.zedAuth;
         
-        // IMPORTANT: Always use the CORS proxy in production
-        this.useProxy = true;
+       // For production, we NEED to use the proxy
+        this.useProxy = true; // Changed from !this.isProduction to always use proxy
         this.proxyUrl = 'https://corsproxy.io/?';
         
         console.log(`Running in ${this.isProduction ? 'production' : 'development'} mode with proxy: ${this.useProxy}`);
