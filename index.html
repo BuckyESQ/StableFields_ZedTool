@@ -2436,7 +2436,7 @@
         
         // Foal Prediction Algorithm - Insert after forms array, before onBloodlineChange function
 
-          function calculateStars(sireStars, damStars) {
+        function calculateStars(sireStars, damStars) {
         // Get values as numbers, defaulting to 0 if not provided
         const sireVal = parseFloat(sireStars) || 0;
         const damVal = parseFloat(damStars) || 0;
@@ -2454,14 +2454,14 @@
         predictedStars = Math.max(Math.min(predictedStars, Math.max(sireVal, damVal) + 0.5), Math.min(sireVal, damVal) - 0.3);
         
         return predictedStars.toFixed(1);
-}
+    }
 
-        function predictFoalBloodline(sire, dam) {
-            if (!sire || !dam) return "Unknown";
-            
-            // 75% chance to inherit from sire, 25% from dam
-            return Math.random() < 0.75 ? sire.bloodline : dam.bloodline;
-        }
+    function predictFoalBloodline(sire, dam) {
+        if (!sire || !dam) return "Unknown";
+        
+        // 75% chance to inherit from sire, 25% from dam
+        return Math.random() < 0.75 ? sire.bloodline : dam.bloodline;
+    }
 
         function predictFoal(sire, dam) {
             if (!sire || !dam) return null;
@@ -3131,6 +3131,12 @@
             });
             if (colorEl.options.length > 1) colorEl.selectedIndex = 1;
             }
+        if (!getColorLabel) {
+        // Fallback if getColorLabel function is missing
+        function getColorLabel(bloodline, hex) {
+            return hex || '';
+        }
+    }    
         }
 
         // Update traits
