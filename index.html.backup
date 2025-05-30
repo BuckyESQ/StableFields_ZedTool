@@ -3162,39 +3162,44 @@
             };
         // --- Bloodline Change Handler ---
         function onBloodlineChange(bloodId, colorId, traitsId, attrsId) {
-    const bloodEl = document.getElementById(bloodId);
-    const colorEl = document.getElementById(colorId);
-    const traitsEl = document.getElementById(traitsId);
-    const attrsEl = document.getElementById(attrsId);
+        const bloodEl = document.getElementById(bloodId);
+        const colorEl = document.getElementById(colorId);
+        const traitsEl = document.getElementById(traitsId);
+        const attrsEl = document.getElementById(attrsId);
 
-    // Update color options
-    if (bloodEl && colorEl) {
-        colorEl.innerHTML = '<option value="">--Select Color--</option>';
-        const blood = bloodEl.value;
-        if (blood && breedColorOptions[blood]) {
+        // Update color options
+        if (bloodEl && colorEl) {
+            colorEl.innerHTML = '<option value="">--Select Color--</option>';
+            const blood = bloodEl.value;
+            if (blood && breedColorOptions[blood]) {
             ["normal","rare","super rare"].forEach(rarity => {
                 const group = breedColorOptions[blood][rarity];
                 if (group && group.length) {
-                    const optgroup = document.createElement('optgroup');
-                    optgroup.label = rarity.charAt(0).toUpperCase() + rarity.slice(1);
-                    group.forEach(c => {
-                        const o = document.createElement('option');
-                        o.value = c.hex;
-                        o.textContent = `${c.label} (${c.hex})`;
-                        o.title = c.hex;
-                        o.style.backgroundColor = c.hex;
-                        o.setAttribute('data-rarity', rarity);
-                        optgroup.appendChild(o);
-                    });
-                    colorEl.appendChild(optgroup);
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = rarity.charAt(0).toUpperCase() + rarity.slice(1);
+                group.forEach(c => {
+                    const o = document.createElement('option');
+                    o.value = c.hex;
+                    o.textContent = `${c.label} (${c.hex})`;
+                    o.title = c.hex;
+                    o.style.backgroundColor = c.hex;
+                    o.setAttribute('data-rarity', rarity);
+                    optgroup.appendChild(o);
+                });
+                colorEl.appendChild(optgroup);
                 }
             });
             if (colorEl.options.length > 1) colorEl.selectedIndex = 1;
+            }
+        if (!getColorLabel) {
+        // Fallback if getColorLabel function is missing
+        function getColorLabel(bloodline, hex) {
+            return hex || '';
         }
-    }
+    }    
+        }
 
-    // Update traits and attributes as before...
-
+        // Update traits
         if (bloodEl && traitsEl) {
             traitsEl.innerHTML = '';
             (bloodlineTraits[bloodEl.value] || []).forEach(t => {
@@ -5675,11 +5680,10 @@ function handleAddRace(event) {
              }
         }
 
-        const tabButtons = document.querySelectorAll('.tab-button');
-        const tabContents = document.querySelectorAll('.tab-content');
-
         function activateTab(tabId) {
     console.log(`Attempting to activate tab: ${tabId}`);
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
     
     tabButtons.forEach(button => {
         button.classList.toggle('active', button.dataset.tab === tabId);
