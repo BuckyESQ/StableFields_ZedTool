@@ -4275,6 +4275,65 @@
             sireSelect.addEventListener('change', (e) => displayParentStats(e.target.value, 'sire'));
             damSelect.addEventListener('change', (e) => displayParentStats(e.target.value, 'dam'));
 
+        // Add predict foal button listener - ADD THIS CODE HERE
+        const predictButton = document.getElementById('predict-foal-btn');
+        if (predictButton) {
+            predictButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                
+                const sireSelect = document.getElementById('predict-sire');
+                const damSelect = document.getElementById('predict-dam');
+                const resultDiv = document.getElementById('foal-prediction-result');
+                
+                if (!sireSelect || !damSelect || !resultDiv) {
+                    console.error("Missing required elements for foal prediction");
+                    return;
+                }
+                
+                const sireName = sireSelect.value;
+                const damName = damSelect.value;
+                
+                if (!sireName || !damName) {
+                    resultDiv.innerHTML = '<p style="color:var(--error-color)">Please select both sire and dam</p>';
+                    return;
+                }
+                
+                // Find the horses by name in the horses array
+                const sire = horses.find(h => h.name === sireName && h.gender === 'Male');
+                const dam = horses.find(h => h.name === damName && h.gender === 'Female');
+                
+                if (!sire || !dam) {
+                    resultDiv.innerHTML = '<p style="color:var(--error-color)">Selected horses not found</p>';
+                    return;
+                }
+                
+                // Get the prediction
+                const prediction = predictFoal(sire, dam);
+                if (!prediction) {
+                    resultDiv.innerHTML = '<p style="color:var(--error-color)">Could not generate prediction</p>';
+                    return;
+                }
+                
+                // Display detailed results with styling
+                resultDiv.innerHTML = `
+                    <div style="padding: 15px; background-color: var(--section-bg); border-radius: 8px; margin-top: 10px;">
+                        <h4 style="margin-top: 0; color: var(--accent-color);">Predicted Foal Attributes</h4>
+                        <p><strong>Bloodline:</strong> ${prediction.bloodline}</p>
+                        <p><strong>Gender:</strong> ${prediction.gender}</p>
+                        <p><strong>Color:</strong> <span class="swatch" style="background-color:${prediction.color};"></span> ${getColorLabel(prediction.bloodline, prediction.color)}</p>
+                        <p><strong>Overall Stars:</strong> ${prediction.overallStars}</p>
+                        <p><strong>Speed Stars:</strong> ${prediction.speedStars || 'Unknown'}</p>
+                        <p><strong>Sprint Stars:</strong> ${prediction.sprintStars || 'Unknown'}</p>
+                        <p><strong>Endurance Stars:</strong> ${prediction.enduranceStars || 'Unknown'}</p>
+                        <p style="font-size: 0.9em; color: var(--text-muted-color);">Note: Results are estimates and may vary.</p>
+                    </div>
+                `;
+                
+                // Add animation effect
+                resultDiv.style.animation = "fadeIn 0.5s ease-in-out";
+            });
+        }    
+
             // Add event listener for External Sire Bloodline change
             document.getElementById('external-sire-bloodline').addEventListener('change', function() {
                 populateColorOptionsFor('external-sire-bloodline', 'external-sire-color');
