@@ -3,7 +3,7 @@
  * Handles authentication token management and API response processing
  */
 
-class ZedApiService {
+        class ZedApiService {
     constructor() {
         // Detect if we're on the production domain
         this.isProduction = window.location.hostname.includes('stablefields.com');
@@ -12,7 +12,7 @@ class ZedApiService {
         this.apiBase = 'https://api.zedchampions.com';
         this.authManager = window.zedAuth;
         
-       // For production, we NEED to use the proxy
+        // For production, we NEED to use the proxy
         this.useProxy = true; // Changed from !this.isProduction to always use proxy
         this.proxyUrl = 'https://corsproxy.io/?';
         
@@ -39,7 +39,8 @@ class ZedApiService {
             }
             
             // Always use proxy in production
-            const baseUrl = this.useProxy ? `${this.proxyUrl}${this.apiBase}` : this.apiBase;
+            const useProxy = true; // Force proxy usage
+            const baseUrl = useProxy ? `${this.proxyUrl}${this.apiBase}` : this.apiBase;
             const url = `${baseUrl}${endpoint}`;
             console.log("Attempting API request to:", url);
             
@@ -49,20 +50,12 @@ class ZedApiService {
                 ...options.headers
             };
             
-            const response = await fetch(url, {
+            return await fetch(url, {
                 ...options,
                 headers
             });
-            
-            if (!response.ok) {
-                console.error(`API error: ${response.status} ${response.statusText}`);
-            }
-            
-            return response;
-            
         } catch (error) {
-            console.error("Network request failed:", endpoint);
-            console.error(error);
+            console.error("API request failed:", error);
             throw error;
         }
     }
