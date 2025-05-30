@@ -2243,12 +2243,66 @@
                 <div class="section">
                     <h2>Import from ZedChampions</h2>
                     <p>Import your horses directly from your ZedChampions account.</p>
-                <div id="api-import-container">
-                    <!-- This container will be populated by the ZedAuthUI -->
+                    
+                    <!-- API Token Section -->
+                    <div class="section">
+                        <h3>ZED Champions API Connection</h3>
+                        <p>Connect with your ZED Champions API key to import your horses.</p>
+                        
+                        <div class="form-grid">
+                            <div>
+                                <label for="api-token">API Token:</label>
+                                <input type="text" id="api-token" placeholder="Paste your ZED Champions API token here">
+                            </div>
+                            <div>
+                                <button id="test-connection-button" class="button">Test Connection</button>
+                            </div>
+                        </div>
+                        
+                        <div id="api-connection-status" style="display:none; margin-top: 15px; padding: 10px;"></div>
+                    </div>
+                    
+                    <!-- Import Racing Stable -->
+                    <div class="section">
+                        <h3>Import Racing Horses</h3>
+                        <p>Import your active racing horses from ZED Champions.</p>
+                        <button id="import-racing-stable-button" class="button">Import Racing Stable</button>
+                        <div id="racing-import-status" style="display:none; margin-top: 15px; padding: 10px;"></div>
+                    </div>
+                    
+                    <!-- Import Breeding Stable -->
+                    <div class="section">
+                        <h3>Import Breeding Horses</h3>
+                        <p>Import your active breeding horses from ZED Champions.</p>
+                        <button id="import-breeding-stable-button" class="button">Import Breeding Stable</button>
+                        <div id="breeding-import-status" style="display:none; margin-top: 15px; padding: 10px;"></div>
+                    </div>
+                    
+                    <!-- Import Single Horse -->
+                    <div class="section">
+                        <h3>Import Single Horse</h3>
+                        <p>Import a specific horse by its ID.</p>
+                        <div class="form-grid">
+                            <div>
+                                <label for="zed-horse-id">Horse ID:</label>
+                                <input type="text" id="zed-horse-id" placeholder="Enter ZED Champions Horse ID">
+                            </div>
+                            <div>
+                                <label for="import-horse-type">Import As:</label>
+                                <select id="import-horse-type">
+                                    <option value="racing">Racing Horse</option>
+                                    <option value="breeding">Breeding Horse</option>
+                                </select>
+                            </div>
+                            <div>
+                                <button id="import-single-horse-button" class="button">Import Horse</button>
+                            </div>
+                        </div>
+                        <div id="single-import-status" style="display:none; margin-top: 15px; padding: 10px;"></div>
+                    </div>
                 </div>
             </div>
-        </div>
-        
+            
             <!-- Data Management Tab Content -->    
 
            <div id="tab-content-import" class="tab-content">
