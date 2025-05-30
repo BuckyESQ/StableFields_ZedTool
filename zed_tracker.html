@@ -3298,6 +3298,10 @@
 
         // Declare modal variables globally (scoped to the script)
         let modal, modalCloseBtn, modalTitle, modalStatsContent, modalAnalysisContent;
+        // Add this after modal variable initialization in the DOMContentLoaded event listener
+        if (modalCloseBtn) {
+            modalCloseBtn.addEventListener('click', hideHorseDetailsModal);
+        }
 
         // --- DOM Elements ---
         const addHorseForm = document.getElementById('add-horse-form');
