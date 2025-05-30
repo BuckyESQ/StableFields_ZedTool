@@ -2562,112 +2562,111 @@
                 },
 
                 async testConnection() {
-                    if (!this.authToken) {
-                        return { success: false, message: "No authentication token set" };
-                    }
-                    if (this.isTokenExpired()) {
-                        return { success: false, message: "Authentication token has expired" };
-                    }
-                    try {
-                        // Use CORS proxy for all API calls
-                        const proxyUrl = 'https://corsproxy.io/?';
-                        const response = await fetch(`${proxyUrl}https://api.zedchampions.com/v1/account`, {
-                            method: 'GET',
-                            headers: {
-                                'Authorization': `Bearer ${this.authToken}`,
-                                'Content-Type': 'application/json'
-                            }
-                        });
-                        if (response.ok) {
-                            return { success: true, message: "Connection successful!" };
-                        } else {
-                            return { 
-                                success: false, 
-                                message: `API Error: ${response.status} ${response.statusText}` 
-                            };
-                        }
-                    } catch (error) {
-                        return { success: false, message: `Connection error: ${error.message}` };
-                    }
-                },
-
-                async fetchAllHorses(type = 'racing') {
-                    try {
-                        if (!this.authToken) {
-                            return { success: false, message: "No authentication token set" };
-                        }
-                        
-                        // Always use the proxy for production
-                        const proxyUrl = 'https://corsproxy.io/?';
-                        const endpoint = type === 'racing'
-                            ? 'https://api.zedchampions.com/v1/stable/racing'
-                            : 'https://api.zedchampions.com/v1/stable/breeding';
-                        
-                        const response = await fetch(`${proxyUrl}${endpoint}`, {
-                            method: 'GET',
-                            headers: {
-                                'Authorization': `Bearer ${this.authToken}`,
-                                'Content-Type': 'application/json'
-                            }
-                        });
-
-                        if (!response.ok) {
-                            return {
-                                success: false,
-                                message: `API Error: ${response.status} ${response.statusText}`
-                            };
-                        }
-
-                        const data = await response.json();
-                        return { success: true, data: data.horses || [] };
-                    } catch (error) {
-                        return { success: false, message: `Connection error: ${error.message}` };
-                    }
-                },
-
-                async fetchHorse(horseId) {
-                    if (!this.authToken) return { success: false, message: "No auth token set" };
-                    try {
-                        const proxyUrl = 'https://corsproxy.io/?';
-                        const response = await fetch(`${proxyUrl}https://api.zedchampions.com/v1/horses/${horseId}`, {
-                            method: 'GET',
-                            headers: {
-                                'Authorization': `Bearer ${this.authToken}`,
-                                'Content-Type': 'application/json'
-                            }
-                        });
-                        if (response.ok) {
-                            const data = await response.json();
-                            return { success: true, data };
-                        } else {
-                            return { success: false, message: `API Error: ${response.status} ${response.statusText}` };
-                        }
-                    } catch (error) {
-                        return { success: false, message: `Connection error: ${error.message}` };
-                    }
-                },
-
-                async searchHorses(query) {
-                    if (!this.authToken) return { success: false, message: "No auth token set" };
-                    try {
-                        const response = await fetch(`https://api.zedchampions.com/v1/horses/search?q=${encodeURIComponent(query)}`, {
-                            method: 'GET',
-                            headers: {
-                                'Authorization': `Bearer ${this.authToken}`,
-                                'Content-Type': 'application/json'
-                            }
-                        });
-                        if (response.ok) {
-                            const data = await response.json();
-                            return { success: true, data: data.results || [] };
-                        } else {
-                            return { success: false, message: `API Error: ${response.status} ${response.statusText}` };
-                        }
-                    } catch (error) {
-                        return { success: false, message: `Connection error: ${error.message}` };
-                    }
+        if (!this.authToken) {
+            return { success: false, message: "No authentication token set" };
+        }
+        if (this.isTokenExpired()) {
+            return { success: false, message: "Authentication token has expired" };
+        }
+        try {
+            // Use CORS proxy for all API calls
+            const proxyUrl = 'https://corsproxy.io/?';
+            const response = await fetch(`${proxyUrl}https://api.zedchampions.com/v1/account`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.authToken}`,
+                    'Content-Type': 'application/json'
                 }
-            };
+            });
+            if (response.ok) {
+                return { success: true, message: "Connection successful!" };
+            } else {
+                return { 
+                    success: false, 
+                    message: `API Error: ${response.status} ${response.statusText}` 
+                };
+            }
+        } catch (error) {
+            return { success: false, message: `Connection error: ${error.message}` };
+        }
+    },
+
+    async fetchAllHorses(type = 'racing') {
+        try {
+            if (!this.authToken) {
+                return { success: false, message: "No authentication token set" };
+            }
+            const proxyUrl = 'https://corsproxy.io/?';
+            const endpoint = type === 'racing'
+                ? 'https://api.zedchampions.com/v1/stable/racing'
+                : 'https://api.zedchampions.com/v1/stable/breeding';
+
+            const response = await fetch(`${proxyUrl}${endpoint}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                return {
+                    success: false,
+                    message: `API Error: ${response.status} ${response.statusText}`
+                };
+            }
+
+            const data = await response.json();
+            return { success: true, data: data.horses || [] };
+        } catch (error) {
+            return { success: false, message: `Connection error: ${error.message}` };
+        }
+    },
+
+    async fetchHorse(horseId) {
+        if (!this.authToken) return { success: false, message: "No auth token set" };
+        try {
+            const proxyUrl = 'https://corsproxy.io/?';
+            const response = await fetch(`${proxyUrl}https://api.zedchampions.com/v1/horses/${horseId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                return { success: true, data };
+            } else {
+                return { success: false, message: `API Error: ${response.status} ${response.statusText}` };
+            }
+        } catch (error) {
+            return { success: false, message: `Connection error: ${error.message}` };
+        }
+    },
+
+    async searchHorses(query) {
+        if (!this.authToken) return { success: false, message: "No auth token set" };
+        try {
+            const proxyUrl = 'https://corsproxy.io/?';
+            const response = await fetch(`${proxyUrl}https://api.zedchampions.com/v1/horses/search?q=${encodeURIComponent(query)}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                return { success: true, data: data.results || [] };
+            } else {
+                return { success: false, message: `API Error: ${response.status} ${response.statusText}` };
+            }
+        } catch (error) {
+            return { success: false, message: `Connection error: ${error.message}` };
+        }
+    }
+};    
 
             // Fix API connection issues by improving error handling
             function fixApiConnectionHandling() {
