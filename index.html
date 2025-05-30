@@ -2521,7 +2521,6 @@
         
         // 75% chance to inherit from sire, 25% from dam
         return Math.random() < 0.75 ? sire.bloodline : dam.bloodline;
-    }
 
         function predictFoal(sire, dam) {
             if (!sire || !dam) return null;
@@ -3656,7 +3655,6 @@
                 option.textContent = optionText;
                 selectElement.appendChild(option);
             });
-        }
 
          // Modified populateList to create management list with delete buttons
          function populateManagementList(ulElement, items, type) {
@@ -3758,7 +3756,6 @@
                 option.textContent = horse.name;
                 damSelect.appendChild(option);
             });        
-        }
             // Add this function after your data storage definitions
             function debugRacesAndHorses() {
                 console.group("🔍 DEBUG INFORMATION");
@@ -7312,7 +7309,7 @@ function handleAddRace(event) {
         }
 
         // --- Function to edit horses (racing or breeding) ---
-      function editHorse(horseId) {
+        function editHorse(horseId) {
             const horse = horses.find(h => h.id === horseId);
             if (!horse) {
                 console.error("Horse not found for editing:", horseId);
@@ -7371,6 +7368,43 @@ function handleAddRace(event) {
                     document.getElementById('breeding-horse-color').value = horse.color;
                 }
                 
+                // Optional star values
+                if (horse.stars !== null && horse.stars !== undefined) {
+                    document.getElementById('breeding-horse-stars').value = horse.stars;
+                } else {
+                    document.getElementById('breeding-horse-stars').value = '';
+                }
+                
+                if (horse.speedStars !== null && horse.speedStars !== undefined) {
+                    document.getElementById('breeding-horse-speed-stars').value = horse.speedStars;
+                } else {
+                    document.getElementById('breeding-horse-speed-stars').value = '';
+                }
+                
+                if (horse.sprintStars !== null && horse.sprintStars !== undefined) {
+                    document.getElementById('breeding-horse-sprint-stars').value = horse.sprintStars;
+                } else {
+                    document.getElementById('breeding-horse-sprint-stars').value = '';
+                }
+                
+                if (horse.enduranceStars !== null && horse.enduranceStars !== undefined) {
+                    document.getElementById('breeding-horse-endurance-stars').value = horse.enduranceStars;
+                } else {
+                    document.getElementById('breeding-horse-endurance-stars').value = '';
+                }
+                
+                // Update button text
+                addBreedingHorseForm.querySelector('button[type="submit"]').textContent = 'Update Breeding Horse';
+                
+                // Scroll to the form and switch to breeding tab if needed
+                if (document.querySelector('.tab-button[data-tab="breeding"]') && !document.querySelector('.tab-button[data-tab="breeding"]').classList.contains('active')) {
+                    activateTab('breeding');
+                }
+                document.getElementById('breeding-horses-section').scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            console.log(`Editing horse: ${horse.name} (${horse.status})`);
+        }
                 // Optional star values
                 if (horse.stars !== null && horse.stars !== undefined) {
                     document.getElementById('breeding-horse-stars').value = horse.stars;
