@@ -2596,11 +2596,13 @@
                         if (!this.authToken) {
                             return { success: false, message: "No authentication token set" };
                         }
+                        
+                        // Always use the proxy for production
                         const proxyUrl = 'https://corsproxy.io/?';
                         const endpoint = type === 'racing'
                             ? 'https://api.zedchampions.com/v1/stable/racing'
                             : 'https://api.zedchampions.com/v1/stable/breeding';
-
+                        
                         const response = await fetch(`${proxyUrl}${endpoint}`, {
                             method: 'GET',
                             headers: {
