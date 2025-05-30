@@ -2340,10 +2340,8 @@
                             <div>
                                 <label for="manual-stud-fee-bred-horse" style="display: block; margin-bottom: 5px;">Select Bred Horse:</label>
                                 <select id="manual-stud-fee-bred-horse" style="width: 250px; padding: 10px; height: 42px; box-sizing: border-box;">
-                                    <!-- Options populated efficiently by JavaScript -->
-                                </select>
                                     <option value="">--Select Bred Horse--</option>
-                                    <!-- Options populated by JS -->
+                                    <!-- Options populated efficiently by JavaScript -->
                                 </select>
                             </div>
                             <div>
@@ -2354,7 +2352,6 @@
                         </div>
                     </div>
                 </div>
-
         <script>
         // 1️⃣ Define your color palettes per bloodline.
 
@@ -3448,25 +3445,49 @@
         const transactionsNextPageButton = document.getElementById('transactions-next-page');
         const transactionsPageInfoSpan = document.getElementById('transactions-page-info');
 
-        // ...existing code...
-        // Helper function to display API connection status
-       function showConnectionStatus (message, isSuccess) {
-            const statusEl = document.getElementById('api-connection-status');
-            if (!statusEl) return;
+        // Unified function for showing status messages
+        function showStatusMessage(element, message, isSuccess) {
+            // Handle both cases where element is a DOM element or a string selector
+            let statusElement;
+            if (typeof element === 'string') {
+                statusElement = document.getElementById(element);
+            } else {
+                statusElement = element;
+            }
             
-            statusEl.style.display = 'block';
-            statusEl.textContent = message;
+            if (!statusElement) {
+                console.error("Status element not found:", element);
+                return;
+            }
+            
+            statusElement.style.display = 'block';
+            statusElement.innerHTML = message; // Use innerHTML to support HTML in messages
             
             if (isSuccess === true) {
-                statusEl.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
-                statusEl.style.color = '#4CAF50';
+                statusElement.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                statusElement.style.color = '#4CAF50';
+                statusElement.style.padding = '12px';
+                statusElement.style.borderRadius = '4px';
             } else if (isSuccess === false) {
-                statusEl.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
-                statusEl.style.color = '#F44336';
+                statusElement.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
+                statusElement.style.color = '#F44336';
+                statusElement.style.padding = '12px';
+                statusElement.style.borderRadius = '4px';
             } else {
-                statusEl.style.backgroundColor = 'rgba(33, 150, 243, 0.2)';
-                statusEl.style.color = '#2196F3';
+                statusElement.style.backgroundColor = 'rgba(33, 150, 243, 0.2)';
+                statusElement.style.color = '#2196F3';
+                statusElement.style.padding = '12px';
+                statusElement.style.borderRadius = '4px';
             }
+        }
+
+        // Use this for both connection status and import status
+        function showConnectionStatus(message, isSuccess) {
+            showStatusMessage('api-connection-status', message, isSuccess);
+        }
+
+        function showImportStatus(element, message, isSuccess) {
+            showStatusMessage(element, message, isSuccess);
         }
        
         // --- Initialization ---
@@ -4344,6 +4365,7 @@
             sireSelect.addEventListener('change', (e) => displayParentStats(e.target.value, 'sire'));
             damSelect.addEventListener('change', (e) => displayParentStats(e.target.value, 'dam'));
 
+        
         // Add predict foal button listener - ADD THIS CODE HERE
         const predictButton = document.getElementById('predict-foal-btn');
         if (predictButton) {
@@ -4402,7 +4424,59 @@
                 resultDiv.style.animation = "fadeIn 0.5s ease-in-out";
             });
         }    
+             // ZED API event listeners
+            const saveTokenButton = document.getElementById('save-token-button');
+            const testConnectionButton = document.getElementById('test-connection-button');
+            const apiTokenInput = document.getElementById('api-token');
+            
+            if (saveTokenButton) {
+                saveTokenButton.addEventListener('click', function() {
+                    const token = apiTokenInput.value.trim();
+                    if (token) {
+                        const success = ZED_API.setAuthToken(token);
+                        if (success) {
+                            showConnectionStatus("API token saved successfully.", true);
+                        } else {
+                            showConnectionStatus("Failed to save API token.", false);
+                        }
+                    } else {
+                        showConnectionStatus("Please enter a valid API token.", false);
+                    }
+                });
+            }
+            
+            if (testConnectionButton) {
+                testConnectionButton.addEventListener('click', function() {
+                    showConnectionStatus("Testing connection...", null);
+                    ZED_API.testConnection()
+                        .then(result => {
+                            showConnectionStatus(result.message, result.success);
+                        })
+                        .catch(error => {
+                            showConnectionStatus(`Connection error: ${error.message}`, false);
+                        });
+                });
+            }
 
+            // Import buttons event listeners
+            const importRacingStableButton = document.getElementById('import-racing-stable-button');
+            const importBreedingStableButton = document.getElementById('import-breeding-stable-button');
+            const importSingleHorseButton = document.getElementById('import-single-horse-button');
+            
+            if (importRacingStableButton) {
+                importRacingStableButton.addEventListener('click', importRacingStable);
+            }
+            
+            if (importBreedingStableButton) {
+                importBreedingStableButton.addEventListener('click', importBreedingStable);
+            }
+            
+            if (importSingleHorseButton) {
+                importSingleHorseButton.addEventListener('click', importSingleHorse);
+            }
+
+            // ... other event listeners ...
+        }    
             // Add event listener for External Sire Bloodline change
             document.getElementById('external-sire-bloodline').addEventListener('change', function() {
                 populateColorOptionsFor('external-sire-bloodline', 'external-sire-color');
@@ -4415,9 +4489,7 @@
             }
               // Transactions table listener              
             // Transactions pagination listeners
-            const transactionsItemsPerPageSelect = document.getElementById('transactions-items-per-page');
-            const transactionsPrevPageButton = document.getElementById('transactions-prev-page');
-            const transactionsNextPageButton = document.getElementById('transactions-next-page');
+            // Use already declared transactionsItemsPerPageSelect from global scope
             
             if (transactionsItemsPerPageSelect) {
                 transactionsItemsPerPageSelect.value = transactionTableItemsPerPage;
@@ -4443,9 +4515,7 @@
             }
 
             // Stud Auction pagination listeners
-            const studAuctionItemsPerPageSelect = document.getElementById('stud-auction-items-per-page');
-            const studAuctionPrevPageButton = document.getElementById('stud-auction-prev-page');
-            const studAuctionNextPageButton = document.getElementById('stud-auction-next-page');
+            // Use already declared studAuctionItemsPerPageSelect from global scope
             
             if (studAuctionItemsPerPageSelect) {
                 studAuctionItemsPerPageSelect.value = studAuctionTableItemsPerPage;
@@ -6979,31 +7049,31 @@ function handleAddRace(event) {
             
             // Create new auction record or update existing
             if (currentlyEditingStudAuction) {
-                // Update existing record
-                const index = studAuctions.findIndex(sa => sa.id === currentlyEditingStudAuction.id);
-                if (index !== -1) {
-                    studAuctions[index] = {
-                        ...currentlyEditingStudAuction,
-                        horseId: horseId,
-                        horseName: horse.name,
-                        auctionPrice: auctionPrice,
-                        commission: commission,
-                        date: auctionDate
-                    };
-                }
-            } else {
-                // Create new record
-                const newRecord = {
-                    id: `stud-auction-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+            // Update existing record
+            const index = studAuctions.findIndex(sa => sa.id === currentlyEditingStudAuction.id);
+            if (index !== -1) {
+                studAuctions[index] = {
+                    id: currentlyEditingStudAuction.id,
                     horseId: horseId,
                     horseName: horse.name,
                     auctionPrice: auctionPrice,
                     commission: commission,
                     date: auctionDate
                 };
-                
-                studAuctions.push(newRecord);
             }
+        } else {
+            // Create new record
+            const newRecord = {
+                id: `stud-auction-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                horseId: horseId,
+                horseName: horse.name,
+                auctionPrice: auctionPrice,
+                commission: commission,
+                date: auctionDate
+            };
+            
+            studAuctions.push(newRecord);
+        }
             
             // Update totals, save data, and refresh UI
             saveData();
@@ -7355,8 +7425,12 @@ function handleAddRace(event) {
             </div>
         </div>
         <!-- ZED Champions API Integration -->
-            <script src="zed-auth.js"></script>
-            <script src="zed-api.js"></script>
-            <script src="zed-auth-ui.js"></script>
-    </body>
+        <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    console.log("ZED Champions API initialized");
+                    // The ZED_API variable is already defined in the main code
+                });
+        </script>
+
+     </body>
     </html>
