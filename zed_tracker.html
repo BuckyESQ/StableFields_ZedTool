@@ -917,7 +917,6 @@
 
         .filter-item-small { /* Class for smaller inputs like MMR range */
             width: 100px;
-        }
 
         /* --- Augment Analysis Per Horse (Racing Tab) --- */
         #augment-analysis-content table {
@@ -935,7 +934,6 @@
             text-align: left;
             width: auto; /* Let this column take remaining space */
             /* REMOVED overflow, text-overflow, white-space */
-        }
         #augment-analysis-content th:nth-child(2), /* Races */
         #augment-analysis-content td:nth-child(2) {
             width: 70px;
@@ -983,12 +981,10 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
         #individual-augment-table th:nth-child(2),
         #individual-augment-table td:nth-child(2) { /* Type */
             width: 70px;
             text-align: center;
-        }
 
         /* --- Augment Pair Table Specifics --- */
         #augment-pair-table th:nth-child(1),
@@ -998,7 +994,6 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
 
         /* --- Triple Augment Table Specifics --- */
         #augment-triple-table th:nth-child(1),
@@ -2529,7 +2524,7 @@
                 authToken: null,
                 tokenExpiry: null,
 
-                setAuthToken(token) {
+                setAuthToken: function(token) {
                     this.authToken = token;
                     localStorage.setItem('zedTrackerAuthToken', token);
                     // Check expiration when setting token
@@ -2537,7 +2532,7 @@
                     return true;
                 },
 
-                loadAuthToken() {
+                loadAuthToken: function() {
                     const token = localStorage.getItem('zedTrackerAuthToken');
                     if (token) {
                         this.authToken = token;
@@ -2546,7 +2541,7 @@
                     return false;
                 },
 
-                isTokenExpired() {
+                isTokenExpired: function() {
                     if (!this.authToken) return true;
                     try {
                         const base64Url = this.authToken.split('.')[1];
@@ -2560,13 +2555,14 @@
                         return true;
                     }
                 },
-                async function testCorsProxy() {
+
+                testCorsProxy: async function() {
                     try {
                         const proxyUrl = 'https://corsproxy.io/?';
                         const response = await fetch(`${proxyUrl}https://api.zedchampions.com/v1/account`, {
                             method: 'GET',
                             headers: {
-                                'Authorization': `Bearer ${ZED_API.authToken}`,
+                                'Authorization': `Bearer ${this.authToken}`,
                                 'Content-Type': 'application/json'
                             }
                         });
@@ -2581,9 +2577,9 @@
                         console.error("CORS proxy test failed:", error);
                         return false;
                     }
-                }
+                },
 
-                async testConnection() {
+                testConnection: async function() {
                     if (!this.authToken) {
                         return { success: false, message: "No authentication token set" };
                     }
@@ -2600,20 +2596,38 @@
                                 'Content-Type': 'application/json'
                             }
                         });
+                        
                         if (response.ok) {
-                            return { success: true, message: "Connection successful!" };
-                        } else {
+                            const data = await response.json();
                             return { 
-                                success: false, 
-                                message: `API Error: ${response.status} ${response.statusText}` 
+                                success: true, 
+                                message: `Connection successful! Hello, ${data.username || 'user'}!`,
+                                data: data
                             };
+                        } else {
+                            // More detailed error handling
+                            let errorMsg;
+                            try {
+                                // Try to get error details from response
+                                const errorData = await response.json();
+                                errorMsg = errorData.message || errorData.error || `API Error: ${response.status} ${response.statusText}`;
+                            } catch (e) {
+                                // Fallback if can't parse error JSON
+                                errorMsg = `API Error: ${response.status} ${response.statusText}`;
+                            }
+                            
+                            return { success: false, message: errorMsg };
                         }
                     } catch (error) {
-                        return { success: false, message: `Connection error: ${error.message}` };
+                        console.error("API connection error:", error);
+                        return { 
+                            success: false, 
+                            message: `Connection error: ${error.message}. Please check your internet connection and ensure ZedChampions API is available.` 
+                        };
                     }
                 },
 
-                async fetchAllHorses(type = 'racing') {
+                fetchAllHorses: async function(type = 'racing') {
                     try {
                         if (!this.authToken) {
                             return { success: false, message: "No authentication token set" };
@@ -2638,14 +2652,14 @@
                             };
                         }
 
-            const data = await response.json();
-            return { success: true, data: data.horses || [] };
-        } catch (error) {
-            return { success: false, message: `Connection error: ${error.message}` };
-        }
-    },
+                        const data = await response.json();
+                        return { success: true, data: data.horses || [] };
+                    } catch (error) {
+                        return { success: false, message: `Connection error: ${error.message}` };
+                    }
+                },
 
-                async fetchHorse(horseId) {
+                fetchHorse: async function(horseId) {
                     if (!this.authToken) return { success: false, message: "No auth token set" };
                     try {
                         const proxyUrl = 'https://corsproxy.io/?';
@@ -2667,7 +2681,7 @@
                     }
                 },
 
-                async searchHorses(query) {
+                searchHorses: async function(query) {
                     if (!this.authToken) return { success: false, message: "No auth token set" };
                     try {
                         const proxyUrl = 'https://corsproxy.io/?';
@@ -2688,8 +2702,7 @@
                         return { success: false, message: `Connection error: ${error.message}` };
                     }
                 }
-            };    
-
+            };
             // Fix API connection issues by improving error handling
             function fixApiConnectionHandling() {
             // Update the testConnection method in ZED_API:
