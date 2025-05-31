@@ -3162,34 +3162,57 @@
             };
         // --- Bloodline Change Handler ---
         function onBloodlineChange(bloodId, colorId, traitsId, attrsId) {
-    const bloodEl = document.getElementById(bloodId);
-    const colorEl = document.getElementById(colorId);
-    const traitsEl = document.getElementById(traitsId);
-    const attrsEl = document.getElementById(attrsId);
+        const bloodEl = document.getElementById(bloodId);
+        const colorEl = document.getElementById(colorId);
+        const traitsEl = document.getElementById(traitsId);
+        const attrsEl = document.getElementById(attrsId);
 
-    // Update color options
-    if (bloodEl && colorEl) {
+        // Update color options
+        if (bloodEl && colorEl) {
         colorEl.innerHTML = '<option value="">--Select Color--</option>';
         const blood = bloodEl.value;
         if (blood && breedColorOptions[blood]) {
             ["normal","rare","super rare"].forEach(rarity => {
-                const group = breedColorOptions[blood][rarity];
-                if (group && group.length) {
-                    const optgroup = document.createElement('optgroup');
-                    optgroup.label = rarity.charAt(0).toUpperCase() + rarity.slice(1);
-                    group.forEach(c => {
-                        const o = document.createElement('option');
-                        o.value = c.hex;
-                        o.textContent = `${c.label} (${c.hex})`;
-                        o.title = c.hex;
-                        o.style.backgroundColor = c.hex;
-                        o.setAttribute('data-rarity', rarity);
-                        optgroup.appendChild(o);
-                    });
-                    colorEl.appendChild(optgroup);
-                }
+            const group = breedColorOptions[blood][rarity];
+            if (group && group.length) {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = rarity.charAt(0).toUpperCase() + rarity.slice(1);
+                group.forEach(c => {
+                const o = document.createElement('option');
+                o.value = c.hex;
+                o.textContent = `${c.label} (${c.hex})`;
+                o.title = c.hex;
+                o.style.backgroundColor = c.hex;
+                o.setAttribute('data-rarity', rarity);
+                optgroup.appendChild(o);
+                });
+                colorEl.appendChild(optgroup);
+            }
             });
             if (colorEl.options.length > 1) colorEl.selectedIndex = 1;
+        }
+        }
+
+        // Update traits
+        if (bloodEl && traitsEl) {
+        traitsEl.innerHTML = '';
+        traitsEl.style.display = 'block'; // Make visible
+        (bloodlineTraits[bloodEl.value] || []).forEach(t => {
+            const li = document.createElement('li');
+            li.textContent = t;
+            traitsEl.appendChild(li);
+        });
+        }
+
+        // Update attributes
+        if (bloodEl && attrsEl) {
+        attrsEl.innerHTML = '';
+        attrsEl.style.display = 'block'; // Make visible
+        (bloodlineAttributes[bloodEl.value] || []).forEach(a => {
+            const li = document.createElement('li');
+            li.textContent = a;
+            attrsEl.appendChild(li);
+        });
         }
     }
 
@@ -5679,8 +5702,32 @@ function handleAddRace(event) {
         const tabContents = document.querySelectorAll('.tab-content');
 
         function activateTab(tabId) {
-    console.log(`Attempting to activate tab: ${tabId}`);
-    
+        console.log(`Attempting to activate tab: ${tabId}`);
+        
+        // Use document.querySelectorAll instead of the global variables
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabButtons.forEach(button => {
+        button.classList.toggle('active', button.dataset.tab === tabId);
+        });
+        
+        tabContents.forEach(content => {
+        const contentId = `tab-content-${tabId}`;
+        const shouldBeActive = content.id === contentId;
+        content.classList.toggle('active', shouldBeActive);
+        });
+        
+        console.log(`Activated tab: ${tabId}`);
+        
+        // Render analysis tables if Analysis tab is activated
+        if (tabId === 'analysis') {
+        renderBloodlineAnalysis();
+        renderIndividualAugmentAnalysis();
+        renderAugmentPairAnalysis();
+        renderTripleAugmentAnalysis();
+        }
+    }
     tabButtons.forEach(button => {
         button.classList.toggle('active', button.dataset.tab === tabId);
     });
@@ -7309,102 +7356,104 @@ function handleAddRace(event) {
         }
 
         // --- Function to edit horses (racing or breeding) ---
-        function editHorse(horseId) {
-            const horse = horses.find(h => h.id === horseId);
-            if (!horse) {
-                console.error("Horse not found for editing:", horseId);
-                return;
-            }
-            
-            // Store the horse being edited
-            currentlyEditingHorse = horse;
-            
-            // Determine which form to use based on horse status
-            if (horse.status === 'racing') {
-                // Populate racing horse form
-                document.getElementById('horse-name').value = horse.name;
-                document.getElementById('horse-bloodline').value = horse.bloodline;
-                document.getElementById('horse-gender').value = horse.gender;
-                document.getElementById('horse-stars').value = horse.stars;
-                document.getElementById('horse-zed-balance').value = horse.initialZedBalance;
-                document.getElementById('horse-mm-rating').value = horse.initialMmRating;
-                
-                if (horse.color) {
-                    document.getElementById('horse-color').value = horse.color;
-                }
-                
-                // Optional star values
-                if (horse.speedStars !== null && horse.speedStars !== undefined) {
-                    document.getElementById('horse-speed-stars').value = horse.speedStars;
-                } else {
-                    document.getElementById('horse-speed-stars').value = '';
-                }
-                
-                if (horse.sprintStars !== null && horse.sprintStars !== undefined) {
-                    document.getElementById('horse-sprint-stars').value = horse.sprintStars;
-                } else {
-                    document.getElementById('horse-sprint-stars').value = '';
-                }
-                
-                if (horse.enduranceStars !== null && horse.enduranceStars !== undefined) {
-                    document.getElementById('horse-endurance-stars').value = horse.enduranceStars;
-                } else {
-                    document.getElementById('horse-endurance-stars').value = '';
-                }
-                
-                // Update button text
-                addHorseForm.querySelector('button[type="submit"]').textContent = 'Update Racing Horse';
-                
-                // Scroll to the form
-                document.getElementById('horses-section').scrollIntoView({ behavior: 'smooth' });
-                
-            } else if (horse.status === 'breeding') {
-                // Populate breeding horse form
-                document.getElementById('breeding-horse-name').value = horse.name;
-                document.getElementById('breeding-horse-bloodline').value = horse.bloodline;
-                document.getElementById('breeding-horse-gender').value = horse.gender;
-                
-                if (horse.color) {
-                    document.getElementById('breeding-horse-color').value = horse.color;
-                }
-                
-                // Optional star values
-                if (horse.stars !== null && horse.stars !== undefined) {
-                    document.getElementById('breeding-horse-stars').value = horse.stars;
-                } else {
-                    document.getElementById('breeding-horse-stars').value = '';
-                }
-                
-                if (horse.speedStars !== null && horse.speedStars !== undefined) {
-                    document.getElementById('breeding-horse-speed-stars').value = horse.speedStars;
-                } else {
-                    document.getElementById('breeding-horse-speed-stars').value = '';
-                }
-                
-                if (horse.sprintStars !== null && horse.sprintStars !== undefined) {
-                    document.getElementById('breeding-horse-sprint-stars').value = horse.sprintStars;
-                } else {
-                    document.getElementById('breeding-horse-sprint-stars').value = '';
-                }
-                
-                if (horse.enduranceStars !== null && horse.enduranceStars !== undefined) {
-                    document.getElementById('breeding-horse-endurance-stars').value = horse.enduranceStars;
-                } else {
-                    document.getElementById('breeding-horse-endurance-stars').value = '';
-                }
-                
-                // Update button text
-                addBreedingHorseForm.querySelector('button[type="submit"]').textContent = 'Update Breeding Horse';
-                
-                // Scroll to the form and switch to breeding tab if needed
-                if (document.querySelector('.tab-button[data-tab="breeding"]') && !document.querySelector('.tab-button[data-tab="breeding"]').classList.contains('active')) {
-                    activateTab('breeding');
-                }
-                document.getElementById('breeding-horses-section').scrollIntoView({ behavior: 'smooth' });
-            }
-            
-            console.log(`Editing horse: ${horse.name} (${horse.status})`);
+       // Fix for line 7488 - Remove the extra closing bracket and fix function nesting
+function editHorse(horseId) {
+    const horse = horses.find(h => h.id === horseId);
+    if (!horse) {
+        console.error("Horse not found for editing:", horseId);
+        return;
+    }
+    
+    // Store the horse being edited
+    currentlyEditingHorse = horse;
+    
+    // Determine which form to use based on horse status
+    if (horse.status === 'racing') {
+        // Populate racing horse form
+        document.getElementById('horse-name').value = horse.name;
+        document.getElementById('horse-bloodline').value = horse.bloodline;
+        document.getElementById('horse-gender').value = horse.gender;
+        document.getElementById('horse-stars').value = horse.stars;
+        document.getElementById('horse-zed-balance').value = horse.initialZedBalance;
+        document.getElementById('horse-mm-rating').value = horse.initialMmRating;
+        
+        if (horse.color) {
+            document.getElementById('horse-color').value = horse.color;
         }
+        
+        // Optional star values
+        if (horse.speedStars !== null && horse.speedStars !== undefined) {
+            document.getElementById('horse-speed-stars').value = horse.speedStars;
+        } else {
+            document.getElementById('horse-speed-stars').value = '';
+        }
+        
+        if (horse.sprintStars !== null && horse.sprintStars !== undefined) {
+            document.getElementById('horse-sprint-stars').value = horse.sprintStars;
+        } else {
+            document.getElementById('horse-sprint-stars').value = '';
+        }
+        
+        if (horse.enduranceStars !== null && horse.enduranceStars !== undefined) {
+            document.getElementById('horse-endurance-stars').value = horse.enduranceStars;
+        } else {
+            document.getElementById('horse-endurance-stars').value = '';
+        }
+        
+        // Update button text
+        addHorseForm.querySelector('button[type="submit"]').textContent = 'Update Racing Horse';
+        
+        // Scroll to the form
+        document.getElementById('horses-section').scrollIntoView({ behavior: 'smooth' });
+        
+    } else if (horse.status === 'breeding') {
+        // Populate breeding horse form
+        document.getElementById('breeding-horse-name').value = horse.name;
+        document.getElementById('breeding-horse-bloodline').value = horse.bloodline;
+        document.getElementById('breeding-horse-gender').value = horse.gender;
+        
+        if (horse.color) {
+            document.getElementById('breeding-horse-color').value = horse.color;
+        }
+        
+        // Optional star values
+        if (horse.stars !== null && horse.stars !== undefined) {
+            document.getElementById('breeding-horse-stars').value = horse.stars;
+        } else {
+            document.getElementById('breeding-horse-stars').value = '';
+        }
+        
+        if (horse.speedStars !== null && horse.speedStars !== undefined) {
+            document.getElementById('breeding-horse-speed-stars').value = horse.speedStars;
+        } else {
+            document.getElementById('breeding-horse-speed-stars').value = '';
+        }
+        
+        if (horse.sprintStars !== null && horse.sprintStars !== undefined) {
+            document.getElementById('breeding-horse-sprint-stars').value = horse.sprintStars;
+        } else {
+            document.getElementById('breeding-horse-sprint-stars').value = '';
+        }
+        
+        if (horse.enduranceStars !== null && horse.enduranceStars !== undefined) {
+            document.getElementById('breeding-horse-endurance-stars').value = horse.enduranceStars;
+        } else {
+            document.getElementById('breeding-horse-endurance-stars').value = '';
+        }
+        
+        // Update button text
+        addBreedingHorseForm.querySelector('button[type="submit"]').textContent = 'Update Breeding Horse';
+        
+        // Scroll to the form and switch to breeding tab if needed
+        if (document.querySelector('.tab-button[data-tab="breeding"]') && !document.querySelector('.tab-button[data-tab="breeding"]').classList.contains('active')) {
+            activateTab('breeding');
+        }
+        document.getElementById('breeding-horses-section').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    console.log(`Editing horse: ${horse.name} (${horse.status})`);
+}
+</script>
                 // Optional star values
                 if (horse.stars !== null && horse.stars !== undefined) {
                     document.getElementById('breeding-horse-stars').value = horse.stars;
