@@ -116,10 +116,6 @@ class ZedApiService {
      */
     async fetchFromApi(endpoint, method = 'GET', data = null) {
             try {
-                // Force production mode on stablefields.com domain
-                const isProduction = window.location.hostname.includes('stablefields.com');
-                const useProxy = !isProduction;
-                
                 // Ensure the endpoint starts with a slash
                 if (!endpoint.startsWith('/')) {
                     endpoint = '/' + endpoint;
@@ -129,7 +125,6 @@ class ZedApiService {
                 const baseUrl = useProxy ? `${this.proxyUrl}${this.apiBase}` : this.apiBase;
                 const url = `${baseUrl}${endpoint}`;
                 
-                console.log(`Running in ${isProduction ? 'production' : 'development'} mode`);
                 console.log("Attempting API request to:", url);
                 
                 const token = this.authManager.getToken();
