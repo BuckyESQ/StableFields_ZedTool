@@ -176,7 +176,7 @@ class ZedAuthUI {
         /**
          * Create the token input form
          */
-        createTokenInput() {
+     createTokenInput() {
             const container = document.getElementById('api-import-container');
             if (!container) return;
             
@@ -241,7 +241,7 @@ class ZedAuthUI {
                         <div id="single-import-status" style="margin-top: 10px;"></div>
                     </div>
                 </div>
-            `;
+            `;   
             
             container.appendChild(tokenSection);
             
