@@ -154,7 +154,7 @@ class ZedApiService {
 class ZedAuthUI {
         constructor() {
             this.apiService = window.zedApi;
-            this.statusContainerId = 'api-connection-status'; // Define the status container ID
+            this.statusContainerId = 'test-api-connection-status'; // Define the status container ID
         }    
             
         /**
@@ -163,9 +163,27 @@ class ZedAuthUI {
         initialize() {
             this.createTokenInput();
             this.updateTokenStatus();
+            this.populateHorseTypeOptions();
             
             // Check token status every minute
             setInterval(() => this.updateTokenStatus(), 60000);
+        }
+    
+        /**
+         * Populate the "Import As" dropdown with horse types dynamically
+         */
+        populateHorseTypeOptions() {
+            const horseTypes = ['racing', 'breeding']; // Replace with dynamic API call if needed
+            const selectElement = document.getElementById('import-horse-type');
+            if (!selectElement) return;
+    
+            selectElement.innerHTML = ''; // Clear existing options
+            horseTypes.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = `${type.charAt(0).toUpperCase() + type.slice(1)} Horse`;
+                selectElement.appendChild(option);
+            });
         }
         /**
          * Create the token input form
@@ -187,57 +205,86 @@ class ZedAuthUI {
     createTokenSection() {
         const tokenSection = document.createElement('div');
         tokenSection.className = 'section';
-        tokenSection.innerHTML = `
-    
-        <h2>ZED Champions API Authentication</h2>
-            <div class="token-notice">
-                <p><strong>Note:</strong> ZED Champions API tokens expire after 24 hours. You'll need to get a new token daily.</p>
-                <p><strong>To get a token:</strong> <a href="docs/api-token-instructions.html" target="_blank">Click here for detailed instructions</a>.</p>
+
+        tokenSection.appendChild(this.createHeader());
+        tokenSection.appendChild(this.createTokenInputArea());
+        tokenSection.appendChild(this.createConnectionTestArea());
+        tokenSection.appendChild(this.createImportArea());
+
+        return tokenSection;
+    }
+
+    createHeader() {
+        const header = document.createElement('div');
+        header.innerHTML = `
+            <h2>ZED Champions API Authentication - Manage Your API Tokens</h2>
+            <p>Securely manage your API tokens to ensure uninterrupted access to ZED Champions services.</p>
+            <p><strong>Note:</strong> ZED Champions API tokens expire after 24 hours, regardless of user activity. You'll need to get a new token daily. Consider automating token renewal or implementing a mechanism to alert you when the token is about to expire.</p>
+            <p><strong>To get a token:</strong> <a href="docs/api-token-instructions.html" target="_blank" title="Learn how to obtain and manage your ZED Champions API token, including step-by-step instructions and troubleshooting tips.">Click here for detailed instructions</a>.</p>
+        `;
+        return header;
+    }
+
+    createTokenInputArea() {
+        const tokenInputArea = document.createElement('div');
+        tokenInputArea.style.marginTop = '20px';
+        tokenInputArea.innerHTML = `
+            <div class="form-grid" style="grid-template-columns: 1fr auto;">
+                <textarea id="zed-api-token" placeholder="Enter your ZED Champions API Bearer token" 
+                    class="zed-api-token-textarea"
+                    autocomplete="off" data-lpignore="true"></textarea>
             </div>
-            <div style="margin-top: 20px;">
-                <div class="form-grid" style="grid-template-columns: 1fr auto;">
-                    <textarea id="zed-api-token" placeholder="Paste Bearer token here..." 
-                        style="width: 100%; font-family: monospace; height: 38px; resize: none; padding: 8px;"
-                        autocomplete="off" data-lpignore="true"></textarea>
-                </div>
-                <div style="display: flex; align-items: flex-end; margin-top: 10px;">
-                    <button id="save-api-token-btn" class="button">Save Token</button>
-                </div>
+            <div style="display: flex; align-items: flex-end; margin-top: 10px;">
+                <button id="save-api-token-btn" class="button">Save Token</button>
             </div>
-            <div style="margin-top: 15px; display: flex; gap: 10px; align-items: center;">
-                <button id="test-api-connection-btn" class="button">Test Connection</button>
-                <div id="api-connection-status" 
-                    style="margin-left: 10px; padding: 8px 12px; border-radius: 4px; display: none;"></div>
-            </div>
-            <div style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 25px;">
-                <h3>Import Horses from ZED Champions</h3>
-                <div style="margin-top: 15px; display: flex; gap: 15px; flex-wrap: wrap;">
+        `;
+        return tokenInputArea;
+    }
+
+    createConnectionTestArea() {
+        const connectionTestArea = document.createElement('div');
+        connectionTestArea.style.marginTop = '15px';
+        connectionTestArea.style.display = 'flex';
+        connectionTestArea.style.gap = '10px';
+        connectionTestArea.style.alignItems = 'center';
+        connectionTestArea.innerHTML = `
+            <button id="test-api-connection-btn" class="button">Test Connection</button>
+            <div id="test-api-connection-status" class="api-connection-status"></div>
+        `;
+        return connectionTestArea;
+    }
+
+    createImportArea() {
+        const importArea = document.createElement('div');
+        importArea.style.marginTop = '25px';
+        importArea.style.borderTop = '1px solid var(--border-color)';
+        importArea.style.paddingTop = '25px';
+        importArea.innerHTML = `
+            <h3>Import Horses from ZED Champions</h3>
+            <p>Importing horses allows you to manage your racing and breeding stables efficiently, track performance, and plan strategies for competitions or breeding programs.</p>
+            <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 20px;">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
                     <button id="import-racing-stable-btn" class="button">Import Racing Stable</button>
                     <button id="import-breeding-stable-btn" class="button">Import Breeding Stable</button>
                 </div>
                 <div id="import-status" style="margin-top: 10px;"></div>
-                <div style="margin-top: 25px;">
-                    <h4>Import Single Horse</h4>
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
-                        <div>
-                            <label for="zed-horse-id">Horse ID:</label>
-                            <input type="text" id="zed-horse-id" placeholder="Enter horse ID">
-                        </div>
-                        <div>
-                            <label for="import-horse-type">Import As:</label>
-                            <select id="import-horse-type">
-                                <option value="racing">Racing Horse</option>
-                                <option value="breeding">Breeding Horse</option>
-                            </select>
-                        </div>
-                        <button id="import-single-horse-btn" class="button">Import Horse</button>
+                <h4>Import Single Horse</h4>
+                <p style="margin-bottom: 10px;">"Racing Horse" refers to horses actively competing in races, showcasing their speed and endurance, while "Breeding Horse" represents horses contributing to breeding programs to produce new generations of champions.</p>
+                <p style="margin-bottom: 10px;">Choose "Racing Horse" for horses participating in races and "Breeding Horse" for horses used in breeding programs.</p>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
+                    <div>
+                        <label for="zed-horse-id">Horse ID:</label>
+                        <input type="text" id="zed-horse-id" placeholder="Enter horse ID">
                     </div>
-                    <div id="single-import-status" style="margin-top: 10px;"></div>
+                    <div>
+                        <select id="import-horse-type"></select>
+                    </div>
+                    <button id="import-single-horse-btn" class="button">Import Horse</button>
                 </div>
+                <div id="single-import-status" style="margin-top: 10px;"></div>
             </div>
         `;
-
-        return tokenSection;
+        return importArea;
     }
 
     addEventListeners() {
@@ -470,6 +517,10 @@ class ZedAuthUI {
         
         const horseId = document.getElementById('zed-horse-id')?.value.trim();
         const importType = document.getElementById('import-horse-type')?.value || 'racing';
+        if (!['racing', 'breeding'].includes(importType)) {
+            this.showImportStatus(statusElement, "Invalid horse type selected. Please choose 'Racing Horse' or 'Breeding Horse'.", false);
+            return;
+        }
         const statusElement = document.getElementById('single-import-status');
         
         if (!horseId) {
@@ -577,25 +628,38 @@ class ZedAuthUI {
     /**
      * Show status message
      */
+    /**
+     * Show status message
+     */
     showStatus(message, isSuccess) {
         const statusEl = document.getElementById(this.statusContainerId);
         if (!statusEl) return;
         
         statusEl.style.display = 'block';
+        statusEl.className = ''; // Clear previous classes
         statusEl.textContent = message;
         
         if (isSuccess === true) {
+            statusEl.classList.add('success');
             statusEl.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
             statusEl.style.color = '#4CAF50';
+            statusEl.style.padding = '8px';
+            statusEl.style.borderRadius = '4px';
         } else if (isSuccess === false) {
+            statusEl.classList.add('error');
             statusEl.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
             statusEl.style.color = '#F44336';
+            statusEl.style.padding = '8px';
+            statusEl.style.borderRadius = '4px';
         } else {
+            statusEl.classList.add('info');
             statusEl.style.backgroundColor = 'rgba(33, 150, 243, 0.2)';
             statusEl.style.color = '#2196F3';
+            statusEl.style.padding = '8px';
+            statusEl.style.borderRadius = '4px';
         }
     }
-    
+
     /**
      * Show import status message
      */
@@ -603,19 +667,23 @@ class ZedAuthUI {
         if (!element) return;
         
         element.style.display = 'block';
+        element.className = '';
         element.textContent = message;
         
         if (isSuccess === true) {
+            element.classList.add('success');
             element.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
             element.style.color = '#4CAF50';
             element.style.padding = '8px';
             element.style.borderRadius = '4px';
         } else if (isSuccess === false) {
+            element.classList.add('error');
             element.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
             element.style.color = '#F44336';
             element.style.padding = '8px';
             element.style.borderRadius = '4px';
         } else {
+            element.classList.add('info');
             element.style.backgroundColor = 'rgba(33, 150, 243, 0.2)';
             element.style.color = '#2196F3';
             element.style.padding = '8px';
@@ -624,7 +692,6 @@ class ZedAuthUI {
     }
 }
 
-// Initialize the API service globally
 window.zedApi = new ZedApiService();
 // Initialize the UI when the DOM is ready
 // This event listener waits for the DOM content to be fully loaded before executing.
