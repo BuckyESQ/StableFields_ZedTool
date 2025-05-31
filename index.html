@@ -48,6 +48,7 @@
         --title-font: 'Orbitron', sans-serif;
         --body-font: 'Inter', sans-serif;
         --text-highlight-bg: var(--bg-color); /* Use main bg for TH text highlight */
+        }
 
         body {
             font-family: var(--body-font);
@@ -323,6 +324,7 @@
         #augments-list li span { /* Target the text span */
             flex-grow: 1; /* Allow text to take available space */
             margin-right: 10px; /* Space between text and button */
+        }
         #augments-list li:hover {
             transform: translateX(2px); /* Subtle shift on hover */
             background-color: var(--tab-active-bg); /* Use tab active bg for hover */
@@ -2824,7 +2826,7 @@
                     }
                 };
             }
-            setupBloodlineListeners();
+
             // Call this during initialization - add this to your document.addEventListener('DOMContentLoaded') handler
             document.addEventListener('DOMContentLoaded', () => {
                 // After other initialization...
@@ -3160,87 +3162,44 @@
             };
         // --- Bloodline Change Handler ---
         function onBloodlineChange(bloodId, colorId, traitsId, attrsId) {
-    const bloodEl = document.getElementById(bloodId);
-    const colorEl = document.getElementById(colorId);
-    const traitsEl = document.getElementById(traitsId);
-    const attrsEl = document.getElementById(attrsId);
-    
-    // Ensure elements exist
-    if (!bloodEl) {
-        console.warn(`Bloodline element not found: ${bloodId}`);
-        return;
-    }
-    
-    // Update color options
-    if (colorEl) {
-        const blood = bloodEl.value;
-        colorEl.innerHTML = '<option value="">--Select Color--</option>';
-        
-        if (blood && breedColorOptions[blood]) {
-            console.log(`Populating colors for ${blood} bloodline`);
-            
-            ["normal", "rare", "super rare"].forEach(rarity => {
+        const bloodEl = document.getElementById(bloodId);
+        const colorEl = document.getElementById(colorId);
+        const traitsEl = document.getElementById(traitsId);
+        const attrsEl = document.getElementById(attrsId);
+
+        // Update color options
+        if (bloodEl && colorEl) {
+            colorEl.innerHTML = '<option value="">--Select Color--</option>';
+            const blood = bloodEl.value;
+            if (blood && breedColorOptions[blood]) {
+            ["normal","rare","super rare"].forEach(rarity => {
                 const group = breedColorOptions[blood][rarity];
                 if (group && group.length) {
-                    const optgroup = document.createElement('optgroup');
-                    optgroup.label = rarity.charAt(0).toUpperCase() + rarity.slice(1);
-                    
-                    group.forEach(c => {
-                        const o = document.createElement('option');
-                        o.value = c.hex;
-                        o.textContent = `${c.label} (${c.hex})`;
-                        o.title = c.hex;
-                        o.style.backgroundColor = c.hex;
-                        o.setAttribute('data-rarity', rarity);
-                        optgroup.appendChild(o);
-                    });
-                    
-                    colorEl.appendChild(optgroup);
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = rarity.charAt(0).toUpperCase() + rarity.slice(1);
+                group.forEach(c => {
+                    const o = document.createElement('option');
+                    o.value = c.hex;
+                    o.textContent = `${c.label} (${c.hex})`;
+                    o.title = c.hex;
+                    o.style.backgroundColor = c.hex;
+                    o.setAttribute('data-rarity', rarity);
+                    optgroup.appendChild(o);
+                });
+                colorEl.appendChild(optgroup);
                 }
             });
-            
-            if (colorEl.options.length > 1) {
-                colorEl.selectedIndex = 1;
-                console.log("Set default color option");
+            if (colorEl.options.length > 1) colorEl.selectedIndex = 1;
             }
-        } else {
-            console.warn(`No colors found for bloodline: ${blood}`);
+        if (!getColorLabel) {
+        // Fallback if getColorLabel function is missing
+        function getColorLabel(bloodline, hex) {
+            return hex || '';
         }
-    }
-    
-    // Update traits
-    if (traitsEl) {
-        traitsEl.innerHTML = '';
-        traitsEl.style.display = 'block'; // Make visible
-        
-        const traits = bloodEl.value ? bloodlineTraits[bloodEl.value] || [] : [];
-        if (traits.length > 0) {
-            traits.forEach(t => {
-                const li = document.createElement('li');
-                li.textContent = t;
-                traitsEl.appendChild(li);
-            });
+    }    
         }
-    }
-    
-    // Update attributes
-    if (attrsEl) {
-        attrsEl.innerHTML = '';
-        attrsEl.style.display = 'block'; // Make visible
-        
-        const attrs = bloodEl.value ? bloodlineAttributes[bloodEl.value] || [] : [];
-        if (attrs.length > 0) {
-            attrs.forEach(a => {
-                const li = document.createElement('li');
-                li.textContent = a;
-                attrsEl.appendChild(li);
-            });
-        }
-    }
-}
 
-    // Update traits and attributes as before...
-
+        // Update traits
         if (bloodEl && traitsEl) {
             traitsEl.innerHTML = '';
             (bloodlineTraits[bloodEl.value] || []).forEach(t => {
@@ -3415,31 +3374,26 @@
         const studAuctionCommissionInput = document.getElementById('stud-auction-commission');
         const studAuctionTableBody = document.getElementById('stud-auction-table-body');
         const totalStudAuctionIncomeSpan = document.getElementById('total-stud-auction-income');
+
+        // Tab Elements
+        const tabButtonContainer = document.getElementById('tab-buttons');
+        const tabContentContainer = document.getElementById('tab-content');
+        // const tabButtons = document.querySelectorAll('.tab-button'); // REMOVED duplicate declaration
+        // const tabContents = document.querySelectorAll('.tab-content'); // REMOVED duplicate declaration
+
+        // Augment Management Elements
+        const addAugmentForm = document.getElementById('add-augment-form');
+        const cpuAugmentList = document.getElementById('cpu-augment-list');
+        const ramAugmentList = document.getElementById('ram-augment-list');
+        const hydraulicAugmentList = document.getElementById('hydraulic-augment-list');
+
+        // Stats Elements
         const totalRetirementEarningsSpan = document.getElementById('total-retirement-earnings');
         const totalStudFeesSpan = document.getElementById('total-stud-fees');
 
         // Filter/Search Elements
+        const horseSearchInput = document.getElementById('horse-search-input');
         const horseFilterBloodline = document.getElementById('horse-filter-bloodline');
-        const tabButtonContainer = document.getElementById('tab-buttons');
-        const newContainer = tabButtonContainer.cloneNode(true);
-        
-        // Augment Analysis Filter
-
-        /**
-        if (!newContainer) {
-            console.error("Tab button container element with ID 'tab-buttons' not found. Ensure the element exists in the DOM.");
-         const tabContentContainer = document.getElementById('tab-content');
-         if (tabContentContainer) {
-             console.log("Tab content container retrieved successfully.");
-             // Implement usage of tabContentContainer here if needed
-         }
-        }
-        window.tabButtons = Array.from(newContainer.querySelectorAll('.tab-button'));
-         * This function ensures only the selected tab's content is visible while hiding others.
-         */
-
-        // Update references to the original tabButtonContainer
-        window.tabButtons = Array.from(newContainer.querySelectorAll('.tab-button'));
         const horseFilterGender = document.getElementById('horse-filter-gender');
         
         // Augment Analysis Filter
@@ -3554,7 +3508,29 @@
             modalStatsContent = document.getElementById('modal-stats-content');
             modalAnalysisContent = document.getElementById('modal-analysis-content');
 
-            
+            // Add event listeners for bloodline changes on all forms
+            forms.forEach(f => {
+                const el = document.getElementById(`${f.prefix}-bloodline`);
+                if (el) {
+                    el.addEventListener('change', () => onBloodlineChange(
+                        `${f.prefix}-bloodline`,
+                        f.color, f.traits, f.attrs
+                    ));
+                }
+            }); // <-- This closes the forEach!
+
+            // Initialize color/traits/attributes for all forms
+            forms.forEach(f => onBloodlineChange(
+                `${f.prefix}-bloodline`,
+                f.color, f.traits, f.attrs
+            ));
+
+            // Initialize color/traits/attributes for all forms
+            forms.forEach(f => onBloodlineChange(
+                `${f.prefix}-bloodline`,
+                f.color, f.traits, f.attrs
+            ));
+
             // Main initialization
             loadData(); // Load data FIRST
             populateAugmentDropdowns();
@@ -3578,28 +3554,6 @@
             // --- ZedChampions API UI and Import UI ---
             
             ZED_API.loadAuthToken();
-// Add event listeners for bloodline changes on all forms
-forms.forEach(f => {
-                const el = document.getElementById(`${f.prefix}-bloodline`);
-                if (el) {
-                    el.addEventListener('change', () => onBloodlineChange(
-                        `${f.prefix}-bloodline`,
-                        f.color, f.traits, f.attrs
-                    ));
-                }
-            }); // <-- This closes the forEach!
-
-            // Initialize color/traits/attributes for all forms
-            forms.forEach(f => onBloodlineChange(
-                `${f.prefix}-bloodline`,
-                f.color, f.traits, f.attrs
-            ));
-
-            // Initialize color/traits/attributes for all forms
-            forms.forEach(f => onBloodlineChange(
-                `${f.prefix}-bloodline`,
-                f.color, f.traits, f.attrs
-            ));
 
             console.log("Tracker Initialized.");
         });
@@ -4409,59 +4363,6 @@ forms.forEach(f => {
             sireSelect.addEventListener('change', (e) => displayParentStats(e.target.value, 'sire'));
             damSelect.addEventListener('change', (e) => displayParentStats(e.target.value, 'dam'));
 
-        // Add this to your document.addEventListener('DOMContentLoaded') handler
-        function setupBloodlineListeners() {
-            console.log("Setting up bloodline change listeners");
-            
-            forms.forEach(f => {
-                const bloodlineEl = document.getElementById(`${f.prefix}-bloodline`);
-                if (bloodlineEl) {
-                    console.log(`Adding listener for ${f.prefix}-bloodline`);
-                    
-                    // Remove any existing listeners to prevent duplicates
-                    const newElement = bloodlineEl.cloneNode(true);
-                    bloodlineEl.parentNode.replaceChild(newElement, bloodlineEl);
-                    
-                    // Add fresh listener
-                    newElement.addEventListener('change', () => {
-                        console.log(`Bloodline changed for ${f.prefix}`);
-                        onBloodlineChange(
-                            `${f.prefix}-bloodline`,
-                            f.color,
-                            f.traits,
-                            f.attrs
-                        );
-                    });
-                } else {
-                    console.warn(`Bloodline element not found: ${f.prefix}-bloodline`);
-                }
-            });
-            
-            // Initialize colors for all forms
-            forms.forEach(f => {
-                onBloodlineChange(
-                    `${f.prefix}-bloodline`,
-                    f.color,
-                    f.traits,
-                    f.attrs
-                );
-            });
-        }        document.addEventListener('DOMContentLoaded', () => {
-            // Existing initialization code
-            
-            // Add this:
-            setupBloodlineListeners();
-            
-            // Other initialization
-        });
-        console.log("Available bloodlines in color options:", Object.keys(breedColorOptions));
-        for (const bloodline of Object.keys(breedColorOptions)) {
-            console.log(`${bloodline} colors:`, {
-                normal: breedColorOptions[bloodline].normal?.length || 0,
-                rare: breedColorOptions[bloodline].rare?.length || 0,
-                "super rare": breedColorOptions[bloodline]["super rare"]?.length || 0
-            });
-        }        
         
         // Add predict foal button listener - ADD THIS CODE HERE
         const predictButton = document.getElementById('predict-foal-btn');
@@ -5779,37 +5680,32 @@ function handleAddRace(event) {
              }
         }
 
-        const tabButtons = document.querySelectorAll('.tab-button');
-        const tabContents = document.querySelectorAll('.tab-content');
-
-        /// Fix tab activation function
         function activateTab(tabId) {
-            console.log(`Activating tab: ${tabId}`);
-            
-            // Get fresh references to tab elements
-            const tabButtons = document.querySelectorAll('.tab-button');
-            const tabContents = document.querySelectorAll('.tab-content');
-            
-            tabButtons.forEach(button => {
-                button.classList.toggle('active', button.dataset.tab === tabId);
-            });
-            
-            tabContents.forEach(content => {
-                const contentId = `tab-content-${tabId}`;
-                content.classList.toggle('active', content.id === contentId);
-            });
-            
-            // Special handling for Analysis tab
-            if (tabId === 'analysis') {
-                renderBloodlineAnalysis();
-                renderIndividualAugmentAnalysis();
-                renderAugmentPairAnalysis();
-                renderTripleAugmentAnalysis();
-            }
-            
-            console.log(`Tab ${tabId} activated`);
-        } 
-
+    console.log(`Attempting to activate tab: ${tabId}`);
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach(button => {
+        button.classList.toggle('active', button.dataset.tab === tabId);
+    });
+    
+    tabContents.forEach(content => {
+        const contentId = `tab-content-${tabId}`;
+        const shouldBeActive = content.id === contentId;
+        content.classList.toggle('active', shouldBeActive);
+    });
+    
+    console.log(`Activated tab: ${tabId}`);
+    
+    // Render analysis tables if Analysis tab is activated
+    if (tabId === 'analysis') {
+        renderBloodlineAnalysis();
+        renderIndividualAugmentAnalysis();
+        renderAugmentPairAnalysis();
+        renderTripleAugmentAnalysis();
+    }
+}
+        
         // --- Modal Handling Functions ---
         // Note: Modal element variables are now accessed from the global scope
         function showHorseDetailsModal(horseId) {
@@ -7417,118 +7313,162 @@ function handleAddRace(event) {
         }
 
         // --- Function to edit horses (racing or breeding) ---
-       // Fix for line 7488 - Remove the extra closing bracket and fix function nesting
-       function editHorse(horseId) {
-    const horse = horses.find(h => h.id === horseId);
-    if (!horse) {
-        console.error("Horse not found for editing:", horseId);
-        return;
-    }
-    
-    // Store the horse being edited
-    currentlyEditingHorse = horse;
-    
-    // Determine which form to use based on horse status
-    if (horse.status === 'racing') {
-        // Populate racing horse form
-        document.getElementById('horse-name').value = horse.name;
-        document.getElementById('horse-bloodline').value = horse.bloodline;
-        document.getElementById('horse-gender').value = horse.gender;
-        document.getElementById('horse-stars').value = horse.stars;
-        document.getElementById('horse-zed-balance').value = horse.initialZedBalance;
-        document.getElementById('horse-mm-rating').value = horse.initialMmRating;
-        
-        if (horse.color) {
-            document.getElementById('horse-color').value = horse.color;
+        function editHorse(horseId) {
+            const horse = horses.find(h => h.id === horseId);
+            if (!horse) {
+                console.error("Horse not found for editing:", horseId);
+                return;
+            }
+            
+            // Store the horse being edited
+            currentlyEditingHorse = horse;
+            
+            // Determine which form to use based on horse status
+            if (horse.status === 'racing') {
+                // Populate racing horse form
+                document.getElementById('horse-name').value = horse.name;
+                document.getElementById('horse-bloodline').value = horse.bloodline;
+                document.getElementById('horse-gender').value = horse.gender;
+                document.getElementById('horse-stars').value = horse.stars;
+                document.getElementById('horse-zed-balance').value = horse.initialZedBalance;
+                document.getElementById('horse-mm-rating').value = horse.initialMmRating;
+                
+                if (horse.color) {
+                    document.getElementById('horse-color').value = horse.color;
+                }
+                
+                // Optional star values
+                if (horse.speedStars !== null && horse.speedStars !== undefined) {
+                    document.getElementById('horse-speed-stars').value = horse.speedStars;
+                } else {
+                    document.getElementById('horse-speed-stars').value = '';
+                }
+                
+                if (horse.sprintStars !== null && horse.sprintStars !== undefined) {
+                    document.getElementById('horse-sprint-stars').value = horse.sprintStars;
+                } else {
+                    document.getElementById('horse-sprint-stars').value = '';
+                }
+                
+                if (horse.enduranceStars !== null && horse.enduranceStars !== undefined) {
+                    document.getElementById('horse-endurance-stars').value = horse.enduranceStars;
+                } else {
+                    document.getElementById('horse-endurance-stars').value = '';
+                }
+                
+                // Update button text
+                addHorseForm.querySelector('button[type="submit"]').textContent = 'Update Racing Horse';
+                
+                // Scroll to the form
+                document.getElementById('horses-section').scrollIntoView({ behavior: 'smooth' });
+                
+            } else if (horse.status === 'breeding') {
+                // Populate breeding horse form
+                document.getElementById('breeding-horse-name').value = horse.name;
+                document.getElementById('breeding-horse-bloodline').value = horse.bloodline;
+                document.getElementById('breeding-horse-gender').value = horse.gender;
+                
+                if (horse.color) {
+                    document.getElementById('breeding-horse-color').value = horse.color;
+                }
+                
+                // Optional star values
+                if (horse.stars !== null && horse.stars !== undefined) {
+                    document.getElementById('breeding-horse-stars').value = horse.stars;
+                } else {
+                    document.getElementById('breeding-horse-stars').value = '';
+                }
+                
+                if (horse.speedStars !== null && horse.speedStars !== undefined) {
+                    document.getElementById('breeding-horse-speed-stars').value = horse.speedStars;
+                } else {
+                    document.getElementById('breeding-horse-speed-stars').value = '';
+                }
+                
+                if (horse.sprintStars !== null && horse.sprintStars !== undefined) {
+                    document.getElementById('breeding-horse-sprint-stars').value = horse.sprintStars;
+                } else {
+                    document.getElementById('breeding-horse-sprint-stars').value = '';
+                }
+                
+                if (horse.enduranceStars !== null && horse.enduranceStars !== undefined) {
+                    document.getElementById('breeding-horse-endurance-stars').value = horse.enduranceStars;
+                } else {
+                    document.getElementById('breeding-horse-endurance-stars').value = '';
+                }
+                
+                // Update button text
+                addBreedingHorseForm.querySelector('button[type="submit"]').textContent = 'Update Breeding Horse';
+                
+                // Scroll to the form and switch to breeding tab if needed
+                if (document.querySelector('.tab-button[data-tab="breeding"]') && !document.querySelector('.tab-button[data-tab="breeding"]').classList.contains('active')) {
+                    activateTab('breeding');
+                }
+                document.getElementById('breeding-horses-section').scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            console.log(`Editing horse: ${horse.name} (${horse.status})`);
         }
-        
-        // Optional star values
-        if (horse.speedStars !== null && horse.speedStars !== undefined) {
-            document.getElementById('horse-speed-stars').value = horse.speedStars;
-        } else {
-            document.getElementById('horse-speed-stars').value = '';
+                // Optional star values
+                if (horse.stars !== null && horse.stars !== undefined) {
+                    document.getElementById('breeding-horse-stars').value = horse.stars;
+                } else {
+                    document.getElementById('breeding-horse-stars').value = '';
+                }
+                
+                if (horse.speedStars !== null && horse.speedStars !== undefined) {
+                    document.getElementById('breeding-horse-speed-stars').value = horse.speedStars;
+                } else {
+                    document.getElementById('breeding-horse-speed-stars').value = '';
+                }
+                
+                if (horse.sprintStars !== null && horse.sprintStars !== undefined) {
+                    document.getElementById('breeding-horse-sprint-stars').value = horse.sprintStars;
+                } else {
+                    document.getElementById('breeding-horse-sprint-stars').value = '';
+                }
+                
+                if (horse.enduranceStars !== null && horse.enduranceStars !== undefined) {
+                    document.getElementById('breeding-horse-endurance-stars').value = horse.enduranceStars;
+                } else {
+                    document.getElementById('breeding-horse-endurance-stars').value = '';
+                }
+                
+                // Update button text
+                addBreedingHorseForm.querySelector('button[type="submit"]').textContent = 'Update Breeding Horse';
+                
+                // Scroll to the form and switch to breeding tab if needed
+                if (document.querySelector('.tab-button[data-tab="breeding"]') && !document.querySelector('.tab-button[data-tab="breeding"]').classList.contains('active')) {
+                    activateTab('breeding');
+                }
+                document.getElementById('breeding-horses-section').scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            console.log(`Editing horse: ${horse.name} (${horse.status})`);
         }
+        </script>
         
-        if (horse.sprintStars !== null && horse.sprintStars !== undefined) {
-            document.getElementById('horse-sprint-stars').value = horse.sprintStars;
-        } else {
-            document.getElementById('horse-sprint-stars').value = '';
-        }
-        
-        if (horse.enduranceStars !== null && horse.enduranceStars !== undefined) {
-            document.getElementById('horse-endurance-stars').value = horse.enduranceStars;
-        } else {
-            document.getElementById('horse-endurance-stars').value = '';
-        }
-        
-        // Update button text
-        addHorseForm.querySelector('button[type="submit"]').textContent = 'Update Racing Horse';
-        
-        // Scroll to the form
-        document.getElementById('horses-section').scrollIntoView({ behavior: 'smooth' });
-        
-    } else if (horse.status === 'breeding') {
-        // Populate breeding horse form
-        document.getElementById('breeding-horse-name').value = horse.name;
-        document.getElementById('breeding-horse-bloodline').value = horse.bloodline;
-        document.getElementById('breeding-horse-gender').value = horse.gender;
-        
-        if (horse.color) {
-            document.getElementById('breeding-horse-color').value = horse.color;
-        }
-        
-        // Optional star values
-        if (horse.stars !== null && horse.stars !== undefined) {
-            document.getElementById('breeding-horse-stars').value = horse.stars;
-        } else {
-            document.getElementById('breeding-horse-stars').value = '';
-        }
-        
-        if (horse.speedStars !== null && horse.speedStars !== undefined) {
-            document.getElementById('breeding-horse-speed-stars').value = horse.speedStars;
-        } else {
-            document.getElementById('breeding-horse-speed-stars').value = '';
-        }
-        
-        if (horse.sprintStars !== null && horse.sprintStars !== undefined) {
-            document.getElementById('breeding-horse-sprint-stars').value = horse.sprintStars;
-        } else {
-            document.getElementById('breeding-horse-sprint-stars').value = '';
-        }
-        
-        if (horse.enduranceStars !== null && horse.enduranceStars !== undefined) {
-            document.getElementById('breeding-horse-endurance-stars').value = horse.enduranceStars;
-        } else {
-            document.getElementById('breeding-horse-endurance-stars').value = '';
-        }
-        
-        // Update button text
-        addBreedingHorseForm.querySelector('button[type="submit"]').textContent = 'Update Breeding Horse';
-        
-        // Scroll to the form and switch to breeding tab if needed
-        if (document.querySelector('.tab-button[data-tab="breeding"]') && !document.querySelector('.tab-button[data-tab="breeding"]').classList.contains('active')) {
-            activateTab('breeding');
-        }
-        document.getElementById('breeding-horses-section').scrollIntoView({ behavior: 'smooth' });
-    }
-    
-    console.log(`Editing horse: ${horse.name} (${horse.status})`);
-}
-</script>
-        
-<!-- Horse Details Modal Structure -->
-<div id="horse-details-modal" class="modal">
-    <div class="modal-content">
-        <span class="modal-close" id="modal-close-button">&times;</span>
-        <h3 id="modal-horse-name">Horse Details</h3>
-        <div id="modal-stats-content" class="modal-stats">
-            <!-- Basic stats loaded here -->
+        <!-- Horse Details Modal Structure -->
+    <div id="horse-details-modal" class="modal">
+            <div class="modal-content">
+                <span class="modal-close" id="modal-close-button">&times;</span>
+                <h3 id="modal-horse-name">Horse Details</h3>
+                <div id="modal-stats-content" class="modal-stats">
+                    <!-- Basic stats loaded here -->
+                </div>
+                <h4>Augment Performance</h4>
+                <div id="modal-analysis-content">
+                    <!-- Augment analysis table loaded here -->
+                </div>
+            </div>
         </div>
-        <h4>Augment Performance</h4>
-        <div id="modal-analysis-content">
-            <!-- Augment analysis table loaded here -->
-        </div>
-    </div>
-</div>
-</body>
-</html>
+        <!-- ZED Champions API Integration -->
+        <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    console.log("ZED Champions API initialized");
+                    // The ZED_API variable is already defined in the main code
+                });
+        </script>
+
+     </body>
+    </html>
