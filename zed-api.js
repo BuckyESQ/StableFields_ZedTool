@@ -219,7 +219,11 @@ class ZedAuthUI {
         header.innerHTML = `
             <h2>ZED Champions API Authentication - Manage Your API Tokens</h2>
             <p>Securely manage your API tokens to ensure uninterrupted access to ZED Champions services.</p>
-            <p><strong>Note:</strong> ZED Champions API tokens expire after 24 hours, regardless of user activity. You'll need to get a new token daily. Consider automating token renewal or implementing a mechanism to alert you when the token is about to expire.</p>
+            <ul>
+                <li><strong>Note:</strong> ZED Champions API tokens expire after 24 hours, regardless of user activity.</li>
+                <li>You need to obtain a new token daily to maintain access.</li>
+                <li>Consider automating token renewal or setting up alerts for token expiration.</li>
+            </ul>
             <p><strong>To get a token:</strong> <a href="docs/api-token-instructions.html" target="_blank" title="Learn how to obtain and manage your ZED Champions API token, including step-by-step instructions and troubleshooting tips.">Click here for detailed instructions</a>.</p>
         `;
         return header;
