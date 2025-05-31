@@ -114,39 +114,43 @@ class ZedApiService {
     /**
      * Fetch from the ZED Champions API with authorization
      */
-    async fetchFromApi(endpoint, options = {}) {
-        try {
-            const token = this.authManager.getToken();
-            if (!token) {
-                throw new Error("No API token available");
-            }
-            console.log("Token header:", `Bearer ${token.substring(0, 10)}...`);
-            
-            // Ensure the endpoint starts with a slash
-            if (!endpoint.startsWith('/')) {
-                endpoint = '/' + endpoint;
-            }
-            
-            // Use proxy in development environments
-            const baseUrl = this.useProxy ? `${this.proxyUrl}${this.apiBase}` : this.apiBase;
-            const url = `${baseUrl}${endpoint}`;
-            console.log("Attempting API request to:", url);
-            
-            const headers = {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-                ...options.headers
-            };
-            
-            return await fetch(url, {
-                ...options,
-                headers
-            });
-        } catch (error) {
-            console.error(`Network request failed: ${endpoint}`, error);
-            throw new Error("Network request failed. Please check your internet connection.");
+        async fetchFromApi(endpoint, method = 'GET', data = null) {
+    try {
+        // Force production mode on stablefields.com domain
+        const isProduction = window.location.hostname.includes('stablefields.com');
+        const useProxy = !isProduction;
+        
+        // Ensure the endpoint starts with a slash
+        if (!endpoint.startsWith('/')) {
+            endpoint = '/' + endpoint;
         }
+        
+        // Build the URL - don't use proxy in production
+        const baseUrl = useProxy ? `${this.proxyUrl}${this.apiBase}` : this.apiBase;
+        const url = `${baseUrl}${endpoint}`;
+        
+        console.log(`Running in ${isProduction ? 'production' : 'development'} mode`);
+        console.log("Attempting API request to:", url);
+        
+        const token = this.authManager.getToken();
+        const options = {
+            method: method,
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        };
+        
+        if (data) {
+            options.body = JSON.stringify(data);
+        }
+        
+        return await fetch(url, options);
+    } catch (error) {
+        console.error(`Network request failed: ${endpoint}`, error);
+        throw new Error("Network request failed. Please check your internet connection.");
     }
+}
 } // <-- Close ZedApiService class here
 
     /**
