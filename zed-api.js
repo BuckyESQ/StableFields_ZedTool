@@ -115,11 +115,11 @@ class ZedApiService {
      * Fetch from the ZED Champions API with authorization
      */
     async fetchFromApi(endpoint, method = 'GET', data = null) {
-            try {
-                // Ensure the endpoint starts with a slash
-                if (!endpoint.startsWith('/')) {
-                    endpoint = '/' + endpoint;
-                }
+        try {
+            // Ensure the endpoint starts with a slash
+            if (!endpoint.startsWith('/')) {
+                endpoint = '/' + endpoint;
+            }
                 
                 // Build the URL - don't use proxy in production
                 const baseUrl = this.useProxy ? 'http://localhost:3000/proxy/' : this.apiBase;
@@ -196,19 +196,18 @@ class ZedAuthUI {
             </div>
             <div style="margin-top: 20px;">
                 <div class="form-grid" style="grid-template-columns: 1fr auto;">
-                        <textarea id="zed-api-token" placeholder="Paste Bearer token here..." 
-                            style="width: 100%; font-family: monospace; height: 38px; resize: none; padding: 8px;"
-                            autocomplete="off" data-lpignore="true"></textarea>
-                    </div>
-                    <div style="display: flex; align-items: flex-end;">
-                        <button id="save-api-token-btn" class="button">Save Token</button>
-                    </div>
+                    <textarea id="zed-api-token" placeholder="Paste Bearer token here..." 
+                        style="width: 100%; font-family: monospace; height: 38px; resize: none; padding: 8px;"
+                        autocomplete="off" data-lpignore="true"></textarea>
                 </div>
-                <div style="margin-top: 15px; display: flex; gap: 10px; align-items: center;">
-                    <button id="test-api-connection-btn" class="button">Test Connection</button>
-                    <div id="api-connection-status" 
-                        style="margin-left: 10px; padding: 8px 12px; border-radius: 4px; display: none;"></div>
+                <div style="display: flex; align-items: flex-end; margin-top: 10px;">
+                    <button id="save-api-token-btn" class="button">Save Token</button>
                 </div>
+            </div>
+            <div style="margin-top: 15px; display: flex; gap: 10px; align-items: center;">
+                <button id="test-api-connection-btn" class="button">Test Connection</button>
+                <div id="api-connection-status" 
+                    style="margin-left: 10px; padding: 8px 12px; border-radius: 4px; display: none;"></div>
             </div>
             <div style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 25px;">
                 <h3>Import Horses from ZED Champions</h3>
@@ -419,9 +418,8 @@ class ZedAuthUI {
                 const existingHorse = window.horses.find(h => h.zedId === horseData.id);
                 
                 const processedHorse = {
-                    id: existingHorse?.id || `horse-${crypto.randomUUID()}`,
+                    id: existingHorse?.id || crypto.randomUUID(),
                     name: horseData.name,
-                    bloodline: horseData.bloodline,
                     color: horseData.color || '#CCCCCC',
                     gender: horseData.gender,
                     stars: horseData.overall_rating || null,
@@ -493,7 +491,7 @@ class ZedAuthUI {
             
             const processedHorse = {
                 id: existingHorse?.id || `horse-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-                name: horseData.name,
+                id: existingHorse?.id || crypto.randomUUID(),
                 bloodline: horseData.bloodline,
                 color: horseData.color || '#CCCCCC',
                 gender: horseData.gender,
