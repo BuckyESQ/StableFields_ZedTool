@@ -7,15 +7,18 @@ class ZedApiService {
         // Detect if we're on the production domain
         this.isProduction = window.location.hostname.includes('stablefields.com');
         
-        // Configure API settings based on environment
+        // Configure API settings based on environment - use direct connection
         this.apiBase = 'https://api.zedchampions.com';
         this.authManager = window.zedAuth;
         
-        // Only use proxy in development environments
-        this.useProxy = !this.isProduction;
-        this.proxyUrl = 'http://localhost:3000/proxy/';
+        // DISABLE proxy for development since the API is experiencing issues
+        this.useProxy = false;
+        
+        // Add fallback API endpoint in case main one isn't working
+        this.fallbackApiBase = 'https://api-alt.zedchampions.com'; // Alternative endpoint if exists
         
         console.log(`Running in ${this.isProduction ? 'production' : 'development'} mode`);
+        console.log(`Direct API connection enabled, proxy disabled`);
     }
     /**
      * Test connection to the ZED Champions API
@@ -120,35 +123,54 @@ class ZedApiService {
             if (!endpoint.startsWith('/')) {
                 endpoint = '/' + endpoint;
             }
+            
+            // Use direct API connection - no proxy
+            const url = `${this.apiBase}${endpoint}`;
+            
+            console.log("Attempting API request to:", url);
+            
+            const token = this.authManager.getToken();
+            const options = {
+                method: method,
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                // Add CORS mode for direct API access
+                mode: 'cors'
+            };
+            
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+            
+            // Add timeout to prevent hanging requests
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+            options.signal = controller.signal;
+            
+            try {
+                const response = await fetch(url, options);
+                clearTimeout(timeoutId);
+                return response;
+            } catch (error) {
+                clearTimeout(timeoutId);
                 
-                // Build the URL - don't use proxy in production
-                const baseUrl = this.useProxy ? 'http://localhost:3000/proxy' : this.apiBase;
-                // Fix double slash by ensuring endpoint starts with slash only if baseUrl doesn't end with one
-                const url = `${baseUrl}${endpoint.startsWith('/') && baseUrl.endsWith('/') ? endpoint.slice(1) : endpoint}`;
-                        
-                console.log("Attempting API request to:", url);
-                
-                const token = this.authManager.getToken();
-                const options = {
-                    method: method,
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                };
-                
-                if (data) {
-                    options.body = JSON.stringify(data);
+                // If main API fails, try the fallback if available
+                if (this.fallbackApiBase) {
+                    console.log("Main API connection failed, trying fallback...");
+                    const fallbackUrl = `${this.fallbackApiBase}${endpoint}`;
+                    return await fetch(fallbackUrl, options);
                 }
                 
-                return await fetch(url, options);
-            } catch (error) {
-                console.error(`Network request failed: ${endpoint}`, error);
-                throw new Error("Network request failed. Please check your internet connection.");
+                throw error;
             }
+        } catch (error) {
+            console.error(`Network request failed: ${endpoint}`, error);
+            throw new Error(`Network request failed: ${error.message}. Please check if the ZED Champions API is available.`);
         }
-} // <-- Close ZedApiService class here
-
+    }
+}
     /**
      * ZED Champions Auth Token UI Components
      */
