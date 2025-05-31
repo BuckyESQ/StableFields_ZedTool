@@ -517,11 +517,12 @@ class ZedAuthUI {
         
         const horseId = document.getElementById('zed-horse-id')?.value.trim();
         const importType = document.getElementById('import-horse-type')?.value || 'racing';
+        const statusElement = document.getElementById('single-import-status');
+        
         if (!['racing', 'breeding'].includes(importType)) {
             this.showImportStatus(statusElement, "Invalid horse type selected. Please choose 'Racing Horse' or 'Breeding Horse'.", false);
             return;
         }
-        const statusElement = document.getElementById('single-import-status');
         
         if (!horseId) {
             this.showImportStatus(statusElement, "Please enter a horse ID", false);
@@ -541,7 +542,6 @@ class ZedAuthUI {
             const existingHorse = window.horses.find(h => h.zedId === horseData.id);
             
             const processedHorse = {
-                id: existingHorse?.id || `horse-${Date.now()}-${Math.random().toString(16).slice(2)}`,
                 id: existingHorse?.id || crypto.randomUUID(),
                 bloodline: horseData.bloodline,
                 color: horseData.color || '#CCCCCC',
