@@ -5777,33 +5777,41 @@ function handleAddRace(event) {
         const tabButtons = document.querySelectorAll('.tab-button');
         const tabContents = document.querySelectorAll('.tab-content');
 
-     // Fix tab activation function
-function activateTab(tabId) {
-    console.log(`Activating tab: ${tabId}`);
-    
-    // Get fresh references to tab elements
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const tabContents = document.querySelectorAll('.tab-content');
-    
-    tabButtons.forEach(button => {
-        button.classList.toggle('active', button.dataset.tab === tabId);
-    });
-    
-    tabContents.forEach(content => {
-        const contentId = `tab-content-${tabId}`;
-        content.classList.toggle('active', content.id === contentId);
-    });
-    
-    console.log(`Tab ${tabId} activated`);
-    
-    // Render analysis tables if Analysis tab is activated
-    if (tabId === 'analysis') {
-        renderBloodlineAnalysis();
-        renderIndividualAugmentAnalysis();
-        renderAugmentPairAnalysis();
-        renderTripleAugmentAnalysis();
-    }
-} 
+        // Fix tab activation function
+        function activateTab(tabId) {
+            console.log(`Activating tab: ${tabId}`);
+            
+            // Get fresh references to tab elements
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.classList.toggle('active', button.dataset.tab === tabId);
+            });
+            
+            tabContents.forEach(content => {
+                const contentId = `tab-content-${tabId}`;
+                content.classList.toggle('active', content.id === contentId);
+            });
+            
+            // Special handling for Analysis tab
+            if (tabId === 'analysis') {
+                renderBloodlineAnalysis();
+                renderIndividualAugmentAnalysis();
+                renderAugmentPairAnalysis();
+                renderTripleAugmentAnalysis();
+            }
+            
+            console.log(`Tab ${tabId} activated`);
+        }
+        // Render analysis tables if Analysis tab is activated
+        if (tabId === 'analysis') {
+            renderBloodlineAnalysis();
+            renderIndividualAugmentAnalysis();
+            renderAugmentPairAnalysis();
+            renderTripleAugmentAnalysis();
+        }
+    } 
     tabButtons.forEach(button => {
         button.classList.toggle('active', button.dataset.tab === tabId);
     });
@@ -5823,7 +5831,7 @@ function activateTab(tabId) {
         renderAugmentPairAnalysis();
         renderTripleAugmentAnalysis();
     }
-}
+
         
         // --- Modal Handling Functions ---
         // Note: Modal element variables are now accessed from the global scope
