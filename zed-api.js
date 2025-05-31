@@ -188,7 +188,8 @@ class ZedAuthUI {
         const tokenSection = document.createElement('div');
         tokenSection.className = 'section';
         tokenSection.innerHTML = `
-            <h2>ZED Champions API Authentication</h2>
+    
+        <h2>ZED Champions API Authentication</h2>
             <div class="token-notice">
                 <p><strong>Note:</strong> ZED Champions API tokens expire after 24 hours. You'll need to get a new token daily.</p>
                 <p><strong>To get a token:</strong> <a href="docs/api-token-instructions.html" target="_blank">Click here for detailed instructions</a>.</p>
@@ -239,6 +240,7 @@ class ZedAuthUI {
                 </div>
             </div>
         `;
+
         return tokenSection;
     }
 
