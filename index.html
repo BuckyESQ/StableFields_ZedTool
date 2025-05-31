@@ -48,7 +48,6 @@
         --title-font: 'Orbitron', sans-serif;
         --body-font: 'Inter', sans-serif;
         --text-highlight-bg: var(--bg-color); /* Use main bg for TH text highlight */
-        }
 
         body {
             font-family: var(--body-font);
@@ -324,7 +323,6 @@
         #augments-list li span { /* Target the text span */
             flex-grow: 1; /* Allow text to take available space */
             margin-right: 10px; /* Space between text and button */
-        }
         #augments-list li:hover {
             transform: translateX(2px); /* Subtle shift on hover */
             background-color: var(--tab-active-bg); /* Use tab active bg for hover */
@@ -3417,24 +3415,31 @@
         const studAuctionCommissionInput = document.getElementById('stud-auction-commission');
         const studAuctionTableBody = document.getElementById('stud-auction-table-body');
         const totalStudAuctionIncomeSpan = document.getElementById('total-stud-auction-income');
-
-        // Tab Elements
-        const tabButtonContainer = document.getElementById('tab-buttons');
-        const tabContentContainer = document.getElementById('tab-content');
-
-        // Augment Management Elements
-        const addAugmentForm = document.getElementById('add-augment-form');
-        const cpuAugmentList = document.getElementById('cpu-augment-list');
-        const ramAugmentList = document.getElementById('ram-augment-list');
-        const hydraulicAugmentList = document.getElementById('hydraulic-augment-list');
-
-        // Stats Elements
         const totalRetirementEarningsSpan = document.getElementById('total-retirement-earnings');
         const totalStudFeesSpan = document.getElementById('total-stud-fees');
 
         // Filter/Search Elements
-        const horseSearchInput = document.getElementById('horse-search-input');
         const horseFilterBloodline = document.getElementById('horse-filter-bloodline');
+        const tabButtonContainer = document.getElementById('tab-buttons');
+        const newContainer = tabButtonContainer.cloneNode(true);
+        
+        // Augment Analysis Filter
+
+        /**
+        if (!newContainer) {
+            console.error("Tab button container element with ID 'tab-buttons' not found. Ensure the element exists in the DOM.");
+         const tabContentContainer = document.getElementById('tab-content');
+         if (tabContentContainer) {
+             console.log("Tab content container retrieved successfully.");
+             // Implement usage of tabContentContainer here if needed
+         }
+        }
+        window.tabButtons = Array.from(newContainer.querySelectorAll('.tab-button'));
+         * This function ensures only the selected tab's content is visible while hiding others.
+         */
+
+        // Update references to the original tabButtonContainer
+        window.tabButtons = Array.from(newContainer.querySelectorAll('.tab-button'));
         const horseFilterGender = document.getElementById('horse-filter-gender');
         
         // Augment Analysis Filter
@@ -4404,22 +4409,36 @@ forms.forEach(f => {
             sireSelect.addEventListener('change', (e) => displayParentStats(e.target.value, 'sire'));
             damSelect.addEventListener('change', (e) => displayParentStats(e.target.value, 'dam'));
 
-// Add this to your document.addEventListener('DOMContentLoaded') handler
-function setupBloodlineListeners() {
-    console.log("Setting up bloodline change listeners");
-    
-    forms.forEach(f => {
-        const bloodlineEl = document.getElementById(`${f.prefix}-bloodline`);
-        if (bloodlineEl) {
-            console.log(`Adding listener for ${f.prefix}-bloodline`);
+        // Add this to your document.addEventListener('DOMContentLoaded') handler
+        function setupBloodlineListeners() {
+            console.log("Setting up bloodline change listeners");
             
-            // Remove any existing listeners to prevent duplicates
-            const newElement = bloodlineEl.cloneNode(true);
-            bloodlineEl.parentNode.replaceChild(newElement, bloodlineEl);
+            forms.forEach(f => {
+                const bloodlineEl = document.getElementById(`${f.prefix}-bloodline`);
+                if (bloodlineEl) {
+                    console.log(`Adding listener for ${f.prefix}-bloodline`);
+                    
+                    // Remove any existing listeners to prevent duplicates
+                    const newElement = bloodlineEl.cloneNode(true);
+                    bloodlineEl.parentNode.replaceChild(newElement, bloodlineEl);
+                    
+                    // Add fresh listener
+                    newElement.addEventListener('change', () => {
+                        console.log(`Bloodline changed for ${f.prefix}`);
+                        onBloodlineChange(
+                            `${f.prefix}-bloodline`,
+                            f.color,
+                            f.traits,
+                            f.attrs
+                        );
+                    });
+                } else {
+                    console.warn(`Bloodline element not found: ${f.prefix}-bloodline`);
+                }
+            });
             
-            // Add fresh listener
-            newElement.addEventListener('change', () => {
-                console.log(`Bloodline changed for ${f.prefix}`);
+            // Initialize colors for all forms
+            forms.forEach(f => {
                 onBloodlineChange(
                     `${f.prefix}-bloodline`,
                     f.color,
@@ -4427,36 +4446,24 @@ function setupBloodlineListeners() {
                     f.attrs
                 );
             });
-        } else {
-            console.warn(`Bloodline element not found: ${f.prefix}-bloodline`);
-        }
-    });
-    
-    // Initialize colors for all forms
-    forms.forEach(f => {
-        onBloodlineChange(
-            `${f.prefix}-bloodline`,
-            f.color,
-            f.traits,
-            f.attrs
-        );
-    });
-}        document.addEventListener('DOMContentLoaded', () => {
-    // Existing initialization code
-    
-    // Add this:
-    setupBloodlineListeners();
-    
-    // Other initialization
-});
-console.log("Available bloodlines in color options:", Object.keys(breedColorOptions));
-for (const bloodline of Object.keys(breedColorOptions)) {
-    console.log(`${bloodline} colors:`, {
-        normal: breedColorOptions[bloodline].normal?.length || 0,
-        rare: breedColorOptions[bloodline].rare?.length || 0,
-        "super rare": breedColorOptions[bloodline]["super rare"]?.length || 0
-    });
-}        // Add predict foal button listener - ADD THIS CODE HERE
+        }        document.addEventListener('DOMContentLoaded', () => {
+            // Existing initialization code
+            
+            // Add this:
+            setupBloodlineListeners();
+            
+            // Other initialization
+        });
+        console.log("Available bloodlines in color options:", Object.keys(breedColorOptions));
+        for (const bloodline of Object.keys(breedColorOptions)) {
+            console.log(`${bloodline} colors:`, {
+                normal: breedColorOptions[bloodline].normal?.length || 0,
+                rare: breedColorOptions[bloodline].rare?.length || 0,
+                "super rare": breedColorOptions[bloodline]["super rare"]?.length || 0
+            });
+        }        
+        
+        // Add predict foal button listener - ADD THIS CODE HERE
         const predictButton = document.getElementById('predict-foal-btn');
         if (predictButton) {
             predictButton.addEventListener('click', function(event) {
