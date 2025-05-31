@@ -3162,59 +3162,84 @@
             };
         // --- Bloodline Change Handler ---
         function onBloodlineChange(bloodId, colorId, traitsId, attrsId) {
-        const bloodEl = document.getElementById(bloodId);
-        const colorEl = document.getElementById(colorId);
-        const traitsEl = document.getElementById(traitsId);
-        const attrsEl = document.getElementById(attrsId);
-
-        // Update color options
-        if (bloodEl && colorEl) {
-        colorEl.innerHTML = '<option value="">--Select Color--</option>';
+    const bloodEl = document.getElementById(bloodId);
+    const colorEl = document.getElementById(colorId);
+    const traitsEl = document.getElementById(traitsId);
+    const attrsEl = document.getElementById(attrsId);
+    
+    // Ensure elements exist
+    if (!bloodEl) {
+        console.warn(`Bloodline element not found: ${bloodId}`);
+        return;
+    }
+    
+    // Update color options
+    if (colorEl) {
         const blood = bloodEl.value;
+        colorEl.innerHTML = '<option value="">--Select Color--</option>';
+        
         if (blood && breedColorOptions[blood]) {
-            ["normal","rare","super rare"].forEach(rarity => {
-            const group = breedColorOptions[blood][rarity];
-            if (group && group.length) {
-                const optgroup = document.createElement('optgroup');
-                optgroup.label = rarity.charAt(0).toUpperCase() + rarity.slice(1);
-                group.forEach(c => {
-                const o = document.createElement('option');
-                o.value = c.hex;
-                o.textContent = `${c.label} (${c.hex})`;
-                o.title = c.hex;
-                o.style.backgroundColor = c.hex;
-                o.setAttribute('data-rarity', rarity);
-                optgroup.appendChild(o);
-                });
-                colorEl.appendChild(optgroup);
-            }
+            console.log(`Populating colors for ${blood} bloodline`);
+            
+            ["normal", "rare", "super rare"].forEach(rarity => {
+                const group = breedColorOptions[blood][rarity];
+                if (group && group.length) {
+                    const optgroup = document.createElement('optgroup');
+                    optgroup.label = rarity.charAt(0).toUpperCase() + rarity.slice(1);
+                    
+                    group.forEach(c => {
+                        const o = document.createElement('option');
+                        o.value = c.hex;
+                        o.textContent = `${c.label} (${c.hex})`;
+                        o.title = c.hex;
+                        o.style.backgroundColor = c.hex;
+                        o.setAttribute('data-rarity', rarity);
+                        optgroup.appendChild(o);
+                    });
+                    
+                    colorEl.appendChild(optgroup);
+                }
             });
-            if (colorEl.options.length > 1) colorEl.selectedIndex = 1;
-        }
-        }
-
-        // Update traits
-        if (bloodEl && traitsEl) {
-        traitsEl.innerHTML = '';
-        traitsEl.style.display = 'block'; // Make visible
-        (bloodlineTraits[bloodEl.value] || []).forEach(t => {
-            const li = document.createElement('li');
-            li.textContent = t;
-            traitsEl.appendChild(li);
-        });
-        }
-
-        // Update attributes
-        if (bloodEl && attrsEl) {
-        attrsEl.innerHTML = '';
-        attrsEl.style.display = 'block'; // Make visible
-        (bloodlineAttributes[bloodEl.value] || []).forEach(a => {
-            const li = document.createElement('li');
-            li.textContent = a;
-            attrsEl.appendChild(li);
-        });
+            
+            if (colorEl.options.length > 1) {
+                colorEl.selectedIndex = 1;
+                console.log("Set default color option");
+            }
+        } else {
+            console.warn(`No colors found for bloodline: ${blood}`);
         }
     }
+    
+    // Update traits
+    if (traitsEl) {
+        traitsEl.innerHTML = '';
+        traitsEl.style.display = 'block'; // Make visible
+        
+        const traits = bloodEl.value ? bloodlineTraits[bloodEl.value] || [] : [];
+        if (traits.length > 0) {
+            traits.forEach(t => {
+                const li = document.createElement('li');
+                li.textContent = t;
+                traitsEl.appendChild(li);
+            });
+        }
+    }
+    
+    // Update attributes
+    if (attrsEl) {
+        attrsEl.innerHTML = '';
+        attrsEl.style.display = 'block'; // Make visible
+        
+        const attrs = bloodEl.value ? bloodlineAttributes[bloodEl.value] || [] : [];
+        if (attrs.length > 0) {
+            attrs.forEach(a => {
+                const li = document.createElement('li');
+                li.textContent = a;
+                attrsEl.appendChild(li);
+            });
+        }
+    }
+}
 
     // Update traits and attributes as before...
 
@@ -4381,8 +4406,59 @@ forms.forEach(f => {
             sireSelect.addEventListener('change', (e) => displayParentStats(e.target.value, 'sire'));
             damSelect.addEventListener('change', (e) => displayParentStats(e.target.value, 'dam'));
 
-        
-        // Add predict foal button listener - ADD THIS CODE HERE
+// Add this to your document.addEventListener('DOMContentLoaded') handler
+function setupBloodlineListeners() {
+    console.log("Setting up bloodline change listeners");
+    
+    forms.forEach(f => {
+        const bloodlineEl = document.getElementById(`${f.prefix}-bloodline`);
+        if (bloodlineEl) {
+            console.log(`Adding listener for ${f.prefix}-bloodline`);
+            
+            // Remove any existing listeners to prevent duplicates
+            const newElement = bloodlineEl.cloneNode(true);
+            bloodlineEl.parentNode.replaceChild(newElement, bloodlineEl);
+            
+            // Add fresh listener
+            newElement.addEventListener('change', () => {
+                console.log(`Bloodline changed for ${f.prefix}`);
+                onBloodlineChange(
+                    `${f.prefix}-bloodline`,
+                    f.color,
+                    f.traits,
+                    f.attrs
+                );
+            });
+        } else {
+            console.warn(`Bloodline element not found: ${f.prefix}-bloodline`);
+        }
+    });
+    
+    // Initialize colors for all forms
+    forms.forEach(f => {
+        onBloodlineChange(
+            `${f.prefix}-bloodline`,
+            f.color,
+            f.traits,
+            f.attrs
+        );
+    });
+}        document.addEventListener('DOMContentLoaded', () => {
+    // Existing initialization code
+    
+    // Add this:
+    setupBloodlineListeners();
+    
+    // Other initialization
+});
+console.log("Available bloodlines in color options:", Object.keys(breedColorOptions));
+for (const bloodline of Object.keys(breedColorOptions)) {
+    console.log(`${bloodline} colors:`, {
+        normal: breedColorOptions[bloodline].normal?.length || 0,
+        rare: breedColorOptions[bloodline].rare?.length || 0,
+        "super rare": breedColorOptions[bloodline]["super rare"]?.length || 0
+    });
+}        // Add predict foal button listener - ADD THIS CODE HERE
         const predictButton = document.getElementById('predict-foal-btn');
         if (predictButton) {
             predictButton.addEventListener('click', function(event) {
@@ -5701,33 +5777,33 @@ function handleAddRace(event) {
         const tabButtons = document.querySelectorAll('.tab-button');
         const tabContents = document.querySelectorAll('.tab-content');
 
-        function activateTab(tabId) {
-        console.log(`Attempting to activate tab: ${tabId}`);
-        
-        // Use document.querySelectorAll instead of the global variables
-        const tabButtons = document.querySelectorAll('.tab-button');
-        const tabContents = document.querySelectorAll('.tab-content');
-        
-        tabButtons.forEach(button => {
+     // Fix tab activation function
+function activateTab(tabId) {
+    console.log(`Activating tab: ${tabId}`);
+    
+    // Get fresh references to tab elements
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach(button => {
         button.classList.toggle('active', button.dataset.tab === tabId);
-        });
-        
-        tabContents.forEach(content => {
+    });
+    
+    tabContents.forEach(content => {
         const contentId = `tab-content-${tabId}`;
-        const shouldBeActive = content.id === contentId;
-        content.classList.toggle('active', shouldBeActive);
-        });
-        
-        console.log(`Activated tab: ${tabId}`);
-        
-        // Render analysis tables if Analysis tab is activated
-        if (tabId === 'analysis') {
+        content.classList.toggle('active', content.id === contentId);
+    });
+    
+    console.log(`Tab ${tabId} activated`);
+    
+    // Render analysis tables if Analysis tab is activated
+    if (tabId === 'analysis') {
         renderBloodlineAnalysis();
         renderIndividualAugmentAnalysis();
         renderAugmentPairAnalysis();
         renderTripleAugmentAnalysis();
-        }
     }
+} 
     tabButtons.forEach(button => {
         button.classList.toggle('active', button.dataset.tab === tabId);
     });
