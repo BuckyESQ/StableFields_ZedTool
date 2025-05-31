@@ -122,9 +122,10 @@ class ZedApiService {
             }
                 
                 // Build the URL - don't use proxy in production
-                const baseUrl = this.useProxy ? 'http://localhost:3000/proxy/' : this.apiBase;
-                const url = `${baseUrl}${endpoint}`;
-                
+                const baseUrl = this.useProxy ? 'http://localhost:3000/proxy' : this.apiBase;
+                // Fix double slash by ensuring endpoint starts with slash only if baseUrl doesn't end with one
+                const url = `${baseUrl}${endpoint.startsWith('/') && baseUrl.endsWith('/') ? endpoint.slice(1) : endpoint}`;
+                        
                 console.log("Attempting API request to:", url);
                 
                 const token = this.authManager.getToken();
