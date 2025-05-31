@@ -3421,8 +3421,6 @@
         // Tab Elements
         const tabButtonContainer = document.getElementById('tab-buttons');
         const tabContentContainer = document.getElementById('tab-content');
-        // const tabButtons = document.querySelectorAll('.tab-button'); // REMOVED duplicate declaration
-        // const tabContents = document.querySelectorAll('.tab-content'); // REMOVED duplicate declaration
 
         // Augment Management Elements
         const addAugmentForm = document.getElementById('add-augment-form');
@@ -5777,7 +5775,7 @@ function handleAddRace(event) {
         const tabButtons = document.querySelectorAll('.tab-button');
         const tabContents = document.querySelectorAll('.tab-content');
 
-        // Fix tab activation function
+        /// Fix tab activation function
         function activateTab(tabId) {
             console.log(`Activating tab: ${tabId}`);
             
@@ -5803,6 +5801,7 @@ function handleAddRace(event) {
             }
             
             console.log(`Tab ${tabId} activated`);
+        } 
 
         // --- Modal Handling Functions ---
         // Note: Modal element variables are now accessed from the global scope
