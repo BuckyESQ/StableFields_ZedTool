@@ -122,7 +122,7 @@ class ZedApiService {
                 }
                 
                 // Build the URL - don't use proxy in production
-                const baseUrl = useProxy ? `${this.proxyUrl}${this.apiBase}` : this.apiBase;
+                const baseUrl = this.useProxy ? `${this.proxyUrl}${this.apiBase}` : this.apiBase;
                 const url = `${baseUrl}${endpoint}`;
                 
                 console.log("Attempting API request to:", url);
@@ -154,7 +154,7 @@ class ZedApiService {
 class ZedAuthUI {
         constructor() {
             this.apiService = window.zedApi;
-            this.statusContainerId = 'api-connection-status'; // Add this line
+            // Removed dynamic statusContainerId to ensure consistency
         }    
             
         /**
@@ -167,94 +167,95 @@ class ZedAuthUI {
             // Check token status every minute
             setInterval(() => this.updateTokenStatus(), 60000);
         }
-        
         /**
          * Create the token input form
          */
-     createTokenInput() {
-            const container = document.getElementById('api-import-container');
-            if (!container) return;
-            
-            const tokenSection = document.createElement('div');
-            tokenSection.className = 'section';
-            tokenSection.innerHTML = `
-                <h2>ZED Champions API Authentication</h2>
-                <div class="token-notice">
-                    <p><strong>Note:</strong> ZED Champions API tokens expire after 24 hours. You'll need to get a new token daily.</p>
-                    <p><strong>To get a token:</strong> Open ZED Champions in your browser, open Developer Tools (F12), 
-                    go to Network tab, reload the page, find any API request to api.zedchampions.com, and copy the 
-                    "Authorization" header value (starting with "Bearer ").</p>
-                </div>
-                
-                <div style="margin-top: 20px;">
-                    <div class="form-grid" style="grid-template-columns: 1fr auto;">
-                        <div>
-                            <!-- Hidden username field to satisfy browser autofill -->
-                            <input type="text" name="fakeusernameremembered" style="display:none;">
-                            <label for="zed-api-token">API Token:</label>
-                            <textarea id="zed-api-token" placeholder="Paste Bearer token here..." 
-                                style="width: 100%; font-family: monospace; height: 38px; resize: none; padding: 8px;"
-                                autocomplete="off" data-lpignore="true"></textarea>
-                        </div>
-                        <div style="display: flex; align-items: flex-end;">
-                            <button id="save-api-token-btn" class="button">Save Token</button>
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top: 15px; display: flex; gap: 10px; align-items: center;">
-                        <button id="test-api-connection-btn" class="button">Test Connection</button>
-                        <div id="${this.statusContainerId}" 
-                            style="margin-left: 10px; padding: 8px 12px; border-radius: 4px; display: none;"></div>
-                    </div>
-                </div>
-                
-                <div style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 25px;">
-                    <h3>Import Horses from ZED Champions</h3>
-                    
-                    <div style="margin-top: 15px; display: flex; gap: 15px; flex-wrap: wrap;">
-                        <button id="import-racing-stable-btn" class="button">Import Racing Stable</button>
-                        <button id="import-breeding-stable-btn" class="button">Import Breeding Stable</button>
-                    </div>
-                    <div id="import-status" style="margin-top: 10px;"></div>
-                    
-                    <div style="margin-top: 25px;">
-                        <h4>Import Single Horse</h4>
-                        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
-                            <div>
-                                <label for="zed-horse-id">Horse ID:</label>
-                                <input type="text" id="zed-horse-id" placeholder="Enter horse ID">
-                            </div>
-                            <div>
-                                <label for="import-horse-type">Import As:</label>
-                                <select id="import-horse-type">
-                                    <option value="racing">Racing Horse</option>
-                                    <option value="breeding">Breeding Horse</option>
-                                </select>
-                            </div>
-                            <button id="import-single-horse-btn" class="button">Import Horse</button>
-                        </div>
-                        <div id="single-import-status" style="margin-top: 10px;"></div>
-                    </div>
-                </div>
-            `;   
-            
-            container.appendChild(tokenSection);
-            
-            // Add event listeners
-            document.getElementById('save-api-token-btn')?.addEventListener('click', () => this.handleSaveToken());
-            document.getElementById('test-api-connection-btn')?.addEventListener('click', () => this.handleTestConnection());
-            
-            // Import buttons
-            document.getElementById('import-racing-stable-btn')?.addEventListener('click', () => this.handleImportRacingStable());
-            document.getElementById('import-breeding-stable-btn')?.addEventListener('click', () => this.handleImportBreedingStable());
-            document.getElementById('import-single-horse-btn')?.addEventListener('click', () => this.handleImportSingleHorse());
-            
-            // Prefill token if available
-            const token = window.zedAuth.getToken();
-            if (token) {
-                document.getElementById('zed-api-token').value = "••••••••••••••••••••••"; // Mask the token
+    createTokenInput() {
+        const container = document.getElementById('api-import-container');
+            if (!container) {
+                console.warn("Warning: The 'api-import-container' element is missing. Token input form cannot be created.");
+                return;
             }
+
+        const tokenSection = this.createTokenSection();
+        container.appendChild(tokenSection);
+
+        this.addEventListeners();
+        this.prefillToken();
+    }
+
+    createTokenSection() {
+        const tokenSection = document.createElement('div');
+        tokenSection.className = 'section';
+        tokenSection.innerHTML = `
+            <h2>ZED Champions API Authentication</h2>
+            <div class="token-notice">
+                <p><strong>Note:</strong> ZED Champions API tokens expire after 24 hours. You'll need to get a new token daily.</p>
+                <p><strong>To get a token:</strong> <a href="docs/api-token-instructions.html" target="_blank">Click here for detailed instructions</a>.</p>
+            </div>
+            <div style="margin-top: 20px;">
+                <div class="form-grid" style="grid-template-columns: 1fr auto;">
+                        <textarea id="zed-api-token" placeholder="Paste Bearer token here..." 
+                            class="zed-api-token-textarea"
+                            autocomplete="off" data-lpignore="true"></textarea>
+                        <textarea id="zed-api-token" placeholder="Paste Bearer token here..." 
+                            style="width: 100%; font-family: monospace; height: 38px; resize: none; padding: 8px;"
+                            autocomplete="off" data-lpignore="true"></textarea>
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <button id="save-api-token-btn" class="button">Save Token</button>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; display: flex; gap: 10px; align-items: center;">
+                    <button id="test-api-connection-btn" class="button">Test Connection</button>
+                    <div id="api-connection-status" 
+                        style="margin-left: 10px; padding: 8px 12px; border-radius: 4px; display: none;"></div>
+                </div>
+            </div>
+            <div style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 25px;">
+                <h3>Import Horses from ZED Champions</h3>
+                <div style="margin-top: 15px; display: flex; gap: 15px; flex-wrap: wrap;">
+                    <button id="import-racing-stable-btn" class="button">Import Racing Stable</button>
+                    <button id="import-breeding-stable-btn" class="button">Import Breeding Stable</button>
+                </div>
+                <div id="import-status" style="margin-top: 10px;"></div>
+                <div style="margin-top: 25px;">
+                    <h4>Import Single Horse</h4>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
+                        <div>
+                            <label for="zed-horse-id">Horse ID:</label>
+                            <input type="text" id="zed-horse-id" placeholder="Enter horse ID">
+                        </div>
+                        <div>
+                            <label for="import-horse-type">Import As:</label>
+                            <select id="import-horse-type">
+                                <option value="racing">Racing Horse</option>
+                                <option value="breeding">Breeding Horse</option>
+                            </select>
+                        </div>
+                        <button id="import-single-horse-btn" class="button">Import Horse</button>
+                    </div>
+                    <div id="single-import-status" style="margin-top: 10px;"></div>
+                </div>
+            </div>
+        `;
+        return tokenSection;
+    }
+
+    addEventListeners() {
+        document.getElementById('save-api-token-btn')?.addEventListener('click', () => this.handleSaveToken());
+        document.getElementById('test-api-connection-btn')?.addEventListener('click', () => this.handleTestConnection());
+        document.getElementById('import-racing-stable-btn')?.addEventListener('click', () => this.handleImportRacingStable());
+        document.getElementById('import-breeding-stable-btn')?.addEventListener('click', () => this.handleImportBreedingStable());
+        document.getElementById('import-single-horse-btn')?.addEventListener('click', () => this.handleImportSingleHorse());
+    }
+
+    prefillToken() {
+        const token = window.zedAuth.getToken();
+        if (token) {
+            document.getElementById('zed-api-token').value = "••••••••••••••••••••••";
         }
+    }
         
     /**
      * Handle saving the API token
