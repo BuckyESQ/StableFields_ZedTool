@@ -190,10 +190,10 @@ class ZedAuthUI {
          */
     createTokenInput() {
         const container = document.getElementById('api-import-container');
-            if (!container) {
-                console.warn("Warning: The 'api-import-container' element is missing. Token input form cannot be created.");
-                return;
-            }
+        if (!container) {
+            console.warn("Warning: The 'api-import-container' element is missing. Token input form cannot be created.");
+            return;
+        }
 
         const tokenSection = this.createTokenSection();
         container.appendChild(tokenSection);
@@ -467,6 +467,7 @@ class ZedAuthUI {
                 const processedHorse = {
                     id: existingHorse?.id || crypto.randomUUID(),
                     name: horseData.name,
+                    bloodline: horseData.bloodline,
                     color: horseData.color || '#CCCCCC',
                     gender: horseData.gender,
                     stars: horseData.overall_rating || null,
