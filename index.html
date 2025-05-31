@@ -2248,7 +2248,25 @@
                 </div>
             </div>
         </div>
-        
+            <div id="api-import-container">
+            <!-- This container will be populated by the ZedAuthUI -->
+            </div>
+
+            <!-- Call ZED API to get racing stable -->
+            <div class="section" style="margin-top: 15px;">
+                <button id="import-racing-button" class="button"
+                        onclick="importRacingStable()">
+                    Import Racing Stable
+                </button>
+                <div id="racing-import-status" style="display:none; margin-top:8px;"></div>
+            </div>
+            <div class="section" style="margin-top: 15px;">
+            <button id="import-breeding-button" class="button"
+                    onclick="importBreedingStable()">
+                Import Breeding Stable
+            </button>
+            <div id="breeding-import-status" style="display:none; margin-top:8px;"></div>
+            </div>
             <!-- Data Management Tab Content -->    
 
            <div id="tab-content-import" class="tab-content">
