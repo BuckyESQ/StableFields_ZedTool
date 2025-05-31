@@ -5803,36 +5803,7 @@ function handleAddRace(event) {
             }
             
             console.log(`Tab ${tabId} activated`);
-        }
-        // Render analysis tables if Analysis tab is activated
-        if (tabId === 'analysis') {
-            renderBloodlineAnalysis();
-            renderIndividualAugmentAnalysis();
-            renderAugmentPairAnalysis();
-            renderTripleAugmentAnalysis();
-        }
-    } 
-    tabButtons.forEach(button => {
-        button.classList.toggle('active', button.dataset.tab === tabId);
-    });
-    
-    tabContents.forEach(content => {
-        const contentId = `tab-content-${tabId}`;
-        const shouldBeActive = content.id === contentId;
-        content.classList.toggle('active', shouldBeActive);
-    });
-    
-    console.log(`Activated tab: ${tabId}`);
-    
-    // Render analysis tables if Analysis tab is activated
-    if (tabId === 'analysis') {
-        renderBloodlineAnalysis();
-        renderIndividualAugmentAnalysis();
-        renderAugmentPairAnalysis();
-        renderTripleAugmentAnalysis();
-    }
 
-        
         // --- Modal Handling Functions ---
         // Note: Modal element variables are now accessed from the global scope
         function showHorseDetailsModal(horseId) {
