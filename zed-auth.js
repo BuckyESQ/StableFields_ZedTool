@@ -39,48 +39,37 @@ class ZedAuthManager {
      *                      `false` if the token is invalid or an error occurs during validation/storage.
      */
     setToken(token) {
-        if (!token) return false;
-        
         try {
-            // Validate the token is a proper JWT
-            const parts = token.split('.');
-            if (parts.length !== 3) {
-                console.error("Invalid JWT format. A valid JWT should consist of three parts separated by dots (header.payload.signature).");
+            // Validate token format
+            if (!token) {
+                console.error("Token is empty or invalid");
                 return false;
             }
             
-            // Extract expiration time
-            let decodedPayload;
-            try {
-                const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-                decodedPayload = atob(base64);
-            } catch (e) {
-                console.error("Invalid Base64 string in JWT payload:", e);
-            sessionStorage.setItem(this.tokenKey, token);
-            }
-            const payload = JSON.parse(decodedPayload);
+            // Parse JWT token
+            const payload = this.parseJwt(token);
+            
+            // Validate expiration
             if (!payload.exp || isNaN(payload.exp)) {
                 console.warn("Token does not contain a valid expiration time");
                 return false;
             }
             
-            // Proceed to store token only if expiration time is valid
+            // Store token and expiry information
             localStorage.setItem(this.tokenKey, token);
             
-            if (payload.exp) {
-                const expiryDate = new Date(payload.exp * 1000);
-                if (isNaN(expiryDate.getTime())) {
-                    console.error("Invalid expiration timestamp in token");
-                    return false;
-                }
-                localStorage.setItem(this.tokenExpiryKey, expiryDate.toISOString());
-            console.error("Error setting token during validation or storage steps:", e);
+            const expiryDate = new Date(payload.exp * 1000);
+            if (isNaN(expiryDate.getTime())) {
+                console.error("Invalid expiration timestamp in token");
+                return false;
             }
             
+            localStorage.setItem(this.tokenExpiryKey, expiryDate.toISOString());
             return true;
+            
         } catch (e) {
             console.error("Error setting token:", e);
-        return sessionStorage.getItem(this.tokenKey);
+            return false;
         }
     }
 
@@ -148,12 +137,13 @@ class ZedAuthManager {
         sessionStorage.removeItem(this.tokenExpiryKey);
     }
 
-    /**
-     * Clears the stored token
-     */
-    clearToken() {
-        localStorage.removeItem(this.tokenKey);
-        localStorage.removeItem(this.tokenExpiryKey);
+    formatRemainingTime(remaining) {
+        if (remaining <= 0) return "Expired";
+        
+        const hours = Math.floor(remaining / (1000 * 60 * 60));
+        const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+        
+        return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
     }
 }
 
