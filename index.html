@@ -9,8 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <head>
-    </head> 
-        <!-- Existing head content -->
+    <!-- Existing head content -->
     <meta name="description" content="Track your ZED Champions horses, races, and breeding operations with this comprehensive management tool.">
     <meta name="keywords" content="ZED Champions, horse tracker, racing tracker, breeding tracker">
     <meta property="og:title" content="StableFields ZED Champions Tracker">
@@ -2244,115 +2243,55 @@
                 <div class="section">
                     <h2>Import from ZedChampions</h2>
                     <p>Import your horses directly from your ZedChampions account.</p>
-                    
-                    <!-- API Token Section -->
-                    <div class="section">
-                        <h3>ZED Champions API Connection</h3>
-                        <p>Connect with your ZED Champions API key to import your horses.</p>
-                        
-                        <div class="form-grid">
-                            <div>
-                                <label for="api-token">API Token:</label>
-                                <input type="password" id="api-token" placeholder="Paste your ZED Champions API token here">
-                            </div>
-                            <div>
-                                <button id="save-token-button" class="button">Save Token</button>
-                                <button id="test-connection-button" class="button">Test Connection</button>
-                            </div>
-                        </div>
-                        
-                        <div id="api-connection-status" style="display:none; margin-top: 15px; padding: 10px;"></div>
+                <div id="api-import-container">
+                    <!-- This container will be populated by the ZedAuthUI -->
+                </div>
+            </div>
+        </div>
+        
+            <!-- Data Management Tab Content -->    
+
+           <div id="tab-content-import" class="tab-content">
+                <h2>Data Management</h2>
+                <div style="margin-top: 15px;">
+                    <button id="export-data-button" class="button">Export All Data</button>
+                    <p style="font-size: 0.9em; color: var(--text-muted-color); margin-top: 8px;">
+                        Saves all horses, races, bred records, and augments to a JSON file as a backup.
+                    </p>
+                </div>
+                
+                <hr style="margin: 2em 0; border-color: var(--border-color);">
+                
+                <div style="margin-top: 15px;">
+                    <button id="import-data-button" class="button">Import Data from Backup</button>
+                    <input type="file" id="import-file-input" accept=".json" style="display: none;">
+                    <p style="font-size: 0.9em; color: var(--text-muted-color); margin-top: 8px;">
+                        Loads data from a previously exported JSON backup file.
+                        <strong style="color: var(--error-color);">Warning: This will overwrite all current data in the tracker.</strong>
+                    </p>
+                </div>
+                
+                <hr style="margin: 2em 0; border-color: var(--border-color);">
+
+                <!-- Add Stud Fee Section -->
+                <h2>Manually Add Stud Fee</h2>
+                <p>Use this if a stud fee wasn't properly recorded in the stats.</p>
+                <div style="margin-top: 15px; display: flex; gap: 10px; align-items: flex-end;">
+                    <div>
+                        <label for="manual-stud-fee-bred-horse" style="display: block; margin-bottom: 5px;">Select Bred Horse:</label>
+                        <select id="manual-stud-fee-bred-horse" style="width: 250px; padding: 10px; height: 42px; box-sizing: border-box;">
+                            <option value="">--Select Bred Horse--</option>
+                            <!-- Options populated by JS -->
+                        </select>
                     </div>
-                    
-                    <!-- Import Racing Stable -->
-                    <div class="section">
-                        <h3>Import Racing Horses</h3>
-                        <p>Import your active racing horses from ZED Champions.</p>
-                        <button id="import-racing-stable-button" class="button">Import Racing Stable</button>
-                        <div id="racing-import-status" style="display:none; margin-top: 15px; padding: 10px;"></div>
+                    <div>
+                        <label for="manual-stud-fee-amount" style="display: block; margin-bottom: 5px;">Stud Fee Amount:</label>
+                        <input type="number" id="manual-stud-fee-amount" step="any" style="width: 120px; padding: 10px; height: 42px; box-sizing: border-box;">
                     </div>
-                    
-                    <!-- Import Breeding Stable -->
-                    <div class="section">
-                        <h3>Import Breeding Horses</h3>
-                        <p>Import your active breeding horses from ZED Champions.</p>
-                        <button id="import-breeding-stable-button" class="button">Import Breeding Stable</button>
-                        <div id="breeding-import-status" style="display:none; margin-top: 15px; padding: 10px;"></div>
-                    </div>
-                    
-                    <!-- Import Single Horse -->
-                    <div class="section">
-                        <h3>Import Single Horse</h3>
-                        <p>Import a specific horse by its ID.</p>
-                        <div class="form-grid">
-                            <div>
-                                <label for="zed-horse-id">Horse ID:</label>
-                                <input type="text" id="zed-horse-id" placeholder="Enter ZED Champions Horse ID">
-                            </div>
-                            <div>
-                                <label for="import-horse-type">Import As:</label>
-                                <select id="import-horse-type">
-                                    <option value="racing">Racing Horse</option>
-                                    <option value="breeding">Breeding Horse</option>
-                                </select>
-                            </div>
-                            <div>
-                                <button id="import-single-horse-button" class="button">Import Horse</button>
-                            </div>
-                        </div>
-                        <div id="single-import-status" style="display:none; margin-top: 15px; padding: 10px;"></div>
-                    </div>
+                    <button id="update-stud-fee-button" class="button" style="height: 42px; margin-bottom: 0; align-self: flex-end; box-sizing: border-box;">Update Stud Fee</button>
                 </div>
             </div>
 
-           
-            <!-- Settings Tab Content: Contains configuration options for data management, stud fees, and other settings -->
-            <div id="tab-content-settings" class="tab-content">
-                <div class="section">
-                    <h2>Settings</h2>
-                    
-                    <!-- Data Management Section -->
-                    <div class="section">
-                        <h3>Data Management</h3>
-                        <div style="margin-top: 15px;">
-                            <button id="export-data-button" class="button">Export All Data</button>
-                            <p style="font-size: 0.9em; color: var(--text-muted-color); margin-top: 8px;">
-                                Saves all horses, races, bred records, and augments to a JSON file as a backup.
-                            </p>
-                        </div>
-                        
-                        <hr style="margin: 2em 0; border-color: var(--border-color);">
-                        
-                        <div style="margin-top: 15px;">
-                            <button id="import-data-button" class="button">Import Data from Backup</button>
-                            <input type="file" id="import-file-input" accept=".json" class="hidden-file-input">
-                            <p style="font-size: 0.9em; color: var(--text-muted-color); margin-top: 8px;">
-                                Loads data from a previously exported JSON backup file.
-                                <strong class="warning-text">Warning: This will overwrite all current data in the tracker.</strong>
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <!-- Add Stud Fee Section -->
-                    <div class="section">
-                        <h3>Manually Add Stud Fee</h3>
-                        <p>Use this if a stud fee wasn't properly recorded in the stats.</p>
-                        <div style="margin-top: 15px; display: flex; gap: 10px; align-items: flex-end;">
-                            <div>
-                                <label for="manual-stud-fee-bred-horse" style="display: block; margin-bottom: 5px;">Select Bred Horse:</label>
-                                <select id="manual-stud-fee-bred-horse" style="width: 250px; padding: 10px; height: 42px; box-sizing: border-box;">
-                                    <option value="">--Select Bred Horse--</option>
-                                    <!-- Options populated efficiently by JavaScript -->
-                                </select>
-                            </div>
-                            <div>
-                                <label for="manual-stud-fee-amount" style="display: block; margin-bottom: 5px;">Stud Fee Amount:</label>
-                                <input type="number" id="manual-stud-fee-amount" step="any" style="width: 120px; padding: 10px; height: 42px; box-sizing: border-box;">
-                            </div>
-                            <button id="update-stud-fee-button" class="button" style="height: 42px; margin-bottom: 0; align-self: flex-end; box-sizing: border-box;">Update Stud Fee</button>
-                        </div>
-                    </div>
-                </div>
         <script>
         // 1️⃣ Define your color palettes per bloodline.
 
@@ -2522,6 +2461,7 @@
         
         // 75% chance to inherit from sire, 25% from dam
         return Math.random() < 0.75 ? sire.bloodline : dam.bloodline;
+    }
 
         function predictFoal(sire, dam) {
             if (!sire || !dam) return null;
@@ -3445,49 +3385,25 @@
         const transactionsNextPageButton = document.getElementById('transactions-next-page');
         const transactionsPageInfoSpan = document.getElementById('transactions-page-info');
 
-        // Unified function for showing status messages
-        function showStatusMessage(element, message, isSuccess) {
-            // Handle both cases where element is a DOM element or a string selector
-            let statusElement;
-            if (typeof element === 'string') {
-                statusElement = document.getElementById(element);
-            } else {
-                statusElement = element;
-            }
+        // ...existing code...
+        // Helper function to display API connection status
+       function showConnectionStatus (message, isSuccess) {
+            const statusEl = document.getElementById('api-connection-status');
+            if (!statusEl) return;
             
-            if (!statusElement) {
-                console.error("Status element not found:", element);
-                return;
-            }
-            
-            statusElement.style.display = 'block';
-            statusElement.innerHTML = message; // Use innerHTML to support HTML in messages
+            statusEl.style.display = 'block';
+            statusEl.textContent = message;
             
             if (isSuccess === true) {
-                statusElement.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
-                statusElement.style.color = '#4CAF50';
-                statusElement.style.padding = '12px';
-                statusElement.style.borderRadius = '4px';
+                statusEl.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                statusEl.style.color = '#4CAF50';
             } else if (isSuccess === false) {
-                statusElement.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
-                statusElement.style.color = '#F44336';
-                statusElement.style.padding = '12px';
-                statusElement.style.borderRadius = '4px';
+                statusEl.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
+                statusEl.style.color = '#F44336';
             } else {
-                statusElement.style.backgroundColor = 'rgba(33, 150, 243, 0.2)';
-                statusElement.style.color = '#2196F3';
-                statusElement.style.padding = '12px';
-                statusElement.style.borderRadius = '4px';
+                statusEl.style.backgroundColor = 'rgba(33, 150, 243, 0.2)';
+                statusEl.style.color = '#2196F3';
             }
-        }
-
-        // Use this for both connection status and import status
-        function showConnectionStatus(message, isSuccess) {
-            showStatusMessage('api-connection-status', message, isSuccess);
-        }
-
-        function showImportStatus(element, message, isSuccess) {
-            showStatusMessage(element, message, isSuccess);
         }
        
         // --- Initialization ---
@@ -3656,6 +3572,7 @@
                 option.textContent = optionText;
                 selectElement.appendChild(option);
             });
+        }
 
          // Modified populateList to create management list with delete buttons
          function populateManagementList(ulElement, items, type) {
@@ -3757,6 +3674,7 @@
                 option.textContent = horse.name;
                 damSelect.appendChild(option);
             });        
+        }
             // Add this function after your data storage definitions
             function debugRacesAndHorses() {
                 console.group("🔍 DEBUG INFORMATION");
@@ -4363,7 +4281,6 @@
             sireSelect.addEventListener('change', (e) => displayParentStats(e.target.value, 'sire'));
             damSelect.addEventListener('change', (e) => displayParentStats(e.target.value, 'dam'));
 
-        
         // Add predict foal button listener - ADD THIS CODE HERE
         const predictButton = document.getElementById('predict-foal-btn');
         if (predictButton) {
@@ -4422,59 +4339,7 @@
                 resultDiv.style.animation = "fadeIn 0.5s ease-in-out";
             });
         }    
-             // ZED API event listeners
-            const saveTokenButton = document.getElementById('save-token-button');
-            const testConnectionButton = document.getElementById('test-connection-button');
-            const apiTokenInput = document.getElementById('api-token');
-            
-            if (saveTokenButton) {
-                saveTokenButton.addEventListener('click', function() {
-                    const token = apiTokenInput.value.trim();
-                    if (token) {
-                        const success = ZED_API.setAuthToken(token);
-                        if (success) {
-                            showConnectionStatus("API token saved successfully.", true);
-                        } else {
-                            showConnectionStatus("Failed to save API token.", false);
-                        }
-                    } else {
-                        showConnectionStatus("Please enter a valid API token.", false);
-                    }
-                });
-            }
-            
-            if (testConnectionButton) {
-                testConnectionButton.addEventListener('click', function() {
-                    showConnectionStatus("Testing connection...", null);
-                    ZED_API.testConnection()
-                        .then(result => {
-                            showConnectionStatus(result.message, result.success);
-                        })
-                        .catch(error => {
-                            showConnectionStatus(`Connection error: ${error.message}`, false);
-                        });
-                });
-            }
 
-            // Import buttons event listeners
-            const importRacingStableButton = document.getElementById('import-racing-stable-button');
-            const importBreedingStableButton = document.getElementById('import-breeding-stable-button');
-            const importSingleHorseButton = document.getElementById('import-single-horse-button');
-            
-            if (importRacingStableButton) {
-                importRacingStableButton.addEventListener('click', importRacingStable);
-            }
-            
-            if (importBreedingStableButton) {
-                importBreedingStableButton.addEventListener('click', importBreedingStable);
-            }
-            
-            if (importSingleHorseButton) {
-                importSingleHorseButton.addEventListener('click', importSingleHorse);
-            }
-
-            // ... other event listeners ...
-        }    
             // Add event listener for External Sire Bloodline change
             document.getElementById('external-sire-bloodline').addEventListener('change', function() {
                 populateColorOptionsFor('external-sire-bloodline', 'external-sire-color');
@@ -4487,7 +4352,9 @@
             }
               // Transactions table listener              
             // Transactions pagination listeners
-            // Use already declared transactionsItemsPerPageSelect from global scope
+            const transactionsItemsPerPageSelect = document.getElementById('transactions-items-per-page');
+            const transactionsPrevPageButton = document.getElementById('transactions-prev-page');
+            const transactionsNextPageButton = document.getElementById('transactions-next-page');
             
             if (transactionsItemsPerPageSelect) {
                 transactionsItemsPerPageSelect.value = transactionTableItemsPerPage;
@@ -4513,7 +4380,9 @@
             }
 
             // Stud Auction pagination listeners
-            // Use already declared studAuctionItemsPerPageSelect from global scope
+            const studAuctionItemsPerPageSelect = document.getElementById('stud-auction-items-per-page');
+            const studAuctionPrevPageButton = document.getElementById('stud-auction-prev-page');
+            const studAuctionNextPageButton = document.getElementById('stud-auction-next-page');
             
             if (studAuctionItemsPerPageSelect) {
                 studAuctionItemsPerPageSelect.value = studAuctionTableItemsPerPage;
@@ -5681,30 +5550,27 @@ function handleAddRace(event) {
         }
 
         function activateTab(tabId) {
-    console.log(`Attempting to activate tab: ${tabId}`);
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const tabContents = document.querySelectorAll('.tab-content');
-    
-    tabButtons.forEach(button => {
-        button.classList.toggle('active', button.dataset.tab === tabId);
-    });
-    
-    tabContents.forEach(content => {
-        const contentId = `tab-content-${tabId}`;
-        const shouldBeActive = content.id === contentId;
-        content.classList.toggle('active', shouldBeActive);
-    });
-    
-    console.log(`Activated tab: ${tabId}`);
-    
-    // Render analysis tables if Analysis tab is activated
-    if (tabId === 'analysis') {
-        renderBloodlineAnalysis();
-        renderIndividualAugmentAnalysis();
-        renderAugmentPairAnalysis();
-        renderTripleAugmentAnalysis();
-    }
-}
+            console.log(`Attempting to activate tab: ${tabId}`); // Corrected syntax
+             tabButtons.forEach(button => {
+                 button.classList.toggle('active', button.dataset.tab === tabId);
+             });
+             tabContents.forEach(content => {
+                  // Use ID matching for content activation
+                 const contentId = `tab-content-${tabId}`;
+                 const shouldBeActive = content.id === contentId;
+                 console.log(`Checking content div #${content.id}: Should be active? ${shouldBeActive}`); // Corrected syntax
+                  content.classList.toggle('active', shouldBeActive);
+             });
+             console.log(`Activated tab: ${tabId}`);
+             
+             // Render analysis tables if Analysis tab is activated
+             if (tabId === 'analysis') {
+                 renderBloodlineAnalysis();
+                 renderIndividualAugmentAnalysis();
+                 renderAugmentPairAnalysis();
+                 renderTripleAugmentAnalysis();
+             }
+        }
         
         // --- Modal Handling Functions ---
         // Note: Modal element variables are now accessed from the global scope
@@ -7050,31 +6916,31 @@ function handleAddRace(event) {
             
             // Create new auction record or update existing
             if (currentlyEditingStudAuction) {
-            // Update existing record
-            const index = studAuctions.findIndex(sa => sa.id === currentlyEditingStudAuction.id);
-            if (index !== -1) {
-                studAuctions[index] = {
-                    id: currentlyEditingStudAuction.id,
+                // Update existing record
+                const index = studAuctions.findIndex(sa => sa.id === currentlyEditingStudAuction.id);
+                if (index !== -1) {
+                    studAuctions[index] = {
+                        ...currentlyEditingStudAuction,
+                        horseId: horseId,
+                        horseName: horse.name,
+                        auctionPrice: auctionPrice,
+                        commission: commission,
+                        date: auctionDate
+                    };
+                }
+            } else {
+                // Create new record
+                const newRecord = {
+                    id: `stud-auction-${Date.now()}-${Math.random().toString(16).slice(2)}`,
                     horseId: horseId,
                     horseName: horse.name,
                     auctionPrice: auctionPrice,
                     commission: commission,
                     date: auctionDate
                 };
+                
+                studAuctions.push(newRecord);
             }
-        } else {
-            // Create new record
-            const newRecord = {
-                id: `stud-auction-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-                horseId: horseId,
-                horseName: horse.name,
-                auctionPrice: auctionPrice,
-                commission: commission,
-                date: auctionDate
-            };
-            
-            studAuctions.push(newRecord);
-        }
             
             // Update totals, save data, and refresh UI
             saveData();
@@ -7313,7 +7179,7 @@ function handleAddRace(event) {
         }
 
         // --- Function to edit horses (racing or breeding) ---
-        function editHorse(horseId) {
+      function editHorse(horseId) {
             const horse = horses.find(h => h.id === horseId);
             if (!horse) {
                 console.error("Horse not found for editing:", horseId);
@@ -7409,43 +7275,6 @@ function handleAddRace(event) {
             
             console.log(`Editing horse: ${horse.name} (${horse.status})`);
         }
-                // Optional star values
-                if (horse.stars !== null && horse.stars !== undefined) {
-                    document.getElementById('breeding-horse-stars').value = horse.stars;
-                } else {
-                    document.getElementById('breeding-horse-stars').value = '';
-                }
-                
-                if (horse.speedStars !== null && horse.speedStars !== undefined) {
-                    document.getElementById('breeding-horse-speed-stars').value = horse.speedStars;
-                } else {
-                    document.getElementById('breeding-horse-speed-stars').value = '';
-                }
-                
-                if (horse.sprintStars !== null && horse.sprintStars !== undefined) {
-                    document.getElementById('breeding-horse-sprint-stars').value = horse.sprintStars;
-                } else {
-                    document.getElementById('breeding-horse-sprint-stars').value = '';
-                }
-                
-                if (horse.enduranceStars !== null && horse.enduranceStars !== undefined) {
-                    document.getElementById('breeding-horse-endurance-stars').value = horse.enduranceStars;
-                } else {
-                    document.getElementById('breeding-horse-endurance-stars').value = '';
-                }
-                
-                // Update button text
-                addBreedingHorseForm.querySelector('button[type="submit"]').textContent = 'Update Breeding Horse';
-                
-                // Scroll to the form and switch to breeding tab if needed
-                if (document.querySelector('.tab-button[data-tab="breeding"]') && !document.querySelector('.tab-button[data-tab="breeding"]').classList.contains('active')) {
-                    activateTab('breeding');
-                }
-                document.getElementById('breeding-horses-section').scrollIntoView({ behavior: 'smooth' });
-            }
-            
-            console.log(`Editing horse: ${horse.name} (${horse.status})`);
-        }
         </script>
         
         <!-- Horse Details Modal Structure -->
@@ -7463,12 +7292,8 @@ function handleAddRace(event) {
             </div>
         </div>
         <!-- ZED Champions API Integration -->
-        <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    console.log("ZED Champions API initialized");
-                    // The ZED_API variable is already defined in the main code
-                });
-        </script>
-
-     </body>
+            <script src="zed-auth.js"></script>
+            <script src="zed-api.js"></script>
+            <script src="zed-auth-ui.js"></script>
+    </body>
     </html>
