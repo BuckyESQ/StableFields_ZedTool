@@ -13,7 +13,7 @@ class ZedApiService {
         
         // Only use proxy in development environments
         this.useProxy = !this.isProduction;
-        this.proxyUrl = 'https://corsproxy.io/?';
+        this.proxyUrl = 'http://localhost:3000/proxy/';
         
         console.log(`Running in ${this.isProduction ? 'production' : 'development'} mode`);
     }
@@ -122,7 +122,7 @@ class ZedApiService {
                 }
                 
                 // Build the URL - don't use proxy in production
-                const baseUrl = this.useProxy ? `${this.proxyUrl}${this.apiBase}` : this.apiBase;
+                const baseUrl = this.useProxy ? 'http://localhost:3000/proxy/' : this.apiBase;
                 const url = `${baseUrl}${endpoint}`;
                 
                 console.log("Attempting API request to:", url);
@@ -154,7 +154,7 @@ class ZedApiService {
 class ZedAuthUI {
         constructor() {
             this.apiService = window.zedApi;
-            // Removed dynamic statusContainerId to ensure consistency
+            this.statusContainerId = 'api-connection-status'; // Define the status container ID
         }    
             
         /**
@@ -196,9 +196,6 @@ class ZedAuthUI {
             </div>
             <div style="margin-top: 20px;">
                 <div class="form-grid" style="grid-template-columns: 1fr auto;">
-                        <textarea id="zed-api-token" placeholder="Paste Bearer token here..." 
-                            class="zed-api-token-textarea"
-                            autocomplete="off" data-lpignore="true"></textarea>
                         <textarea id="zed-api-token" placeholder="Paste Bearer token here..." 
                             style="width: 100%; font-family: monospace; height: 38px; resize: none; padding: 8px;"
                             autocomplete="off" data-lpignore="true"></textarea>
@@ -254,8 +251,15 @@ class ZedAuthUI {
 
     prefillToken() {
         const token = window.zedAuth.getToken();
+        const expiry = window.zedAuth.getTokenExpiry();
+        
         if (token) {
-            document.getElementById('zed-api-token').value = "••••••••••••••••••••••";
+            if (expiry && expiry.expired) {
+                document.getElementById('zed-api-token').value = ""; // Clear token input if expired
+                this.showStatus("Your API token has expired. Please obtain a new token.", false);
+            } else {
+                document.getElementById('zed-api-token').value = "••••••••••••••••••••••"; // Mask the token if valid
+            }
         }
     }
         
@@ -334,7 +338,7 @@ class ZedAuthUI {
                 const existingHorse = window.horses.find(h => h.zedId === horseData.id);
                 
                 const processedHorse = {
-                    id: existingHorse?.id || `horse-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                    id: existingHorse?.id || crypto.randomUUID(),
                     name: horseData.name,
                     bloodline: horseData.bloodline,
                     color: horseData.color || '#CCCCCC', // Default color
@@ -415,7 +419,7 @@ class ZedAuthUI {
                 const existingHorse = window.horses.find(h => h.zedId === horseData.id);
                 
                 const processedHorse = {
-                    id: existingHorse?.id || `horse-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                    id: existingHorse?.id || `horse-${crypto.randomUUID()}`,
                     name: horseData.name,
                     bloodline: horseData.bloodline,
                     color: horseData.color || '#CCCCCC',
@@ -559,19 +563,17 @@ class ZedAuthUI {
      */
     updateTokenStatus() {
         const token = window.zedAuth.getToken();
-        if (!token) {
+        const expiry = window.zedAuth.getTokenExpiry();
+        
+        if (!token || (expiry && expiry.expired)) {
             document.getElementById('test-api-connection-btn')?.setAttribute('disabled', 'disabled');
+            if (expiry && expiry.expired) {
+                this.showStatus("Your API token has expired. Please obtain a new token.", false);
+            }
             return;
         }
         
         document.getElementById('test-api-connection-btn')?.removeAttribute('disabled');
-        
-        const expiry = window.zedAuth.getTokenExpiry();
-        if (!expiry) return;
-        
-        if (expiry.expired) {
-            this.showStatus("Your API token has expired. Please obtain a new token.", false);
-        }
     }
     
     /**
@@ -626,8 +628,12 @@ class ZedAuthUI {
 
 // Initialize the API service globally
 window.zedApi = new ZedApiService();
-
 // Initialize the UI when the DOM is ready
+// This event listener waits for the DOM content to be fully loaded before executing.
+// It creates an instance of the ZedAuthUI class and calls its initialize method.
+// Dependencies:
+// - ZedAuthUI class: Handles the UI components for API authentication and interaction.
+// - window.zedApi: An instance of ZedApiService, required for API communication.
 document.addEventListener('DOMContentLoaded', () => {
     const authUI = new ZedAuthUI();
     authUI.initialize();
