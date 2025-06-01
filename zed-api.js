@@ -1,85 +1,79 @@
-// ZED Champions API Service and UI Components   
-/**
- * ZED Champions API Service
- */
 class ZedApiService {
-    constructor() {
-        // Detect if we're on the production domain
-        this.isProduction = window.location.hostname.includes('stablefields.com');
-        
-        // Configure API settings based on environment - use direct connection
-        this.apiBase = 'https://api.zedchampions.com';
-        this.authManager = window.zedAuth;
-        
-        // DISABLE proxy for development since the API is experiencing issues
-        this.useProxy = false;
-        
-        // Add fallback API endpoint in case main one isn't working
-        this.fallbackApiBase = 'https://api-alt.zedchampions.com'; // Alternative endpoint if exists
-        
-        console.log(`Running in ${this.isProduction ? 'production' : 'development'} mode`);
-        console.log(`Direct API connection enabled, proxy disabled`);
+  constructor() {
+    this.isProduction = window.location.hostname.includes('stablefields.com');
+    this.apiBase = 'https://api.zedchampions.com';
+    this.authManager = window.zedAuth;
+    // ◀️ enable proxy in dev, disable in prod
+    this.useProxy = !this.isProduction;
+    console.log(`Running in ${this.isProduction ? 'production' : 'development'} mode; proxy ${this.useProxy ? 'ON' : 'OFF'}`);
+  }
+
+  /**
+   * Core fetch that switches between proxy and direct API,
+   * applies Bearer token, handles timeout and optional fallback.
+   */
+  async fetchFromApi(endpoint, method = 'GET', data = null) {
+    if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
+
+    // build URL once
+    const url = this.useProxy
+      ? `http://localhost:3000/zed${endpoint}`
+      : `${this.apiBase}${endpoint}`;
+
+    console.log("Attempting API request to:", url);
+
+    const token = this.authManager.getToken();
+    const options = {
+      method,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      mode: 'cors'
+    };
+    if (data) options.body = JSON.stringify(data);
+
+    // timeout via AbortController
+    const controller = new AbortController();
+    options.signal = controller.signal;
+    const timeoutId = setTimeout(() => controller.abort(), 15_000);
+
+    try {
+      const resp = await fetch(url, options);
+      clearTimeout(timeoutId);
+      return resp;
+    } catch (err) {
+      clearTimeout(timeoutId);
+      // if we were using proxy, try direct as a last-ditch
+      if (this.useProxy) {
+        console.warn("Proxy failed, falling back to direct API…");
+        return fetch(`${this.apiBase}${endpoint}`, options);
+      }
+      console.error(`Network request failed for ${endpoint}:`, err);
+      throw new Error(`Network request failed: ${err.message}`);
     }
+  }
     /**
-     * Test connection to the ZED Champions API
+     * Fetch horse types dynamically from the API
      */
-    async testConnection() {
+    async fetchHorseTypes() {
         try {
-            if (!this.authManager.getToken()) {
-                return { 
-                    success: false, 
-                    message: "No API token set. Please enter your ZED Champions API token." 
-                };
+            const response = await this.fetchFromApi('/v1/horse-types');
+            if (!response.ok) {
+                console.error(`Error fetching horse types: ${response.status} ${response.statusText}`);
+                return ['racing', 'breeding']; // Fallback to default types
             }
-            
-            if (this.authManager.isTokenExpired()) {
-                return { 
-                    success: false, 
-                    message: "Your API token has expired. Please obtain a new token." 
-                };
-            }
-            
-            // Try a simpler endpoint for testing
-            try {
-                const response = await this.fetchFromApi('/v1/user/me');
-                if (response.ok) {
-                    const data = await response.json();
-                    return { 
-                        success: true, 
-                        message: `Connection successful! Welcome, ${data.name || 'Challenger'}` 
-                    };
-                } else {
-                    return { 
-                        success: false, 
-                        message: `Connection failed: ${response.status} ${response.statusText}` 
-                    };
-                }
-            } catch (networkError) {
-                // Special case for CORS errors
-                if (networkError.message.includes("CORS") || networkError.message.includes("Failed to fetch")) {
-                    return { 
-                        success: false, 
-                        message: "Connection blocked by CORS policy. Try using this app from a different environment." 
-                    };
-                }
-                
-                return { 
-                    success: false, 
-                    message: `Connection error: ${networkError.message}` 
-                };
-            }
+            const data = await response.json();
+            return data.types || ['racing', 'breeding']; // Ensure fallback if API response is empty
         } catch (error) {
-            console.error("Error testing connection:", error);
-            return { 
-                success: false, 
-                message: `Connection error: ${error.message}` 
-            };
+            console.error(`Error fetching horse types: ${error.message}`);
+            return ['racing', 'breeding']; // Fallback to default types
         }
     }
 
     /**
-    * Fetch a single horse by ID
-    */
+     * Fetch a single horse by ID
+     */
     async fetchHorse(horseId) {
         try {
             const response = await this.fetchFromApi(`/v1/horses/${horseId}`);
@@ -113,62 +107,53 @@ class ZedApiService {
             return { success: false, message: `Error: ${error.message}` };
         }
     }
-    
     /**
      * Fetch from the ZED Champions API with authorization
      */
     async fetchFromApi(endpoint, method = 'GET', data = null) {
-        try {
-            // Ensure the endpoint starts with a slash
-            if (!endpoint.startsWith('/')) {
-                endpoint = '/' + endpoint;
-            }
-            
-            // Use direct API connection - no proxy
-            const url = `${this.apiBase}${endpoint}`;
-            
-            console.log("Attempting API request to:", url);
-            
-            const token = this.authManager.getToken();
-            const options = {
-                method: method,
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                // Add CORS mode for direct API access
-                mode: 'cors'
-            };
-            
-            if (data) {
-                options.body = JSON.stringify(data);
-            }
-            
-            // Add timeout to prevent hanging requests
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
-            options.signal = controller.signal;
-            
-            try {
-                const response = await fetch(url, options);
-                clearTimeout(timeoutId);
-                return response;
-            } catch (error) {
-                clearTimeout(timeoutId);
-                
-                // If main API fails, try the fallback if available
-                if (this.fallbackApiBase) {
-                    console.log("Main API connection failed, trying fallback...");
-                    const fallbackUrl = `${this.fallbackApiBase}${endpoint}`;
-                    return await fetch(fallbackUrl, options);
-                }
-                
-                throw error;
-            }
-        } catch (error) {
-            console.error(`Network request failed: ${endpoint}`, error);
-            throw new Error(`Network request failed: ${error.message}. Please check if the ZED Champions API is available.`);
+        if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
+
+        // build the URL only once
+        let url;
+        if (this.useProxy) {
+            // proxy lives at http://localhost:3000/zed
+            url = `http://localhost:3000/zed${endpoint}`;
+        } else {
+            url = `${this.apiBase}${endpoint}`;
         }
+
+        console.log("Attempting API request to:", url);
+        const token = this.authManager.getToken();
+        const options = {
+            method,
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            mode: 'cors'
+        };
+        if (data) options.body = JSON.stringify(data);
+
+        // timeout support
+        const controller = new AbortController();
+        options.signal = controller.signal;
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+        try {
+            const response = await fetch(url, options);
+            clearTimeout(timeoutId);
+            return response;
+        } catch (err) {
+            clearTimeout(timeoutId);
+            if (this.fallbackApiBase) {
+                console.log("Main API failed, trying fallback…");
+                return fetch(`${this.fallbackApiBase}${endpoint}`, options);
+            }
+            throw err;
+        }
+    } catch (err) {
+        console.error(`Network request failed for ${endpoint}`, err);
+        throw new Error(`Network request failed: ${err.message}`);
     }
 }
     /**
@@ -195,8 +180,8 @@ class ZedAuthUI {
         /**
          * Populate the "Import As" dropdown with horse types dynamically
          */
-        populateHorseTypeOptions() {
-            const horseTypes = ['racing', 'breeding']; // Replace with dynamic API call if needed
+        async populateHorseTypeOptions() {
+            const horseTypes = await this.apiService.fetchHorseTypes(); // Fetch horse types dynamically from the API
             const selectElement = document.getElementById('import-horse-type');
             if (!selectElement) return;
     

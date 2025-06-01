@@ -6949,6 +6949,7 @@ function handleAddRace(event) {
             // Create a Blob and URL
             const blob = new Blob([jsonData], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
+            setTimeout(() => URL.revokeObjectURL(url), 0); // Revoke the URL after use
             
             // Create a temporary download link
             const downloadLink = document.createElement('a');
