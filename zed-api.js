@@ -12,10 +12,10 @@ class ZedApiService {
       this.apiBase = 'http://localhost:3000/zed'; // For compatibility
     } else {
       // Production - Using Vercel deployment
-      this.apiBaseUrl = 'https://zed-champions-proxy.vercel.app/api/zed'; // Replace with your actual Vercel app
+      this.apiBaseUrl = 'https://vercel.com/david-a-prado-srs-projects/v0-new-project-yuprzjsy9ei'; // Replace with your actual Vercel app
       this.apiBase = 'https://zed-champions-proxy.vercel.app/api/zed'; // For compatibility
     }
-    
+
     // Enable proxy in dev, disable in prod
     this.useProxy = !this.isProduction;
     console.log(`Running in ${this.isProduction ? 'production' : 'development'} mode; proxy ${this.useProxy ? 'ON' : 'OFF'}`);
