@@ -8,8 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <head>
-    <!-- Existing head content -->
     <meta name="description" content="Track your ZED Champions horses, races, and breeding operations with this comprehensive management tool.">
     <meta name="keywords" content="ZED Champions, horse tracker, racing tracker, breeding tracker">
     <meta property="og:title" content="StableFields ZED Champions Tracker">
@@ -18,12 +16,7 @@
     <meta property="og:url" content="https://stablefields.com/zed-tracker/">
     <meta name="twitter:card" content="summary_large_image">
     <!-- End of added meta tags -->
-     <div id="welcome-banner" class="section" style="background-color: rgba(76, 175, 80, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-    <h2>Welcome to StableFields ZED Champions Tracker</h2>
-    <p>This tool helps you track your ZED Champions horses, races, breeding, and more. Get started by entering your data or importing directly from the ZED Champions API.</p>
-    <p><a href="#tab-content-import" onclick="activateTab('import'); return false;" style="font-weight: bold;">Go to Import Tab</a> to quickly import your horses from ZED Champions.</p>
-</div>
-</head>
+    
     <style>
         /* Basic Reset & Variables */
        :root {
@@ -1297,7 +1290,11 @@
 <body>
 
      <h1>Zed Champions Tracker</h1>
-
+        <div id="welcome-banner" class="section" style="background-color: rgba(76, 175, 80, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+        <h2>Welcome to StableFields ZED Champions Tracker</h2>
+        <p>This tool helps you track your ZED Champions horses, races, breeding, and more. Get started by entering your data or importing directly from the ZED Champions API.</p>
+        <p><a href="#tab-content-import" onclick="activateTab('import'); return false;" style="font-weight: bold;">Go to Import Tab</a> to quickly import your horses from ZED Champions.</p>
+    </div> 
         <!-- Tab Navigation -->
         <div id="tab-buttons">
             <button class="tab-button active" data-tab="racing">Racing</button>
@@ -2248,7 +2245,7 @@
                 </div>
             </div>
         </div>
-            <div id="api-import-container">
+            <div id="data-management"> 
             <!-- This container will be populated by the ZedAuthUI -->
             </div>
 
