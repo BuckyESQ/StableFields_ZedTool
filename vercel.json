@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "env": {
+    "ZED_TOKEN": "@zed_token"
+  },
+  "rewrites": [
+    {
+      "source": "/api/zed/:path*",
+      "destination": "/api/zed"
+    }
+  ]
+}
