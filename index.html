@@ -7775,87 +7775,106 @@ function handleAddRace(event) {
 
         <!-- Quantum Cosmos Effect -->
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-            // Clean up any duplicate elements that might have been created previously
-            document.querySelectorAll('.quantum-particle').forEach(el => el.remove());
-            if (document.getElementById('sagan-quote')) document.getElementById('sagan-quote').remove();
+        // Quantum Particles Animation
+        function createQuantumParticles() {
+            const maxParticles = 50;
+            const body = document.querySelector('body');
             
-            // Create Sagan quote container
-            const quoteDiv = document.createElement('div');
-            quoteDiv.id = 'sagan-quote';
-            quoteDiv.className = 'sagan-quote';
-            document.body.appendChild(quoteDiv);
-            
-            // Quantum button effect - apply to ALL appropriate buttons
-            document.querySelectorAll('.button:not(.pagination-button):not(.action-button)').forEach(btn => {
-                if (!btn.classList.contains('quantum-button')) {
-                btn.classList.add('quantum-button');
-                }
-            });
-            
-            // Start quote rotation
-            displayRandomSaganQuote();
-            setInterval(displayRandomSaganQuote, 120000);
-            
-            // Create initial set of particles
-            for (let i = 0; i < 30; i++) {
-                setTimeout(() => createQuantumParticle(), i * 100);
+            for (let i = 0; i < maxParticles; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'quantum-particle';
+                    
+                    // Random size between 2-5px
+                    const size = Math.random() * 3 + 2;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    
+                    // Random position on screen
+                    const posX = Math.random() * window.innerWidth;
+                    const posY = Math.random() * window.innerHeight;
+                    particle.style.left = `${posX}px`;
+                    particle.style.top = `${posY}px`;
+                    
+                    // Random opacity
+                    particle.style.opacity = Math.random() * 0.5 + 0.2;
+                    
+                    // Add to DOM
+                    body.appendChild(particle);
+                    
+                    // Animate movement
+                    setTimeout(() => {
+                        const moveX = (Math.random() - 0.5) * 150;
+                        const moveY = (Math.random() - 0.5) * 150;
+                        particle.style.transform = `translate(${moveX}px, ${moveY}px)`;
+                        particle.style.opacity = '0';
+                    }, 100);
+                    
+                    // Clean up
+                    setTimeout(() => {
+                        body.removeChild(particle);
+                        // Create a new particle to replace this one
+                        if (document.querySelectorAll('.quantum-particle').length < maxParticles) {
+                            createQuantumParticles(1);
+                        }
+                    }, 10000);
+                }, i * 200); // Stagger creation
             }
-            });
+        }
 
-            // Make sure our functions are globally available
-            function displayRandomSaganQuote() {
+        // Carl Sagan Quotes Rotation
+        function setupSaganQuotes() {
             const quotes = [
-                "The cosmos is within us. We are made of star-stuff.",
+                "We are made of star stuff.",
+                "The cosmos is within us.",
                 "Somewhere, something incredible is waiting to be known.",
                 "We are a way for the cosmos to know itself.",
-                "The nitrogen in our DNA, the calcium in our teeth, the iron in our blood were made in the interiors of collapsing stars.",
-                "We are like butterflies who flutter for a day and think it is forever."
+                "The universe seems neither benign nor hostile, merely indifferent.",
+                "Imagination will often carry us to worlds that never were.",
+                "The absence of evidence is not the evidence of absence."
             ];
             
-            const quoteContainer = document.getElementById('sagan-quote');
-            if (quoteContainer) {
-                const randomIndex = Math.floor(Math.random() * quotes.length);
-                quoteContainer.textContent = quotes[randomIndex];
-                quoteContainer.style.opacity = 0;
+            const body = document.querySelector('body');
+            const quoteContainer = document.createElement('div');
+            quoteContainer.className = 'sagan-quote';
+            body.appendChild(quoteContainer);
+            
+            let currentIndex = 0;
+            
+            function displayNextQuote() {
+                quoteContainer.style.opacity = '0';
                 
-                // Fade in animation
                 setTimeout(() => {
-                quoteContainer.style.transition = "opacity 2s";
-                quoteContainer.style.opacity = 1;
-                }, 10);
+                    quoteContainer.textContent = `"${quotes[currentIndex]}"`;
+                    quoteContainer.style.opacity = '1';
+                    
+                    currentIndex = (currentIndex + 1) % quotes.length;
+                }, 1000);
             }
-            }
+            
+            // Initial display
+            displayNextQuote();
+            
+            // Rotate quotes every 15 seconds
+            setInterval(displayNextQuote, 15000);
+        }
 
-            function createQuantumParticle() {
-            const particle = document.createElement('div');
-            particle.className = 'quantum-particle';
-            
-            // Random position, size and opacity
-            const size = Math.random() * 3 + 1;
-            particle.style.width = `${size}px`;
-            particle.style.height = `${size}px`;
-            particle.style.left = `${Math.random() * 100}vw`;
-            particle.style.top = `${Math.random() * 100}vh`;
-            particle.style.opacity = Math.random() * 0.5 + 0.1;
-            
-            // Add to document
-            document.body.appendChild(particle);
-            
-            // Animate
-            setTimeout(() => {
-                particle.style.transform = `translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px)`;
-                particle.style.opacity = 0;
-                
-                // Remove after animation
-                setTimeout(() => particle.remove(), 10000);
-            }, 10);
-            
-            // Create new particles at interval - make sure we don't have too many
-            if (document.querySelectorAll('.quantum-particle').length < 50) {
-                setTimeout(createQuantumParticle, 200);
-            }
-            }
-            </script>
+        // Apply quantum styling to buttons
+        function enhanceButtons() {
+            const buttons = document.querySelectorAll('.button');
+            buttons.forEach(button => {
+                if (!button.classList.contains('pagination-button')) {
+                    button.classList.add('quantum-button');
+                }
+            });
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', function() {
+            createQuantumParticles();
+            setupSaganQuotes();
+            enhanceButtons();
+        });
+        </script>
         </body>
     </html>
