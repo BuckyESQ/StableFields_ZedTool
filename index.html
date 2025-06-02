@@ -7753,5 +7753,93 @@ function handleAddRace(event) {
             <script src="zed-auth.js"></script>
             <script src="zed-api.js"></script>
             <script src="zed-auth-ui.js"></script>
+
+        <!-- Quantum Cosmos Effect -->
+        <script>
+        // Sagan quotes to display randomly
+        const saganQuotes = [
+            "The cosmos is within us. We are made of star-stuff.",
+            "Somewhere, something incredible is waiting to be known.",
+            "We are a way for the cosmos to know itself.",
+            "The nitrogen in our DNA, the calcium in our teeth, the iron in our blood were made in the interiors of collapsing stars.",
+            "We are like butterflies who flutter for a day and think it is forever."
+        ];
+
+        // Create quantum particles
+        function createQuantumParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'quantum-particle';
+            
+            // Random position, size and opacity
+            const size = Math.random() * 3 + 1;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.left = `${Math.random() * 100}vw`;
+            particle.style.top = `${Math.random() * 100}vh`;
+            particle.style.opacity = Math.random() * 0.5 + 0.1;
+        
+        // Add to document
+        document.body.appendChild(particle);
+        
+        // Animate
+        setTimeout(() => {
+            particle.style.transform = `translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px)`;
+            particle.style.opacity = 0;
+            
+            // Remove after animation
+            setTimeout(() => particle.remove(), 10000);
+        }, 10);
+        
+        // Create new particles at interval
+        if (document.querySelectorAll('.quantum-particle').length < 50) {
+            setTimeout(createQuantumParticle, 200);
+        }
+        }
+
+        function displayRandomSaganQuote() {
+            const quoteContainer = document.getElementById('sagan-quote');
+            if (quoteContainer) {
+                const randomIndex = Math.floor(Math.random() * saganQuotes.length);
+                quoteContainer.textContent = saganQuotes[randomIndex];
+                quoteContainer.style.animation = 'fadeIn 2s';
+            }
+        }
+
+        // Initialize cosmic effects when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Create quote container if it doesn't exist
+            if (!document.getElementById('sagan-quote')) {
+                const quoteDiv = document.createElement('div');
+                quoteDiv.id = 'sagan-quote';
+                quoteDiv.className = 'sagan-quote';
+                document.body.appendChild(quoteDiv);
+            }
+        
+        // Start displaying quotes
+        displayRandomSaganQuote();
+        setInterval(displayRandomSaganQuote, 120000); // Change every 2 minutes
+        
+        // Start creating particles
+        for (let i = 0; i < 20; i++) {
+            setTimeout(createQuantumParticle, i * 100);
+        }
+        
+        // Convert some buttons to quantum buttons
+        document.querySelectorAll('.button').forEach(btn => {
+            // Only convert main action buttons, not all buttons
+            if (!btn.classList.contains('action-button') && 
+                !btn.classList.contains('pagination-button')) {
+            btn.classList.add('quantum-button');
+            }
+        });
+        
+        // Update section titles
+        const analysisTitles = document.querySelectorAll('#tab-content-analysis h2');
+        if (analysisTitles.length > 0) {
+            analysisTitles[0].textContent = "Quantum Bloodline Performance Analysis";
+            if (analysisTitles[1]) analysisTitles[1].textContent = "Quantum Augment Intelligence Center";
+        }
+      });
+        </script>
     </body>
     </html>
