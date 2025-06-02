@@ -1,9 +1,22 @@
+const API_TIMEOUT_DURATION = 15000; // Timeout duration in milliseconds
+
 class ZedApiService {
   constructor() {
     this.isProduction = window.location.hostname.includes('stablefields.com');
-    this.apiBase = 'https://api.zedchampions.com';
     this.authManager = window.zedAuth;
-    // ◀️ enable proxy in dev, disable in prod
+    
+    // Use environment-based URL
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      // Local development
+      this.apiBaseUrl = 'http://localhost:3000/zed';
+      this.apiBase = 'http://localhost:3000/zed'; // For compatibility
+    } else {
+      // Production - Using Vercel deployment
+      this.apiBaseUrl = 'https://zed-champions-proxy.vercel.app/api/zed'; // Replace with your actual Vercel app
+      this.apiBase = 'https://zed-champions-proxy.vercel.app/api/zed'; // For compatibility
+    }
+    
+    // Enable proxy in dev, disable in prod
     this.useProxy = !this.isProduction;
     console.log(`Running in ${this.isProduction ? 'production' : 'development'} mode; proxy ${this.useProxy ? 'ON' : 'OFF'}`);
   }
@@ -107,58 +120,9 @@ class ZedApiService {
             return { success: false, message: `Error: ${error.message}` };
         }
     }
-    /**
-     * Fetch from the ZED Champions API with authorization
-     */
-    async fetchFromApi(endpoint, method = 'GET', data = null) {
-        if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
-
-        // build the URL only once
-        let url;
-        if (this.useProxy) {
-            // proxy lives at http://localhost:3000/zed
-            url = `http://localhost:3000/zed${endpoint}`;
-        } else {
-            url = `${this.apiBase}${endpoint}`;
-        }
-
-        console.log("Attempting API request to:", url);
-        const token = this.authManager.getToken();
-        const options = {
-            method,
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            mode: 'cors'
-        };
-        if (data) options.body = JSON.stringify(data);
-
-        // timeout support
-        const controller = new AbortController();
-        options.signal = controller.signal;
-        const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-        try {
-            const response = await fetch(url, options);
-            clearTimeout(timeoutId);
-            return response;
-        } catch (err) {
-            clearTimeout(timeoutId);
-            if (this.fallbackApiBase) {
-                console.log("Main API failed, trying fallback…");
-                return fetch(`${this.fallbackApiBase}${endpoint}`, options);
-            }
-            throw err;
-        }
-    } catch (err) {
-        console.error(`Network request failed for ${endpoint}`, err);
-        throw new Error(`Network request failed: ${err.message}`);
-    }
+    // Note: The duplicate fetchFromApi method was removed as it's already defined above
 }
-    /**
-     * ZED Champions Auth Token UI Components
-     */
+
 class ZedAuthUI {
         constructor() {
             this.apiService = window.zedApi;
