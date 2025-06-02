@@ -19,6 +19,9 @@ Thumbs.db
 # Application Backups
 zed_tracker_backup_*.json
 
+# Dependencies
+/node_modules/
+
 # Editor directories and files
 .idea
 .vscode
@@ -29,4 +32,3 @@ zed_tracker_backup_*.json
 *.sw?
 
 # Ignore JSON backup files
-*.json 
