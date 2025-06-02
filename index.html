@@ -2323,50 +2323,66 @@
                 </div>
             </div>
 
-            <!-- Import Tab Content -->
-            <div id="tab-content-import" class="tab-content">
-                <div class="section">
-                    <h2>Import from ZedChampions</h2>
-                    <p>Import your horses directly from your ZedChampions account.</p>
-            <!-- ZedAuthUI will render here -->
-                        </div>
-                        <div id="api-import-container"></div>
-                        <div id="zed-auth-ui">
-                            <h3>Authentication</h3>
-                            <p>Connect to the ZedChampions API to import your horses.</p>
-                            
-                            <div style="margin: 20px 0;">
-                                <label for="zed-api-token" style="display: block; margin-bottom: 8px;">Enter your ZedChampions API token:</label>
-                                <input type="text" id="zed-api-token" style="width: 100%; max-width: 500px; padding: 8px; margin-bottom: 10px;" placeholder="Paste your API token here">
-                                <button id="save-api-token" class="button" onclick="saveApiToken()">Save Token</button>
-                                <div id="api-connection-status" style="display: none; margin-top: 10px; padding: 10px;"></div>
-                            </div>
-                            
-                            <div style="margin: 20px 0;">
-                                <p>Don't have an API token? <a href="https://zedchampions.com/account" target="_blank">Get one from ZedChampions</a></p>
-                            </div>
-                        </div>
-
-                        <div class="section" style="margin-top: 15px;">
-                            <h3>Import Single Horse</h3>
-                            <div style="display: flex; gap: 10px; align-items: flex-end; margin-bottom: 15px;">
-                                <div>
-                                    <label for="zed-horse-id" style="display: block; margin-bottom: 5px;">ZED Horse ID:</label>
-                                    <input type="text" id="zed-horse-id" style="width: 120px; padding: 8px;" placeholder="Enter ID">
+                       <!-- Replace your existing Import Tab Content with this cleaned-up version -->
+                        <div id="tab-content-import" class="tab-content">
+                            <div class="section">
+                                <h2>Import from ZedChampions</h2>
+                                <p>Import your horses directly from your ZedChampions account.</p>
+                                
+                                <!-- ZedAuthUI Container -->
+                                <div id="zed-auth-ui">
+                                    <h3>Authentication</h3>
+                                    <p>Connect to the ZedChampions API to import your horses.</p>
+                                    
+                                    <div style="margin: 20px 0;">
+                                        <label for="zed-api-token" style="display: block; margin-bottom: 8px;">Enter your ZedChampions API token:</label>
+                                        <input type="text" id="zed-api-token" style="width: 100%; max-width: 500px; padding: 8px; margin-bottom: 10px;" placeholder="Paste your API token here">
+                                        <button id="save-api-token" class="button quantum-button">Save Token</button>
+                                        <div id="api-connection-status" style="display: none; margin-top: 10px; padding: 10px;"></div>
+                                    </div>
+                                    
+                                    <div style="margin: 20px 0;">
+                                        <p>Don't have an API token? <a href="https://zedchampions.com/account" target="_blank">Get one from ZedChampions</a></p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label for="import-horse-type" style="display: block; margin-bottom: 5px;">Import As:</label>
-                                    <select id="import-horse-type" style="padding: 8px;">
-                                        <option value="racing">Racing Horse</option>
-                                        <option value="breeding">Breeding Horse</option>
-                                    </select>
-                                </div>
-                                <button class="button" onclick="importSingleHorse()">Import Horse</button>
-                            </div>
-                            <div id="single-import-status" style="display: none; margin-top: 10px;"></div>
-                        </div>
-                        
 
+                                <!-- API Import Container -->
+                                <div id="api-import-container"></div>
+                            </div>
+                                
+                            <div class="section" style="margin-top: 15px;">
+                                <h3>Import Single Horse</h3>
+                                <div style="display: flex; gap: 10px; align-items: flex-end; margin-bottom: 15px;">
+                                    <div>
+                                        <label for="zed-horse-id" style="display: block; margin-bottom: 5px;">ZED Horse ID:</label>
+                                        <input type="text" id="zed-horse-id" style="width: 120px; padding: 8px;" placeholder="Enter ID">
+                                    </div>
+                                    <div>
+                                        <label for="import-horse-type" style="display: block; margin-bottom: 5px;">Import As:</label>
+                                        <select id="import-horse-type" style="padding: 8px;">
+                                            <option value="racing">Racing Horse</option>
+                                            <option value="breeding">Breeding Horse</option>
+                                        </select>
+                                    </div>
+                                    <button class="button quantum-button" onclick="importSingleHorse()">Import Horse</button>
+                                </div>
+                                <div id="single-import-status" style="display: none; margin-top: 10px;"></div>
+                            </div>
+                                
+                            <div class="section" style="margin-top: 15px;">
+                                <button id="import-racing-button" class="button quantum-button" onclick="importRacingStable()">
+                                    Import Racing Stable
+                                </button>
+                                <div id="racing-import-status" style="display:none; margin-top:8px;"></div>
+                            </div>
+                                
+                            <div class="section" style="margin-top: 15px;">
+                                <button id="import-breeding-button" class="button quantum-button" onclick="importBreedingStable()">
+                                    Import Breeding Stable
+                                </button>
+                                <div id="breeding-import-status" style="display:none; margin-top:8px;"></div>
+                            </div>
+                        </div>
                         <script>
                         // Event listener for API token buttons
                         document.addEventListener('DOMContentLoaded', function() {
@@ -7756,7 +7772,7 @@ function handleAddRace(event) {
 
         <!-- Quantum Cosmos Effect -->
         <script>
-        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function() {
             // Clean up any duplicate elements that might have been created previously
             document.querySelectorAll('.quantum-particle').forEach(el => el.remove());
             if (document.getElementById('sagan-quote')) document.getElementById('sagan-quote').remove();
@@ -7773,7 +7789,7 @@ function handleAddRace(event) {
                 btn.classList.add('quantum-button');
                 }
             });
-        
+            
             // Start quote rotation
             displayRandomSaganQuote();
             setInterval(displayRandomSaganQuote, 120000);
@@ -7781,34 +7797,34 @@ function handleAddRace(event) {
             // Create initial set of particles
             for (let i = 0; i < 30; i++) {
                 setTimeout(() => createQuantumParticle(), i * 100);
-        }
-        });
+            }
+            });
 
-        // Make sure our functions are globally available
-        function displayRandomSaganQuote() {
-        const quotes = [
-            "The cosmos is within us. We are made of star-stuff.",
-            "Somewhere, something incredible is waiting to be known.",
-            "We are a way for the cosmos to know itself.",
-            "The nitrogen in our DNA, the calcium in our teeth, the iron in our blood were made in the interiors of collapsing stars.",
-            "We are like butterflies who flutter for a day and think it is forever."
-        ];
-        
-        const quoteContainer = document.getElementById('sagan-quote');
-        if (quoteContainer) {
-            const randomIndex = Math.floor(Math.random() * quotes.length);
-            quoteContainer.textContent = quotes[randomIndex];
-            quoteContainer.style.opacity = 0;
+            // Make sure our functions are globally available
+            function displayRandomSaganQuote() {
+            const quotes = [
+                "The cosmos is within us. We are made of star-stuff.",
+                "Somewhere, something incredible is waiting to be known.",
+                "We are a way for the cosmos to know itself.",
+                "The nitrogen in our DNA, the calcium in our teeth, the iron in our blood were made in the interiors of collapsing stars.",
+                "We are like butterflies who flutter for a day and think it is forever."
+            ];
             
-            // Fade in animation
-            setTimeout(() => {
-            quoteContainer.style.transition = "opacity 2s";
-            quoteContainer.style.opacity = 1;
-            }, 10);
-        }
-    }
+            const quoteContainer = document.getElementById('sagan-quote');
+            if (quoteContainer) {
+                const randomIndex = Math.floor(Math.random() * quotes.length);
+                quoteContainer.textContent = quotes[randomIndex];
+                quoteContainer.style.opacity = 0;
+                
+                // Fade in animation
+                setTimeout(() => {
+                quoteContainer.style.transition = "opacity 2s";
+                quoteContainer.style.opacity = 1;
+                }, 10);
+            }
+            }
 
-        function createQuantumParticle() {
+            function createQuantumParticle() {
             const particle = document.createElement('div');
             particle.className = 'quantum-particle';
             
@@ -7836,7 +7852,7 @@ function handleAddRace(event) {
             if (document.querySelectorAll('.quantum-particle').length < 50) {
                 setTimeout(createQuantumParticle, 200);
             }
-        }
-        </script>
+            }
+            </script>
         </body>
     </html>
