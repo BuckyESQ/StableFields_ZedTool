@@ -13,22 +13,20 @@ class ZedAuthManager {
      * Parses JWT token to extract payload
      */
     parseJwt(token) {
+        if (!token) return null;
         try {
-            // Remove Bearer prefix if present
-            if (token.startsWith('Bearer ')) {
-                token = token.substring(7);
-            }
-            
             const base64Url = token.split('.')[1];
+            if (!base64Url) return null; // Add this null check
+            
             const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
             const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
             }).join(''));
-
+            
             return JSON.parse(jsonPayload);
-        } catch (e) {
-            console.error('Error parsing JWT:', e);
-            throw e;
+        } catch (error) {
+            console.error("Error parsing JWT:", error);
+            return null;
         }
     }
     /**
@@ -83,32 +81,19 @@ class ZedAuthManager {
     /**
      * Checks if the token is expired
      */
-    isTokenExpired() {
-        if (!this.getToken()) return true;
-        
+    // Update the isTokenExpired method:
+    isTokenExpired(token) {
+        if (!token) return true; // Consider empty tokens as expired
+
         try {
-            const token = this.getToken();
-            const payload = this.parseJwt(token);
+            const decodedToken = this.parseJwt(token);
+            if (!decodedToken || !decodedToken.exp) return true;
             
-            // Get expiry from payload (exp is in seconds since epoch)
-            const expiryTime = payload.exp * 1000; // Convert to milliseconds
-            const now = Date.now();
-            
-            // Store expiry time for reference
-            localStorage.setItem(this.tokenExpiryKey, new Date(expiryTime).toISOString());
-            
-            console.log('Token expiry check:', {
-                now: new Date(now).toISOString(),
-                expiryTime: new Date(expiryTime).toISOString(),
-                timeLeft: Math.round((expiryTime - now) / (60 * 1000)) + ' minutes',
-                expired: now >= expiryTime
-            });
-            
-            // Simple check: is current time past expiration? (removed buffer)
-            return now >= expiryTime;
-        } catch (e) {
-            console.error('Error checking token expiration:', e);
-            return true; // Assume expired on error
+            const currentTime = Math.floor(Date.now() / 1000);
+            return decodedToken.exp < currentTime;
+        } catch (error) {
+            console.error("Error checking token expiration:", error);
+            return true; // Consider tokens with parsing errors as expired
         }
     }
     /**

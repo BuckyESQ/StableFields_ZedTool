@@ -7,13 +7,14 @@ class ZedApiService {
     
     // Use environment-based URL
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      // Local development
-      this.apiBaseUrl = 'http://localhost:3000/zed';
-      this.apiBase = 'http://localhost:3000/zed'; // For compatibility
-    } else {
-      // Production - Using Vercel deployment
-      this.apiBaseUrl = 'https://vercel.com/david-a-prado-srs-projects/v0-new-project-yuprzjsy9ei'; // Replace with your actual Vercel app
-      this.apiBase = 'https://zed-champions-proxy.vercel.app/api/zed'; // For compatibility
+        // Local development
+        this.apiBaseUrl = 'http://localhost:3000/zed';
+        this.apiBase = 'http://localhost:3000/zed'; // For compatibility
+    }   else {
+        // Production - Using Vercel deployment
+        // Replace with your actual deployed Vercel function URL
+        this.apiBaseUrl = 'https://zed-champions-proxy.vercel.app/api/zed';
+        this.apiBase = 'https://zed-champions-proxy.vercel.app/api/zed';
     }
 
     // Enable proxy in dev, disable in prod
