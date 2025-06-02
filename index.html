@@ -2326,52 +2326,64 @@
                 </div>
             </div>
 
-                       <!-- Replace your existing Import Tab Content with this cleaned-up version -->
-                        <div id="tab-content-import" class="tab-content">
-                            <div class="section">
-                                <h2>Import from ZedChampions</h2>
-                                <p>Import your horses directly from your ZedChampions account.</p>
+            <!-- Replace your existing Import Tab Content with this cleaned-up version -->
+            <div id="tab-content-import" class="tab-content">
+                 <div class="section">
+                    <h2>Import from ZedChampions</h2>
+                    <p>Import your horses directly from your ZedChampions account.</p>
                                 
-                                <!-- ZedAuthUI Container -->
-                                <div id="zed-auth-ui">
-                                    <h3>Authentication</h3>
-                                    <p>Connect to the ZedChampions API to import your horses.</p>
-                                    
-                                    <div style="margin: 20px 0;">
-                                        <label for="zed-api-token" style="display: block; margin-bottom: 8px;">Enter your ZedChampions API token:</label>
-                                        <input type="text" id="zed-api-token" style="width: 100%; max-width: 500px; padding: 8px; margin-bottom: 10px;" placeholder="Paste your API token here">
-                                        <button id="save-api-token" class="button quantum-button">Save Token</button>
-                                        <div id="api-connection-status" style="display: none; margin-top: 10px; padding: 10px;"></div>
-                                    </div>
-                                    
-                                    <div style="margin: 20px 0;">
-                                        <p>Don't have an API token? <a href="https://zedchampions.com/account" target="_blank">Get one from ZedChampions</a></p>
-                                    </div>
-                                </div>
+            <!-- ZedAuthUI Container -->
+            <div id="zed-auth-ui">
+                <h3>Authentication</h3>
+                <p>Connect to the ZedChampions API to import your horses.</p>
+                
+                <div style="margin: 20px 0;">
+                    <label for="zed-api-token" style="display: block; margin-bottom: 8px;">Enter your ZedChampions API token:</label>
+                    <input type="text" id="zed-api-token" style="width: 100%; max-width: 500px; padding: 8px; margin-bottom: 10px;" placeholder="Paste your API token here">
+                    <button id="save-api-token" class="button quantum-button">Save Token</button>
+                    <div id="api-connection-status" style="display: none; margin-top: 10px; padding: 10px;"></div>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <p>Don't have an API token? <a href="https://zedchampions.com/account" target="_blank">Get one from ZedChampions</a></p>
+                </div>
+            </div>    
 
-                                <!-- API Import Container -->
-                                <div id="api-import-container"></div>
-                            </div>
-                                
-                            <div class="section" style="margin-top: 15px;">
-                                <h3>Import Single Horse</h3>
-                                <div style="display: flex; gap: 10px; align-items: flex-end; margin-bottom: 15px;">
-                                    <div>
-                                        <label for="zed-horse-id" style="display: block; margin-bottom: 5px;">ZED Horse ID:</label>
-                                        <input type="text" id="zed-horse-id" style="width: 120px; padding: 8px;" placeholder="Enter ID">
-                                    </div>
-                                    <div>
-                                        <label for="import-horse-type" style="display: block; margin-bottom: 5px;">Import As:</label>
-                                        <select id="import-horse-type" style="padding: 8px;">
-                                            <option value="racing">Racing Horse</option>
-                                            <option value="breeding">Breeding Horse</option>
-                                        </select>
-                                    </div>
-                                    <button class="button quantum-button" onclick="importSingleHorse()">Import Horse</button>
+                        <!-- API Import Container -->
+                        <div id="api-import-container" class="section" style="margin-top: 15px;">
+                            <h3>Import Racing Horses</h3>
+                            <p>Import all horses from your racing stable.</p>
+                            <button id="import-racing-button" class="button quantum-button" onclick="importRacingStable()">
+                                Import Racing Stable
+                            </button>
+                            <div id="racing-import-status" style="display:none; margin-top:8px;"></div>
+                            
+                            <h3 style="margin-top: 20px;">Import Breeding Horses</h3>
+                            <p>Import all horses from your breeding stable.</p>
+                            <button id="import-breeding-button" class="button quantum-button" onclick="importBreedingStable()">
+                                Import Breeding Stable
+                            </button>
+                            <div id="breeding-import-status" style="display:none; margin-top:8px;"></div>
+                            
+                            <h3 style="margin-top: 20px;">Import Single Horse</h3>
+                            <div style="display: flex; gap: 10px; align-items: flex-end; margin-bottom: 15px;">
+                                <div>
+                                    <label for="zed-horse-id" style="display: block; margin-bottom: 5px;">ZED Horse ID:</label>
+                                    <input type="text" id="zed-horse-id" style="width: 120px; padding: 8px;" placeholder="Enter ID">
                                 </div>
-                                <div id="single-import-status" style="display: none; margin-top: 10px;"></div>
+                                <div>
+                                    <label for="import-horse-type" style="display: block; margin-bottom: 5px;">Import As:</label>
+                                    <select id="import-horse-type" style="padding: 8px;">
+                                        <option value="racing">Racing Horse</option>
+                                        <option value="breeding">Breeding Horse</option>
+                                    </select>
+                                </div>
+                                <button class="button quantum-button" onclick="importSingleHorse()">Import Horse</button>
                             </div>
-                                
+                            <div id="single-import-status" style="display: none; margin-top: 10px;"></div>
+                        </div>
+                    </div>
+                </div>      
                             <div class="section" style="margin-top: 15px;">
                                 <button id="import-racing-button" class="button quantum-button" onclick="importRacingStable()">
                                     Import Racing Stable
