@@ -2327,63 +2327,64 @@
             </div>
 
             <!-- Replace your existing Import Tab Content with this cleaned-up version -->
+            <!-- Replace the entire Import Tab Content with this clean version -->
             <div id="tab-content-import" class="tab-content">
-                 <div class="section">
+                <div class="section">
                     <h2>Import from ZedChampions</h2>
                     <p>Import your horses directly from your ZedChampions account.</p>
-                                
-            <!-- ZedAuthUI Container -->
-            <div id="zed-auth-ui">
-                <h3>Authentication</h3>
-                <p>Connect to the ZedChampions API to import your horses.</p>
-                
-                <div style="margin: 20px 0;">
-                    <label for="zed-api-token" style="display: block; margin-bottom: 8px;">Enter your ZedChampions API token:</label>
-                    <input type="text" id="zed-api-token" style="width: 100%; max-width: 500px; padding: 8px; margin-bottom: 10px;" placeholder="Paste your API token here">
-                    <button id="save-api-token" class="button quantum-button">Save Token</button>
-                    <div id="api-connection-status" style="display: none; margin-top: 10px; padding: 10px;"></div>
-                </div>
-                
-                <div style="margin: 20px 0;">
-                    <p>Don't have an API token? <a href="https://zedchampions.com/account" target="_blank">Get one from ZedChampions</a></p>
-                </div>
-            </div>    
-
-                        <!-- API Import Container -->
-                        <div id="api-import-container" class="section" style="margin-top: 15px;">
-                            <h3>Import Racing Horses</h3>
-                            <p>Import all horses from your racing stable.</p>
-                            <button id="import-racing-button" class="button quantum-button" onclick="importRacingStable()">
-                                Import Racing Stable
-                            </button>
-                            <div id="racing-import-status" style="display:none; margin-top:8px;"></div>
-                            
-                            <h3 style="margin-top: 20px;">Import Breeding Horses</h3>
-                            <p>Import all horses from your breeding stable.</p>
-                            <button id="import-breeding-button" class="button quantum-button" onclick="importBreedingStable()">
-                                Import Breeding Stable
-                            </button>
-                            <div id="breeding-import-status" style="display:none; margin-top:8px;"></div>
-                            
-                            <h3 style="margin-top: 20px;">Import Single Horse</h3>
-                            <div style="display: flex; gap: 10px; align-items: flex-end; margin-bottom: 15px;">
-                                <div>
-                                    <label for="zed-horse-id" style="display: block; margin-bottom: 5px;">ZED Horse ID:</label>
-                                    <input type="text" id="zed-horse-id" style="width: 120px; padding: 8px;" placeholder="Enter ID">
-                                </div>
-                                <div>
-                                    <label for="import-horse-type" style="display: block; margin-bottom: 5px;">Import As:</label>
-                                    <select id="import-horse-type" style="padding: 8px;">
-                                        <option value="racing">Racing Horse</option>
-                                        <option value="breeding">Breeding Horse</option>
-                                    </select>
-                                </div>
-                                <button class="button quantum-button" onclick="importSingleHorse()">Import Horse</button>
-                            </div>
-                            <div id="single-import-status" style="display: none; margin-top: 10px;"></div>
+                    
+                    <!-- ZedAuthUI Container -->
+                    <div id="zed-auth-ui">
+                        <h3>Authentication</h3>
+                        <p>Connect to the ZedChampions API to import your horses.</p>
+                        
+                        <div style="margin: 20px 0;">
+                            <label for="zed-api-token" style="display: block; margin-bottom: 8px;">Enter your ZedChampions API token:</label>
+                            <input type="text" id="zed-api-token" style="width: 100%; max-width: 500px; padding: 8px; margin-bottom: 10px;" placeholder="Paste your API token here">
+                            <button id="save-api-token" class="button quantum-button">Save Token</button>
+                            <div id="api-connection-status" style="display: none; margin-top: 10px; padding: 10px;"></div>
+                        </div>
+                        
+                        <div style="margin: 20px 0;">
+                            <p>Don't have an API token? <a href="https://zedchampions.com/account" target="_blank">Get one from ZedChampions</a></p>
                         </div>
                     </div>
-                </div>      
+
+                    <!-- API Import Container -->
+                    <div id="api-import-container" style="margin-top: 15px;">
+                        <h3>Import Racing Horses</h3>
+                        <p>Import all horses from your racing stable.</p>
+                        <button id="import-racing-button" class="button quantum-button" onclick="importRacingStable()">
+                            Import Racing Stable
+                        </button>
+                        <div id="racing-import-status" style="display:none; margin-top:8px;"></div>
+                        
+                        <h3 style="margin-top: 20px;">Import Breeding Horses</h3>
+                        <p>Import all horses from your breeding stable.</p>
+                        <button id="import-breeding-button" class="button quantum-button" onclick="importBreedingStable()">
+                            Import Breeding Stable
+                        </button>
+                        <div id="breeding-import-status" style="display:none; margin-top:8px;"></div>
+                        
+                        <h3 style="margin-top: 20px;">Import Single Horse</h3>
+                        <div style="display: flex; gap: 10px; align-items: flex-end; margin-bottom: 15px;">
+                            <div>
+                                <label for="zed-horse-id" style="display: block; margin-bottom: 5px;">ZED Horse ID:</label>
+                                <input type="text" id="zed-horse-id" style="width: 120px; padding: 8px;" placeholder="Enter ID">
+                            </div>
+                            <div>
+                                <label for="import-horse-type" style="display: block; margin-bottom: 5px;">Import As:</label>
+                                <select id="import-horse-type" style="padding: 8px;">
+                                    <option value="racing">Racing Horse</option>
+                                    <option value="breeding">Breeding Horse</option>
+                                </select>
+                            </div>
+                            <button class="button quantum-button" onclick="importSingleHorse()">Import Horse</button>
+                        </div>
+                        <div id="single-import-status" style="display: none; margin-top: 10px;"></div>
+                    </div>
+                </div>
+            </div>     
                             <div class="section" style="margin-top: 15px;">
                                 <button id="import-racing-button" class="button quantum-button" onclick="importRacingStable()">
                                     Import Racing Stable
@@ -7787,105 +7788,22 @@ function handleAddRace(event) {
 
         <!-- Quantum Cosmos Effect -->
         <script>
-        // Quantum Particles Animation
-        function createQuantumParticles() {
-            const maxParticles = 50;
-            const body = document.querySelector('body');
-            
-            for (let i = 0; i < maxParticles; i++) {
-                setTimeout(() => {
-                    const particle = document.createElement('div');
-                    particle.className = 'quantum-particle';
-                    
-                    // Random size between 2-5px
-                    const size = Math.random() * 3 + 2;
-                    particle.style.width = `${size}px`;
-                    particle.style.height = `${size}px`;
-                    
-                    // Random position on screen
-                    const posX = Math.random() * window.innerWidth;
-                    const posY = Math.random() * window.innerHeight;
-                    particle.style.left = `${posX}px`;
-                    particle.style.top = `${posY}px`;
-                    
-                    // Random opacity
-                    particle.style.opacity = Math.random() * 0.5 + 0.2;
-                    
-                    // Add to DOM
-                    body.appendChild(particle);
-                    
-                    // Animate movement
-                    setTimeout(() => {
-                        const moveX = (Math.random() - 0.5) * 150;
-                        const moveY = (Math.random() - 0.5) * 150;
-                        particle.style.transform = `translate(${moveX}px, ${moveY}px)`;
-                        particle.style.opacity = '0';
-                    }, 100);
-                    
-                    // Clean up
-                    setTimeout(() => {
-                        body.removeChild(particle);
-                        // Create a new particle to replace this one
-                        if (document.querySelectorAll('.quantum-particle').length < maxParticles) {
-                            createQuantumParticles(1);
-                        }
-                    }, 10000);
-                }, i * 200); // Stagger creation
-            }
-        }
-
-        // Carl Sagan Quotes Rotation
-        function setupSaganQuotes() {
-            const quotes = [
-                "We are made of star stuff.",
-                "The cosmos is within us.",
-                "Somewhere, something incredible is waiting to be known.",
-                "We are a way for the cosmos to know itself.",
-                "The universe seems neither benign nor hostile, merely indifferent.",
-                "Imagination will often carry us to worlds that never were.",
-                "The absence of evidence is not the evidence of absence."
-            ];
-            
-            const body = document.querySelector('body');
-            const quoteContainer = document.createElement('div');
-            quoteContainer.className = 'sagan-quote';
-            body.appendChild(quoteContainer);
-            
-            let currentIndex = 0;
-            
-            function displayNextQuote() {
-                quoteContainer.style.opacity = '0';
-                
-                setTimeout(() => {
-                    quoteContainer.textContent = `"${quotes[currentIndex]}"`;
-                    quoteContainer.style.opacity = '1';
-                    
-                    currentIndex = (currentIndex + 1) % quotes.length;
-                }, 1000);
-            }
-            
-            // Initial display
-            displayNextQuote();
-            
-            // Rotate quotes every 15 seconds
-            setInterval(displayNextQuote, 15000);
-        }
-
-        // Apply quantum styling to buttons
-        function enhanceButtons() {
-            const buttons = document.querySelectorAll('.button');
-            buttons.forEach(button => {
-                if (!button.classList.contains('pagination-button')) {
-                    button.classList.add('quantum-button');
-                }
-            });
-        }
-
-        // Initialize everything
+        // Event listener for API token buttons
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize quantum effects ONCE
             createQuantumParticles();
             setupSaganQuotes();
             enhanceButtons();
+            
+            // Check for existing token
+            if (ZED_API.loadAuthToken()) {
+                document.getElementById('zed-api-token').value = "••••••••••••••••••••" + 
+                                                            (ZED_API.authToken ? ZED_API.authToken.substring(ZED_API.authToken.length - 6) : "");
+                testApiConnection();
+            }
+            
+            // Add listeners (moved here to ensure elements exist)
+            document.getElementById('save-api-token').addEventListener('click', saveApiToken);
         });
         </script>
     </body>
