@@ -2801,10 +2801,10 @@
             `${f.prefix}-bloodline`,
             f.color, f.traits, f.attrs
         ));
-        
+                
         // Foal Prediction Algorithm - Insert after forms array, before onBloodlineChange function
 
-        function calculateStars(sireStars, damStars) {
+    function calculateStars(sireStars, damStars) {
         // Get values as numbers, defaulting to 0 if not provided
         const sireVal = parseFloat(sireStars) || 0;
         const damVal = parseFloat(damStars) || 0;
@@ -2969,7 +2969,7 @@
                             'Authorization': `Bearer ${this.authToken}`,
                             'Content-Type': 'application/json'
                         }
-                    });
+                    }); // Ensure this matches an opening block or statement
                     
                     if (response.ok) {
                         const data = await response.json();
@@ -3654,7 +3654,10 @@
             
             ZED_API.loadAuthToken();
 
-            console.log("Tracker Initialized.");
+            // Tracker initialization message for debugging
+            if (process.env.NODE_ENV !== 'production') {
+                console.log("Tracker Initialized.");
+            }
         });
         // --- End Initialization ---
         
@@ -5058,8 +5061,13 @@ function handleAddRace(event) {
                 const enduranceStarsInput = document.getElementById('bred-endurance-stars');
                 const dateInput = document.getElementById('bred-date');
 
-                // ...rest of your function unchanged...
-            // ...existing code...
+                // Get parent select elements
+                const sireSelect = document.getElementById('bred-sire');
+                const damSelect = document.getElementById('bred-dam');
+                const useExternalSireCheckbox = document.getElementById('use-external-sire');
+                const externalSireFields = document.querySelectorAll('.external-sire-field');
+                const sireStatsDiv = document.getElementById('sire-stats');
+                const damStatsDiv = document.getElementById('dam-stats');
 
             const parseFloatOptional = (value) => value ? parseFloat(value) : null;
 
@@ -6903,9 +6911,9 @@ function handleAddRace(event) {
                     const importedData = JSON.parse(e.target.result);
                     
                     // Basic validation - check for required data
-                    if (!importedData.horses || !Array.isArray(importedData.horses) ||
-                        !importedData.races || !Array.isArray(importedData.races)) {
-                        throw new Error("Invalid backup file: Missing required data");
+                    if (!importedData.horses || !Array.isArray(importedData.horses)) {
+                        alert("Invalid data format in the import file.");
+                        return;
                     }
                     
                     // Import data
@@ -7120,7 +7128,7 @@ function handleAddRace(event) {
                 const index = studAuctions.findIndex(sa => sa.id === currentlyEditingStudAuction.id);
                 if (index !== -1) {
                     studAuctions[index] = {
-                        ...currentlyEditingStudAuction,
+                        id: currentlyEditingStudAuction.id,
                         horseId: horseId,
                         horseName: horse.name,
                         auctionPrice: auctionPrice,
@@ -7141,7 +7149,6 @@ function handleAddRace(event) {
                 
                 studAuctions.push(newRecord);
             }
-            
             // Update totals, save data, and refresh UI
             saveData();
             renderStudAuctionTable();
@@ -7296,7 +7303,7 @@ function handleAddRace(event) {
                 saveData();
                 renderStudAuctionTable();
                 updateOverallStats();
-                console.log("Stud auction record deleted:", auctionId);
+                console.log("Stud auction deleted:", auctionId);
             }
         }
 
@@ -7304,7 +7311,8 @@ function handleAddRace(event) {
         function populateManualStudFeeDropdown() {
             const dropdown = document.getElementById('manual-stud-fee-bred-horse');
             if (!dropdown) return;
-            
+            }
+
             // Clear existing options except first one
             while (dropdown.options.length > 1) {
                 dropdown.remove(1);
@@ -7494,7 +7502,10 @@ function handleAddRace(event) {
        
         <script>
         // Global Error Handler
-        window.onerror = function(message, source, lineno, colno, error) {
+       window.onerror = function(message, source, lineno, colno, error) {
+        console.error("Error occurred:", {message, source, lineno, colno, error});
+        return false; // Let default error handler run as well
+    };
             // Filter out third-party errors
             if (source && !source.includes(window.location.host)) {
                 console.log("Ignoring third-party error:", message);
