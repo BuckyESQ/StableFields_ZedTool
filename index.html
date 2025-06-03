@@ -8010,6 +8010,170 @@
 
             console.log("Tracker Initialized.");
         });
+
+        // 6. Global Error Handler and System Status Monitor
+        window.addEventListener('error', function(event) {
+            console.error("Global error:", event.error);
+            
+            // Don't show error messages for script load failures (likely CORS issues)
+            if (event.filename && (
+                event.filename.includes('script.googleusercontent.com') || 
+                event.filename.includes('connect.facebook.net') ||
+                event.filename.includes('cdn.')
+            )) {
+                console.warn("Ignoring third-party script error:", event.filename);
+                return;
+            }
+
+            // Check if we've shown too many errors recently to prevent spam
+            const now = Date.now();
+            const errorHistory = window._errorHistory || [];
+            window._errorHistory = errorHistory;
+
+            // Keep only errors from last 10 seconds
+            const recentErrors = errorHistory.filter(time => (now - time) < 10000);
+            window._errorHistory = [...recentErrors, now];
+
+            // Limit to 3 errors in 10 seconds
+            if (window._errorHistory.length <= 3) {
+                showSystemError(error);
+            }
+        });
+
+        // System error notification
+        function showSystemError(error) {
+            const errorNotification = document.createElement('div');
+            errorNotification.className = 'system-error-notification';
+            
+            // Apply styles inline to ensure they work
+            errorNotification.style.position = 'fixed';
+            errorNotification.style.bottom = '20px';
+            errorNotification.style.left = '20px';
+            errorNotification.style.backgroundColor = 'rgba(244, 67, 54, 0.9)';
+            errorNotification.style.color = 'white';
+            errorNotification.style.padding = '15px';
+            errorNotification.style.borderRadius = '5px';
+            errorNotification.style.zIndex = '9999';
+            errorNotification.style.maxWidth = '400px';
+            errorNotification.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+            
+            const errorMsg = error.message || 'Unknown error';
+            const errorStack = error.stack ? error.stack.split('\n').slice(0,2).join('\n') : '';
+            
+            errorNotification.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <strong style="margin-right: 15px;">System Error:</strong>
+                    <span style="cursor: pointer;" onclick="this.parentElement.parentElement.remove()">×</span>
+                </div>
+                <p style="margin: 5px 0 10px;">${errorMsg}</p>
+                <details>
+                    <summary style="cursor: pointer; color: #ffcdd2;">Technical details</summary>
+                    <pre style="margin-top: 10px; font-size: 11px; white-space: pre-wrap; color: #ffcdd2;">${errorStack}</pre>
+                </details>
+                <div style="margin-top: 10px; font-size: 12px;">
+                    Try refreshing the page. If the problem persists, exporting your data as backup is recommended.
+                </div>
+            `;
+            
+            document.body.appendChild(errorNotification);
+            
+            // Auto-remove after 20 seconds
+            setTimeout(() => {
+                if (document.body.contains(errorNotification)) {
+                    errorNotification.remove();
+                }
+            }, 20000);
+        }
+
+        // System health monitoring
+        function monitorSystemHealth() {
+            const healthStats = {
+                horsesCount: horses.length,
+                racesCount: races.length,
+                bredHorsesCount: bredHorses.length,
+                studAuctionsCount: studAuctions ? studAuctions.length : 0,
+                transactionsCount: transactions ? transactions.length : 0,
+                storageUsage: calculateStorageUsage(),
+                hasLocalStorageError: false,
+                memoryWarning: false
+            };
+            
+            // Check localStorage availability
+            try {
+                localStorage.setItem('zedHealthCheck', '1');
+                localStorage.removeItem('zedHealthCheck');
+            } catch (e) {
+                healthStats.hasLocalStorageError = true;
+                console.error("localStorage test failed:", e);
+            }
+            
+            // Check for memory warning signs
+            if (horses.length > 1000 || races.length > 5000) {
+                healthStats.memoryWarning = true;
+                console.warn("Large data detected, performance may be affected");
+            }
+            
+            // Alert user if storage is almost full or other critical issues
+            if (healthStats.storageUsage > 0.8 || healthStats.hasLocalStorageError) {
+                showStorageWarning(healthStats);
+            }
+            
+            return healthStats;
+        }
+
+        function calculateStorageUsage() {
+            try {
+                const totalBytes = 
+                    JSON.stringify(horses).length +
+                    JSON.stringify(races).length +
+                    JSON.stringify(bredHorses).length +
+                    JSON.stringify(studAuctions || []).length +
+                    JSON.stringify(transactions || []).length +
+                    JSON.stringify(cpuAugments || []).length +
+                    JSON.stringify(ramAugments || []).length +
+                    JSON.stringify(hydraulicAugments || []).length;
+                    
+                // Estimate localStorage quota (typically 5MB)
+                const estimatedQuota = 5 * 1024 * 1024;
+                return totalBytes / estimatedQuota;
+            } catch (e) {
+                console.error("Error calculating storage usage:", e);
+                return 0;
+            }
+        }
+
+        function showStorageWarning(stats) {
+            if (document.getElementById('storage-warning')) {
+                // Warning already shown
+                return;
+            }
+            
+            const warningEl = document.createElement('div');
+            warningEl.id = 'storage-warning';
+            warningEl.style.backgroundColor = 'rgba(255, 152, 0, 0.1)';
+            warningEl.style.borderLeft = '4px solid #FF9800';
+            warningEl.style.padding = '15px';
+            warningEl.style.margin = '15px 0';
+            warningEl.style.borderRadius = '4px';
+            
+            const usagePercent = Math.round(stats.storageUsage * 100);
+            const message = stats.hasLocalStorageError
+                ? `<strong>Storage Error:</strong> There was a problem accessing browser storage. Your changes may not be saved.`
+                : `<strong>Storage Warning:</strong> Your data is using approximately ${usagePercent}% of available storage. Please back up your data and consider removing old races.`;
+            
+            warningEl.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>${message}</div>
+                    <button onclick="this.parentElement.parentElement.remove()" 
+                        style="background: none; border: none; font-size: 18px; cursor: pointer;">×</button>
+                </div>
+                <div style="margin-top: 10px;">
+                    <button onclick="activateTab('data-management')" class="button" 
+                        style="background-color: #FF9800; font-size: 0.9em; padding: 6px 12px;">
+                        Go to Data Management
+                    </button>
+                </div>
+            `;
         </script>
     </body>
 </html>
