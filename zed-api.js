@@ -1,26 +1,44 @@
-const API_TIMEOUT_DURATION = 15000; // Timeout duration in milliseconds
+        class ZedApiService {
+        constructor() {
+            this.authManager = window.zedAuth;
+            const host = window.location.hostname;
+            const dev = host === 'localhost' || host === '127.0.0.1';
+            this.useProxy = !host.includes('stablefields.com');
+            this.apiBase = dev
+            ? 'http://localhost:3000/zed'
+            : 'https://your-vercel-deployment-url/api/zed';
+        }
 
-class ZedApiService {
-  constructor() {
-    this.isProduction = window.location.hostname.includes('stablefields.com');
-    this.authManager = window.zedAuth;
-    
-    // Use environment-based URL
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        // Local development
-        this.apiBaseUrl = 'http://localhost:3000/zed';
-        this.apiBase = 'http://localhost:3000/zed'; // For compatibility
-    }   else {
-        // Production - Using Vercel deployment
-        // Replace with your actual deployed Vercel function URL
-        this.apiBaseUrl = 'https://zed-champions-proxy.vercel.app/api/zed';
-        this.apiBase = 'https://zed-champions-proxy.vercel.app/api/zed';
-    }
+        async fetchFromApi(path, method = 'GET', body = null) {
+            if (!path.startsWith('/')) path = '/' + path;
+            const url = `${this.apiBase}${path}`;
+            console.log('→ API request:', url);
 
-    // Enable proxy in dev, disable in prod
-    this.useProxy = !this.isProduction;
-    console.log(`Running in ${this.isProduction ? 'production' : 'development'} mode; proxy ${this.useProxy ? 'ON' : 'OFF'}`);
-  }
+            const token = this.authManager.getToken();
+            const opts = {
+            method,
+            headers: { 
+                Authorization: `Bearer ${token}`, 
+                'Content-Type': 'application/json' 
+            },
+            mode: 'cors'
+            };
+            if (body) opts.body = JSON.stringify(body);
+
+            const controller = new AbortController();
+            opts.signal = controller.signal;
+            setTimeout(() => controller.abort(), API_TIMEOUT_DURATION);
+
+            try {
+            return await fetch(url, opts);
+            } catch (err) {
+            if (this.useProxy) {
+                console.warn('Proxy failed, retrying direct…');
+                return fetch(url, opts);
+            }
+            throw err;
+            }
+        }
 
   /**
    * Core fetch that switches between proxy and direct API,
