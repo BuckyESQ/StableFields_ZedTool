@@ -7793,10 +7793,8 @@ function handleAddRace(event) {
             
             return modalContainer;
         }
-
-        // Replace the existing DOMContentLoaded listener with one that uses the initialization function
-        document.addEventListener('DOMContentLoaded', function() {
             initializeApplication();
+            fixApiConnectionHandling();
         });
         </script>
 
