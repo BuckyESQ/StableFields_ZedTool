@@ -2720,41 +2720,107 @@
         // Helper function to show import status
         // Fix 3: Fix the showImportStatus function - this is causing status messages to fail
         function showImportStatus(element, message, isSuccess) {
-            // Handle both cases where element is a DOM element or a string selector
-            let statusElement;
-            if (typeof element === 'string') {
-                statusElement = document.getElementById(element);
-            } else {
-                statusElement = element;
-            }
-            
-            if (!statusElement) {
-                console.error("Import status element not found:", element);
-                return;
-            }
-            
-            statusElement.style.display = 'block';
-            statusElement.textContent = message;
-            
-            if (isSuccess === true) {
-                statusElement.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
-                statusElement.style.color = '#4CAF50';
-                statusElement.style.padding = '8px 12px';
-                statusElement.style.borderRadius = '4px';
-            } else if (isSuccess === false) {
-                statusElement.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
-                statusElement.style.color = '#F44336';
-                statusElement.style.padding = '8px 12px';
-                statusElement.style.borderRadius = '4px';
-            } else {
-                statusElement.style.backgroundColor = 'rgba(33, 150, 243, 0.2)';
-                statusElement.style.color = '#2196F3';
-                statusElement.style.padding = '8px 12px';
-                statusElement.style.borderRadius = '4px';
+            try {
+                // Handle both cases where element is a DOM element or a string selector
+                let statusElement;
+                
+                if (typeof element === 'string') {
+                    statusElement = document.getElementById(element);
+                    if (!statusElement) {
+                        console.warn(`Import status element not found with ID: ${element}`);
+                        // Try to create a fallback element
+                        statusElement = document.createElement('div');
+                        statusElement.id = element;
+                        
+                        // Try to append to import container
+                        const importContainer = document.getElementById('api-import-container') || 
+                                            document.getElementById('tab-content-import') ||
+                                            document.body;
+                        importContainer.appendChild(statusElement);
+                    }
+                } else if (element instanceof Element) {
+                    statusElement = element;
+                } else {
+                    console.error("Invalid element provided to showImportStatus:", element);
+                    // Create a floating notification as fallback
+                    statusElement = document.createElement('div');
+                    statusElement.style.position = 'fixed';
+                    statusElement.style.top = '20px';
+                    statusElement.style.right = '20px';
+                    statusElement.style.zIndex = '1000';
+                    document.body.appendChild(statusElement);
+                    
+                    // Remove after 10 seconds
+                    setTimeout(() => {
+                        if (document.body.contains(statusElement)) {
+                            statusElement.remove();
+                        }
+                    }, 10000);
+                }
+                
+                // Set content and styling
+                statusElement.style.display = 'block';
+                statusElement.innerHTML = message; // Use innerHTML to allow formatted messages
+                
+                // Apply appropriate styling based on status
+                if (isSuccess === true) {
+                    statusElement.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                    statusElement.style.color = '#4CAF50';
+                    statusElement.style.padding = '12px 15px';
+                    statusElement.style.borderRadius = '4px';
+                    statusElement.style.border = '1px solid rgba(76, 175, 80, 0.5)';
+                } else if (isSuccess === false) {
+                    statusElement.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
+                    statusElement.style.color = '#F44336';
+                    statusElement.style.padding = '12px 15px';
+                    statusElement.style.borderRadius = '4px';
+                    statusElement.style.border = '1px solid rgba(244, 67, 54, 0.5)';
+                    
+                    // Add troubleshooting info for errors
+                    if (message.includes("API") || message.includes("token") || message.includes("authentication")) {
+                        statusElement.innerHTML += `
+                            <div style="margin-top: 8px; font-size: 0.9em;">
+                                <strong>Troubleshooting:</strong>
+                                <ul style="margin-top: 4px; padding-left: 20px;">
+                                    <li>Check your internet connection</li>
+                                    <li>Make sure your API token is correct and valid</li>
+                                    <li>API tokens expire after 24 hours - you may need a new one</li>
+                                </ul>
+                            </div>
+                        `;
+                    } else if (message.includes("import") || message.includes("data")) {
+                        statusElement.innerHTML += `
+                            <div style="margin-top: 8px; font-size: 0.9em;">
+                                <strong>Troubleshooting:</strong>
+                                <ul style="margin-top: 4px; padding-left: 20px;">
+                                    <li>Try refreshing the page</li>
+                                    <li>Check the browser console for detailed errors</li>
+                                </ul>
+                            </div>
+                        `;
+                    }
+                } else {
+                    statusElement.style.backgroundColor = 'rgba(33, 150, 243, 0.2)';
+                    statusElement.style.color = '#2196F3';
+                    statusElement.style.padding = '12px 15px';
+                    statusElement.style.borderRadius = '4px';
+                    statusElement.style.border = '1px solid rgba(33, 150, 243, 0.5)';
+                }
+                
+                // Log also to console
+                const logMethod = isSuccess === false ? console.error : 
+                                (isSuccess === true ? console.log : console.info);
+                logMethod(`Import status: ${message.replace(/<[^>]*>/g, '')}`); // Strip HTML tags for console
+                
+                return statusElement; // Return for possible chaining
+            } catch (error) {
+                // Last resort fallback if even the status display fails
+                console.error("Error displaying import status:", error, message);
+                alert(`Import status: ${message}\n\nError displaying status: ${error.message}`);
             }
         }
             // --- REPLACE the entire ZED_API and all duplicate fetchHorse/searchHorses definitions with this block ---
-            
+ 
             const ZED_API = {
                 authToken: null,
                 tokenExpiry: null,
