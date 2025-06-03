@@ -6,7 +6,7 @@
   "rewrites": [
     {
       "source": "/api/zed/:path*",
-      "destination": "/api/zed"
+      "destination": "https://api.zedchampions.com/v1/:path*"
     }
   ],
   "headers": [
