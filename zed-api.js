@@ -1,14 +1,18 @@
-        class ZedApiService {
+    class ZedApiService {
         constructor() {
             this.authManager = window.zedAuth;
             const host = window.location.hostname;
-            const dev = host === 'localhost' || host === '127.0.0.1';
-            this.useProxy = !host.includes('stablefields.com');
-            this.apiBase = dev
+            const isDev = host === 'localhost' || host === '127.0.0.1';
+
+            // only proxy when developing locally
+            this.apiBase = isDev
             ? 'http://localhost:3000/zed'
-            : 'https://your-vercel-deployment-url/api/zed';
+            : '/api/zed';
         }
 
+        /**
+         * Core fetch that applies Bearer token, handles timeout and optional dev-proxy.
+         */
         async fetchFromApi(path, method = 'GET', body = null) {
             if (!path.startsWith('/')) path = '/' + path;
             const url = `${this.apiBase}${path}`;
@@ -16,29 +20,34 @@
 
             const token = this.authManager.getToken();
             const opts = {
-            method,
-            headers: { 
-                Authorization: `Bearer ${token}`, 
-                'Content-Type': 'application/json' 
-            },
-            mode: 'cors'
+                method,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                mode: 'cors'
             };
             if (body) opts.body = JSON.stringify(body);
 
             const controller = new AbortController();
             opts.signal = controller.signal;
-            setTimeout(() => controller.abort(), API_TIMEOUT_DURATION);
+            const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_DURATION);
 
             try {
-            return await fetch(url, opts);
+                const resp = await fetch(url, opts);
+                clearTimeout(timeoutId);
+                return resp;
             } catch (err) {
-            if (this.useProxy) {
-                console.warn('Proxy failed, retrying direct…');
-                return fetch(url, opts);
+                clearTimeout(timeoutId);
+                // on dev only: fallback to direct if proxy fails
+                if (this.apiBase.includes('localhost:3000')) {
+                    console.warn('Dev proxy failed, retrying direct…');
+                    return fetch(`https://api.zedchampions.com/v1${path}`, opts);
+                }
+                console.error(`Network request failed for ${path}:`, err);
+                throw err;
             }
-            throw err;
-            }
-        }
+        }      
 
   /**
    * Core fetch that switches between proxy and direct API,
