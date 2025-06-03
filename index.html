@@ -3205,8 +3205,8 @@
                     console.error("Import error:", error);
                     showImportStatus(statusElement, `Error importing horses: ${error.message}`, false);
                 });
-        }
-            // Check API token
+           
+                // Check API token
             if (!ZED_API.authToken) {
                 showImportStatus(statusElement, 'No API token set. Please set your ZedChampions API token first.', false);
                 return;
@@ -3343,7 +3343,7 @@
                         resultDiv.style.animation = "fadeIn 0.5s ease-in-out";
                     });
                 }
-            };
+            
                 // Unified function for handling bloodline changes
                 function onBloodlineChange(bloodlineId, colorId, traitsId, attrsId) {
                     const bloodEl = document.getElementById(bloodlineId);
@@ -3607,30 +3607,7 @@
             modalStatsContent = document.getElementById('modal-stats-content');
             modalAnalysisContent = document.getElementById('modal-analysis-content');
 
-            // Add event listeners for bloodline changes on all forms
-            forms.forEach(f => {
-                const el = document.getElementById(`${f.prefix}-bloodline`);
-                if (el) {
-                    el.addEventListener('change', () => onBloodlineChange(
-                        `${f.prefix}-bloodline`,
-                        f.color, f.traits, f.attrs
-                    ));
-                }
-            }); // <-- This closes the forEach!
-
-            // Initialize color/traits/attributes for all forms
-            forms.forEach(f => onBloodlineChange(
-                `${f.prefix}-bloodline`,
-                f.color, f.traits, f.attrs
-            ));
-
-            // Initialize color/traits/attributes for all forms
-            forms.forEach(f => onBloodlineChange(
-                `${f.prefix}-bloodline`,
-                f.color, f.traits, f.attrs
-            ));
-
-            // Main initialization
+                        // Main initialization
             loadData(); // Load data FIRST
             populateAugmentDropdowns();
             populateAugmentAnalysisHorseFilter();
@@ -3658,7 +3635,7 @@
             if (process.env.NODE_ENV !== 'production') {
                 console.log("Tracker Initialized.");
             }
-        });
+        
         // --- End Initialization ---
         
         // --- Data Storage (localStorage) ---
@@ -7311,7 +7288,6 @@ function handleAddRace(event) {
         function populateManualStudFeeDropdown() {
             const dropdown = document.getElementById('manual-stud-fee-bred-horse');
             if (!dropdown) return;
-            }
 
             // Clear existing options except first one
             while (dropdown.options.length > 1) {
@@ -7580,8 +7556,7 @@ function handleAddRace(event) {
             console.error("Application error:", message, source, lineno, colno, error);
             
             return true; // Prevent default browser error handling
-        };
-
+        
         // System Health Monitoring
         function checkSystemHealth() {
             try {
