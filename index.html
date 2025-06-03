@@ -7624,6 +7624,8 @@ function handleAddRace(event) {
                 // Phase 5: System Health Check
                 console.log("Phase 5: Checking system health...");
                 checkSystemHealth();
+                ZED_API.loadAuthToken();       // make sure your saved token is imported
+                setupEventListeners();         // attaches tab clicks, form submits, import buttons, etc.
 
                 // Set periodic health checks (clear existing one if any)
                 if (window._healthCheckInterval) {
@@ -7633,7 +7635,8 @@ function handleAddRace(event) {
 
                 console.log("Application initialization complete!");
                 return true;
-            } catch (error) {
+            } 
+                catch (error) {
 
                 // Critical failure in initialization
                 console.error("Critical initialization failure:", error);
